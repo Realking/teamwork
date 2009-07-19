@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="mod/teamwork/db" VERSION="20090719" COMMENT="XMLDB file for Moodle mod/teamwork"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="teamwork" COMMENT="tabla principal del modulo teamwork, donde se guardan las instancias del mismo" NEXT="teamwork_teams">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="course"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Course newmodule activity belongs to" PREVIOUS="id" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="name field for moodle instances" PREVIOUS="course" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" ENUM="false" PREVIOUS="name" NEXT="startsends"/>
+        <FIELD NAME="startsends" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="fecha de inicio de los envios de trabajos" PREVIOUS="description" NEXT="endsends"/>
+
+        <FIELD NAME="endsends" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="fecha final de la recepción de trabajos" PREVIOUS="startsends" NEXT="startevals"/>
+        <FIELD NAME="startevals" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="fecha de inicio de las evaluaciones" PREVIOUS="endsends" NEXT="endevals"/>
+        <FIELD NAME="endevals" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="fecha final de las evaluaciones" PREVIOUS="startevals" NEXT="wggrading"/>
+        <FIELD NAME="wggrading" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Indica el peso de la puntuación obtenida del analisis de las evaluaciones que yo hago al resto sobre mi calificación final. Cumple el objetivo de evaluar mi forma de evaluar a los demás." PREVIOUS="endevals" NEXT="wgteam"/>
+        <FIELD NAME="wgteam" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Indica el peso de la calificaciones obtenidas por el equipo de las evaluaciones de sus compañeros sobre la nota final" PREVIOUS="wggrading" NEXT="wgteacher"/>
+        <FIELD NAME="wgteacher" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Contiene el peso de la evaluación del profesor sobre la nota final." PREVIOUS="wgteam" NEXT="wgintra"/>
+        <FIELD NAME="wgintra" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Contiene el peso que indica el porcentaje sobre el cual se va a aplicar el factor de corrección (nota de los alumnos a sus compañeros de equipo)" PREVIOUS="wgteacher" NEXT="bgteam"/>
+        <FIELD NAME="bgteam" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Contiene el numero de elementos de los extremos que deben omitirse en el computo de notas del equipo." PREVIOUS="wgintra" NEXT="bgintra"/>
+        <FIELD NAME="bgintra" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Contiene el numero de elementos de los extremos que deben omitirse en el computo de notas de la evaluaciones intra grupos." PREVIOUS="bgteam" NEXT="allowselecteval"/>
+
+        <FIELD NAME="allowselecteval" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Activa/desactiva la elección de evaluaciones por el alumno." PREVIOUS="bgintra" NEXT="selectevalmin"/>
+        <FIELD NAME="selectevalmin" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Número mínimo de evaluaciones que un alumno debe elegir." PREVIOUS="allowselecteval" NEXT="selectevalmax"/>
+        <FIELD NAME="selectevalmax" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Número máximo de evaluaciones que puede realizar un alumno" PREVIOUS="selectevalmin" NEXT="selectteammax"/>
+        <FIELD NAME="selectteammax" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Numero máximo de alumnos que pueden evaluar este trabajo en la libre elección." PREVIOUS="selectevalmax"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+
+        <INDEX NAME="course" UNIQUE="false" FIELDS="course"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="teamwork_teams" COMMENT="Equipos que participan en la actividad" PREVIOUS="teamwork" NEXT="teamwork_users_teams">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="teamworkid"/>
+        <FIELD NAME="teamworkid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id de la instancia de teamwork a la que pertenece el equipo" PREVIOUS="id" NEXT="teamname"/>
+        <FIELD NAME="teamname" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Nombre del equipo dado por el profesor" PREVIOUS="teamworkid" NEXT="teamleader"/>
+        <FIELD NAME="teamleader" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id del alumno que es el líder del grupo (el que envía el trabajo)" PREVIOUS="teamname" NEXT="workdescription"/>
+
+        <FIELD NAME="workdescription" TYPE="text" LENGTH="big" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Contenido en modo texto del trabajo enviado por el grupo." PREVIOUS="teamleader" NEXT="worktime"/>
+        <FIELD NAME="worktime" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Fecha de envío/modificación del trabajo" PREVIOUS="workdescription"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="teamworkid"/>
+        <KEY NAME="teamworkid" TYPE="foreign" FIELDS="teamworkid" REFTABLE="teamwork" REFFIELDS="id" PREVIOUS="primary" NEXT="teamleader"/>
+        <KEY NAME="teamleader" TYPE="foreign" FIELDS="teamleader" REFTABLE="user" REFFIELDS="id" PREVIOUS="teamworkid"/>
+      </KEYS>
+    </TABLE>
+
+    <TABLE NAME="teamwork_users_teams" COMMENT="Asociación de usuarios a los grupos" PREVIOUS="teamwork_teams" NEXT="teamwork_evals">
+      <FIELDS>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id del usuario" NEXT="teamid"/>
+        <FIELD NAME="teamid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="id del grupo donde meter al usuario" PREVIOUS="userid"/>
+      </FIELDS>
+    </TABLE>
+    <TABLE NAME="teamwork_evals" COMMENT="Contiene para cada usuario evaluado un registro por cada evaluación que le emiten sus compañeros de equipo, en la evaluación intra grupos." PREVIOUS="teamwork_users_teams" NEXT="teamwork_eval_items">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="userevaluated"/>
+
+        <FIELD NAME="userevaluated" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="id de usuario que recibe la valoración" PREVIOUS="id" NEXT="teamevaluated"/>
+        <FIELD NAME="teamevaluated" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="id del equipo que recibe la evaluación" PREVIOUS="userevaluated" NEXT="evaluator"/>
+        <FIELD NAME="evaluator" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="id de usuario que emite la evaluación" PREVIOUS="teamevaluated" NEXT="grade"/>
+        <FIELD NAME="grade" TYPE="number" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" DECIMALS="2" COMMENT="Nota media que obtiene el evaluado del usuario evaluador tras el proceso de evaluación." PREVIOUS="evaluator" NEXT="timegraded"/>
+        <FIELD NAME="timegraded" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="timestamp de la fecha en que el alumno realiza la evaluación" PREVIOUS="grade" NEXT="timecreated"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="timestamp de la fecha en que se crea la evaluación" PREVIOUS="timegraded"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="evaluator"/>
+
+        <KEY NAME="evaluator" TYPE="foreign" FIELDS="evaluator" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary" NEXT="userevaluated"/>
+        <KEY NAME="userevaluated" TYPE="foreign" FIELDS="userevaluated" REFTABLE="user" REFFIELDS="id" PREVIOUS="evaluator" NEXT="teamevaluated"/>
+        <KEY NAME="teamevaluated" TYPE="foreign" FIELDS="teamevaluated" REFTABLE="teamwork_teams" REFFIELDS="id" PREVIOUS="userevaluated"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="teamwork_eval_items" COMMENT="Valoración de cada item en la evaluación intra grupos" PREVIOUS="teamwork_evals" NEXT="teamwork_items">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="userevalsid"/>
+        <FIELD NAME="userevalsid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id de la evaluación (teamwork_evals) a la que la evaluación de este item hace referencia" PREVIOUS="id" NEXT="evalid"/>
+
+        <FIELD NAME="evalid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="id de la evaluación a la que pertenece la evaluación de este item" PREVIOUS="userevalsid" NEXT="itemid"/>
+        <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id del item que se está evaluando" PREVIOUS="evalid" NEXT="grade"/>
+        <FIELD NAME="grade" TYPE="number" LENGTH="4" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" DECIMALS="3" COMMENT="Nota en la evaluación de este criterio" PREVIOUS="itemid" NEXT="comments"/>
+        <FIELD NAME="comments" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Comentarios a la valoración" PREVIOUS="grade"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="evalid"/>
+        <KEY NAME="evalid" TYPE="foreign" FIELDS="evalid" REFTABLE="teamwork_evals" REFFIELDS="id" PREVIOUS="primary" NEXT="itemid"/>
+        <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="teamwork_items" REFFIELDS="id" PREVIOUS="evalid"/>
+
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="teamwork_items" COMMENT="Items de evaluación" PREVIOUS="teamwork_eval_items" NEXT="teamwork_rubrics">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="templateid"/>
+        <FIELD NAME="templateid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id del template al que pertenece este item de evaluación" PREVIOUS="id" NEXT="itemorder"/>
+        <FIELD NAME="itemorder" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Orden del item dentro de la lista de items que se muestra al usuario" PREVIOUS="templateid" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Explicación del item de evaluación en si mismo" PREVIOUS="itemorder" NEXT="scale"/>
+        <FIELD NAME="scale" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id de la escala de evaluación de moodle que usará para que el alumno value este item" PREVIOUS="description" NEXT="weight"/>
+
+        <FIELD NAME="weight" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Peso de este item sobre la nota de la evaluación" PREVIOUS="scale"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="templateid"/>
+        <KEY NAME="templateid" TYPE="foreign" FIELDS="templateid" REFTABLE="teamwork_templates" REFFIELDS="id" PREVIOUS="primary" NEXT="scale"/>
+        <KEY NAME="scale" TYPE="foreign" FIELDS="scale" REFTABLE="scale" REFFIELDS="id" PREVIOUS="templateid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="teamwork_rubrics" COMMENT="Rubricas" PREVIOUS="teamwork_items" NEXT="teamwork_templates">
+
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="itemid"/>
+        <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id del item al que hace referencia" PREVIOUS="id" NEXT="rubricorder"/>
+        <FIELD NAME="rubricorder" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Orden del elemento de la rubrica" PREVIOUS="itemid" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Texto de la rubrica en si" PREVIOUS="rubricorder"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="itemid"/>
+        <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="teamwork_items" REFFIELDS="id" PREVIOUS="primary"/>
+
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="teamwork_templates" COMMENT="Contiene un modelo de evaluación instanciable a un teamwork en el ámbito de un curso." PREVIOUS="teamwork_rubrics" NEXT="teamwork_tplinstances">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id del curso donde este template ha sido definido y puede ser usado" PREVIOUS="id" NEXT="teamworkid"/>
+        <FIELD NAME="teamworkid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="referencia al teamwork en el que se creó" PREVIOUS="courseid" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Nombre del template" PREVIOUS="teamworkid" NEXT="description"/>
+        <FIELD NAME="description" TYPE="text" LENGTH="medium" NOTNULL="false" SEQUENCE="false" ENUM="false" COMMENT="Descripción del template para un mayor explicación de objetivos" PREVIOUS="name"/>
+
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="courseid"/>
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" PREVIOUS="primary" NEXT="teamworkid"/>
+        <KEY NAME="teamworkid" TYPE="foreign" FIELDS="teamworkid" REFTABLE="teamwork" REFFIELDS="id" PREVIOUS="courseid"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="teamwork_tplinstances" COMMENT="Un registro por cada template asociado a un teamwork, indicando el tipo de evaluación al que se aplica." PREVIOUS="teamwork_templates">
+      <FIELDS>
+
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="templateid"/>
+        <FIELD NAME="templateid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id del template que se instancia" PREVIOUS="id" NEXT="teamworkid"/>
+        <FIELD NAME="teamworkid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id del teamwork donde se instancia" PREVIOUS="templateid" NEXT="evaltype"/>
+        <FIELD NAME="evaltype" TYPE="char" LENGTH="4" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Tipo de evaluacion: &quot;user&quot; o &quot;team&quot;" PREVIOUS="teamworkid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="templateid"/>
+        <KEY NAME="templateid" TYPE="foreign" FIELDS="templateid" REFTABLE="teamwork_templates" REFFIELDS="id" PREVIOUS="primary" NEXT="teamworkid"/>
+        <KEY NAME="teamworkid" TYPE="foreign" FIELDS="teamworkid" REFTABLE="teamwork" REFFIELDS="id" PREVIOUS="templateid"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+  <STATEMENTS>
+    <STATEMENT NAME="insert log_display" TYPE="insert" TABLE="log_display" COMMENT="Initial insert of records on table log_display. Each record describes how data will be showed by log reports.">
+      <SENTENCES>
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('teamwork', 'add', 'teamwork', 'name')" />
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('teamwork', 'update', 'teamwork', 'name')" />
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('teamwork', 'view', 'teamwork', 'name')" />
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('teamwork', 'submit', 'teamwork', 'name')" />
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('teamwork', 'assess user', 'teamwork', 'name')" />
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('teamwork', 'assess group', 'teamwork', 'name')" />
+        <SENTENCE TEXT="(module, action, mtable, field) VALUES ('teamwork', 'edit submit', 'teamwork', 'name')" />
+      </SENTENCES>
+    </STATEMENT>
+  </STATEMENTS>
+</XMLDB>
