@@ -21,7 +21,7 @@ $string['modulenameplural'] = 'teamworks';
 
 
 //
-/// usadas por nuestro módulo
+/// usadas por el módulo teamwork
 //
 
 
