@@ -15,8 +15,8 @@
 ///usadas por moodle y de obligada inclusión
 //
 
-$string['modulename'] = 'teamwork';
-$string['modulenameplural'] = 'teamworks';
+$string['modulename'] = 'Trabajo en Equipo';
+$string['modulenameplural'] = 'Trabajos en Equipo';
 
 
 
@@ -24,5 +24,23 @@ $string['modulenameplural'] = 'teamworks';
 /// usadas por el módulo teamwork
 //
 
+//en el formulario de creación/modificación de la actividad
+$string['description'] = 'Descripción';
+$string['timing'] = 'Temporización';
+$string['evaluation'] = 'Evaluación';
+$string['otheroptions'] = 'Otras opciones';
 
+$string['startsends'] = 'Inicio de los envíos';
+$string['endsends'] = 'Finalización de los envíos';
+$string['startevals'] = 'Inicio de las evaluaciones';
+$string['endevals'] = 'Finalización de las evaluaciones'; 
+$string['wggranding'] = 'Evaluación de evaluaciones';
+$string['wgteam'] = 'Evaluación del Equipo';
+$string['wgteacher'] = 'Evaluación del Profesor';
+$string['wgintra'] = 'Evaluación de los Compañeros';
+//$string['evaluationinfo'] = 'La suma de las 4 opciones debe ser 100';
+
+
+
+$string['deactivateeval'] = 'Desactivada';
 ?>
