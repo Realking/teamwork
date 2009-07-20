@@ -12,7 +12,7 @@
  */
 
 //versión del módulo
-$module->version  = 2007101509;
+$module->version  = 2009071900;
 
 //versión de moodle mínima para instalarse
 $module->requires = 2007101509;
