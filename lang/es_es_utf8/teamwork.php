@@ -26,21 +26,28 @@ $string['modulenameplural'] = 'Trabajos en Equipo';
 
 //en el formulario de creación/modificación de la actividad
 $string['description'] = 'Descripción';
-$string['timing'] = 'Temporización';
-$string['evaluation'] = 'Evaluación';
+$string['timing'] = 'Fechas';
+$string['evaluationweights'] = 'Pesos de las Calificaciones';
 $string['otheroptions'] = 'Otras opciones';
 
 $string['startsends'] = 'Inicio de los envíos';
 $string['endsends'] = 'Finalización de los envíos';
 $string['startevals'] = 'Inicio de las evaluaciones';
 $string['endevals'] = 'Finalización de las evaluaciones'; 
-$string['wggranding'] = 'Evaluación de evaluaciones';
-$string['wgteam'] = 'Evaluación del Equipo';
-$string['wgteacher'] = 'Evaluación del Profesor';
-$string['wgintra'] = 'Evaluación de los Compañeros';
+$string['wggranding'] = 'Calificación de las Calificaciones';
+$string['wgteam'] = 'Calificación de los Alumnos';
+$string['wgteacher'] = 'Calificación del Profesor';
+$string['wgintra'] = 'Calificación de Participación';
 //$string['evaluationinfo'] = 'La suma de las 4 opciones debe ser 100';
-
+$string['bgteam'] = 'Eliminar extremos en calificación del equipo';
+$string['bgintra'] = 'Eliminar extremos en calificación de participación';
+$string['allowselecteval'] = 'Permitir que los alumnos elijan los trabajos';
+$string['selectevalmin'] = 'Número mínimo de trabajos que un alumno debe calificar';
+$string['selectevalmax'] = 'Número máximo de trabajos que un alumno puede calificar';
+$string['selectteammax'] = 'Número máximo de veces que puede ser calificado un trabajo';
 
 
 $string['deactivateeval'] = 'Desactivada';
+$string['deactivateextremecut'] = 'No eliminar';
+$string['nolimit'] = 'Sin límite';
 ?>

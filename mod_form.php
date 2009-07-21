@@ -54,6 +54,7 @@ class mod_teamwork_mod_form extends moodleform_mod
         $mform->setType('description', PARAM_RAW);
         //boton de ayuda unico con tres opciones relacionadas con el editor html
         $mform->setHelpButton('description', array('writing', 'questions', 'richtext'), false, 'editorhelpbutton');
+		$mform->addRule('description', null, 'required', null, 'client');
         //-----------------------------------------------------------
 
         //------------------------- temporización -------------------------
@@ -79,8 +80,8 @@ class mod_teamwork_mod_form extends moodleform_mod
         //-----------------------------------------------------------------
 		
 		//------------------------- evaluación -------------------------
-		$mform->addElement('header', 'evaluacion', get_string('evaluation', 'teamwork'));
-		$mform->setHelpButton('evaluacion', array('evaluationsection', get_string('helpevaluationsection', 'teamwork'), 'teamwork'));
+		$mform->addElement('header', 'evaluationweights', get_string('evaluationweights', 'teamwork'));
+		$mform->setHelpButton('evaluationweights', array('evaluationweights', get_string('helpevaluationweights', 'teamwork'), 'teamwork'));
 		
 		$selectrange = array(0=>get_string('deactivateeval', 'teamwork')) + (array_combine(range(1, 100), range(1, 100)));
 		
@@ -101,35 +102,45 @@ class mod_teamwork_mod_form extends moodleform_mod
 		
 		//------------------------- otrasopciones -------------------------
 		$mform->addElement('header', 'otrasopciones', get_string('otheroptions', 'teamwork'));
+		
+		$selectrange = array(0=>get_string('deactivateextremecut', 'teamwork')) + (array_combine(range(1, 50), range(1, 50)));
+		
+		$mform->addElement('select', 'bgteam', get_string('bgteam', 'teamwork'), $selectrange);
+		$mform->setHelpButton('bgteam', array('bgteam', get_string('helpbgteam', 'teamwork'), 'teamwork'));
+		
+		$mform->addElement('select', 'bgintra', get_string('bgintra', 'teamwork'), $selectrange);
+		$mform->setHelpButton('bgintra', array('bgintra', get_string('helpbgintra', 'teamwork'), 'teamwork'));
+		
+		$selectrange = array(0=>get_string('no'), 1=>get_string('yes'));
+		
+		$mform->addElement('select', 'allowselecteval', get_string('allowselecteval', 'teamwork'), $selectrange);
+		$mform->setHelpButton('allowselecteval', array('allowselecteval', get_string('helpallowselecteval', 'teamwork'), 'teamwork'));
+		
+		$selectrange = array(0=>get_string('nolimit', 'teamwork')) + (array_combine(range(1, 50), range(1, 50)));
+		
+		$mform->addElement('select', 'selectevalmin', get_string('selectevalmin', 'teamwork'), $selectrange);
+		$mform->setHelpButton('selectevalmin', array('selectevalmin', get_string('helpselectevalmin', 'teamwork'), 'teamwork'));
+		$mform->disabledIf('selectevalmin', 'allowselecteval', 'eq', 0);
+		
+		$mform->addElement('select', 'selectevalmax', get_string('selectevalmax', 'teamwork'), $selectrange);
+		$mform->setHelpButton('selectevalmax', array('selectevalmax', get_string('helpselectevalmax', 'teamwork'), 'teamwork'));
+		$mform->disabledIf('selectevalmax', 'allowselecteval', 'eq', 0);
+		
+		$mform->addElement('select', 'selectteammax', get_string('selectteammax', 'teamwork'), $selectrange);
+		$mform->setHelpButton('selectteammax', array('selectteammax', get_string('helpselectteammax', 'teamwork'), 'teamwork'));
+		$mform->disabledIf('selectteammax', 'allowselecteval', 'eq', 0);
+		
 		//-----------------------------------------------------------------
 		
-		
-        //Crea el boton de ayuda para el elemento 'description' abriendo la página 'description' y de título la cadena i18n
-        //$mform->setHelpButton('description', array('mods', get_string('description', 'teamwork')), 'teamwork');
-
-        /*if (!$options = get_records_menu("survey", "template", 0, "name", "id, name")) {
-            error('No survey templates found!');
-        }
-
-        foreach ($options as $id => $name) {
-            $options[$id] = get_string($name, "survey");
-        }
-        $options = array(''=>get_string('choose').'...') + $options;
-        $mform->addElement('select', 'template', get_string("surveytype", "survey"), $options);
-        $mform->addRule('template', get_string('required'), 'required', null, 'client');
-        $mform->setHelpButton('template', array('surveys', get_string('helpsurveys', 'survey')));*/
-
-
-        
-
+		//------------------------- commonmodulesettings -------------------------
         $features = new stdClass;
         $features->groups = false;
         $features->groupings = true;
         $features->groupmembersonly = true;
         $this->standard_coursemodule_elements($features);
+		//------------------------------------------------------------------------
 
-//-------------------------------------------------------------------------------
-        // buttons
+        // botones de envío y cancelación
         $this->add_action_buttons();
     }
 }
