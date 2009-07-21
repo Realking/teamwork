@@ -46,8 +46,40 @@ $string['selectevalmin'] = 'Número mínimo de trabajos que un alumno debe calif
 $string['selectevalmax'] = 'Número máximo de trabajos que un alumno puede calificar';
 $string['selectteammax'] = 'Número máximo de veces que puede ser calificado un trabajo';
 
-
 $string['deactivateeval'] = 'Desactivada';
 $string['deactivateextremecut'] = 'No eliminar';
 $string['nolimit'] = 'Sin límite';
+
+
+//en la vista principal view.php
+$string['phase1'] = 'Esperando el inicio del envío de trabajos';
+$string['phase2'] = 'Envío de trabajos';
+$string['phase3'] = 'Esperando el inicio de la calificación de trabajos';
+$string['phase4'] = 'Calificación de trabajos';
+$string['phase5'] = 'Esperando las calificaciones finales';
+$string['phase6'] = 'Alumno calificado, fin de la actividad';
+$string['currentphase'] = 'Fase actual';
+$string['timebefore'] = 'faltan $a';
+$string['timeafter'] = '$a después';
+
+
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+
+
 ?>
