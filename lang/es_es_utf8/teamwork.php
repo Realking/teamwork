@@ -61,16 +61,17 @@ $string['phase6'] = 'Alumno calificado, fin de la actividad';
 $string['currentphase'] = 'Fase actual';
 $string['timebefore'] = 'faltan $a';
 $string['timeafter'] = '$a después';
+$string['youaremanager'] = 'Usted tiene permisos de gestión';
+$string['managetemplates'] = 'Gestionar las plantillas';
 
 
-$string[''] = '';
-$string[''] = '';
-$string[''] = '';
-$string[''] = '';
-$string[''] = '';
-$string[''] = '';
-$string[''] = '';
-$string[''] = '';
+//en el editor de templates template.php
+$string['templatesanditemseditor'] = 'Editor de plantillas e items de evaluación';
+$string['coursetemplateslisting'] = 'Listado de plantillas disponibles y asignadas';
+$string['notemplatesforthiscourse'] = 'No hay plantillas definidas a nivel de curso.';
+$string['Add?'] = '¿Añadir?';
+
+$string['sectionnotexist'] = 'La sección especificada no existe.';
 $string[''] = '';
 $string[''] = '';
 $string[''] = '';

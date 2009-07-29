@@ -57,9 +57,18 @@ add_to_log($course->id, 'teamwork', 'view', "view.php?id={$cm->id}", $teamwork->
 $ismanager = has_capability('mod/teamwork:manage', $cm->context);
 
 //si no es profesor y la actividad se encuentra oculta...
-if(!$ismanager AND !$cm->visible)
+//¡¡esta misma funcionalidad lo hace la funcion require_login
+//http://phpdocs.moodle.org/19/moodlecore/_lib---moodlelib.php.html#functionrequire_login
+/*if(!$ismanager AND !$cm->visible)
 {
 	notice(get_string("activityiscurrentlyhidden"));
+}*/
+
+//si es manager y no se tiene asociado alguno de los 2 templates de items necesarios...
+if($ismanager AND count_records('teamwork_tplinstances', 'teamworkid', $teamwork->id) < 2)
+{
+	//redirigimos a la página de edición de templates
+	//redirect("template.php?id=$cm->id");
 }
 
 //
@@ -79,7 +88,8 @@ print_header($pagetitle, $course->fullname, $navigation, '', '',
 echo '<div class="clearer"></div><br />';
 
 
-teamwork_show_status_info($teamwork);
+teamwork_show_status_info();
+
 
 
 
@@ -92,8 +102,14 @@ print_heading_block('balabl');
 print_headline('dsadas');
 print_side_block('titleeee', 'content');
 
+notify('mensaje de notificacion');
+notice_yesno('¿te has liado cual pata de un romano?', 'si.php', 'no.php');
+
+echo '$cm: ';
 var_dump($cm);
+echo '$course: ';
 var_dump($course);
+echo '$teamwork: ';
 var_dump($teamwork);
 
 print_footer($course);

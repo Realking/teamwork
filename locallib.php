@@ -13,11 +13,14 @@
 /**
  * Imprime la información de estado de la actividad que aparece en la vista general del módulo
  * 
- * @param object $teamwork datos de la instancia
+ * @global object $teamwork datos de la instancia
+ * @global object $cm contexto del módulo
  * @return void
  */
-function teamwork_show_status_info($teamwork)
+function teamwork_show_status_info()
 {
+	global $ismanager, $teamwork, $cm;
+	
 	//imprimir nombre
 	print_heading(format_string($teamwork->name));
 	
@@ -50,9 +53,17 @@ function teamwork_show_status_info($teamwork)
 				$strdifference = get_string('timebefore', 'teamwork', $strdifference);
 			}
 			
-            echo '<b>'.get_string($type, 'teamwork').'</b>: '.userdate($date)." ($strdifference)<br />";
+            echo '<b>'.get_string($type, 'teamwork').'</b>: '.userdate($date)." ($strdifference)<br />\n";
         }
     }
+	
+	//si es manager imprimimos aqui enlaces a la administración
+	if($ismanager)
+	{
+		echo "<br />\n";
+		
+		echo '<span class="highlight2">'.get_string('youaremanager', 'teamwork').':</span> <a href="template.php?id='.$cm->id.'">'.get_string('managetemplates', 'teamwork').'</a>';
+	}
 	
 	//cerrar caja
 	print_box_end();
