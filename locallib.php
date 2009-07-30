@@ -10,6 +10,7 @@
  * @license http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero GPL 3
  */
 
+require_once('../../lib/formslib.php');
 /**
  * Imprime la información de estado de la actividad que aparece en la vista general del módulo
  * 
@@ -62,7 +63,7 @@ function teamwork_show_status_info()
 	{
 		echo "<br />\n";
 		
-		echo '<span class="highlight2">'.get_string('youaremanager', 'teamwork').':</span> <a href="template.php?id='.$cm->id.'">'.get_string('managetemplates', 'teamwork').'</a>';
+		echo '<span class="highlight2">'.get_string('youaremanager', 'teamwork').':</span> <a href="template.php?id='.$cm->id.'">'.get_string('templatesanditemseditor', 'teamwork').'</a>';
 	}
 	
 	//cerrar caja
@@ -118,5 +119,51 @@ function teamwork_phase($teamwork, $numeric = false)
 	}
 	
 	return $message;
+}
+
+/**
+ * Clase para mostrar el formulario de editar (o añadir) un template
+ */
+class teamwork_templates_form extends moodleform
+{
+    /**
+     * Define el formulario
+     */
+    function definition()
+    {
+        global $CFG;
+        $mform =& $this->_form;
+
+        //marco del formulario
+        $mform->addElement('header', 'general', get_string('addtemplate', 'teamwork'));
+        $mform->setHelpButton('general', array('addtemplate', get_string('addtemplate', 'teamwork'), 'teamwork'));
+
+        //---> Nombre
+
+        //nombre de la plantilla
+        $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('name', PARAM_TEXT); //funcion definida en moodle/lib/formslib.php
+        } else {
+            $mform->setType('name', PARAM_CLEAN);
+        }
+
+        //regla de validacion (no puede estar vacio el campo)
+        $mform->addRule('name', null, 'required', null, 'server');
+
+        //---> Descripción
+
+        //añadir un textarea para la descripción de la actividad
+        $mform->addElement('htmleditor', 'description', get_string('description', 'teamwork'), 'wrap="virtual" rows="20" cols="75"');
+        //tipo RAW para mantener el HTML
+        $mform->setType('description', PARAM_RAW);
+        //boton de ayuda unico con tres opciones relacionadas con el editor html
+        $mform->setHelpButton('description', array('writing', 'questions', 'richtext'), false, 'editorhelpbutton');
+		$mform->addRule('description', null, 'required', null, 'server');
+
+
+        // botones de envío y cancelación
+        $this->add_action_buttons();
+    }
 }
 ?>

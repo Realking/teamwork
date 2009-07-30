@@ -64,9 +64,7 @@ require_capability('mod/teamwork:manage', $cm->context);
 $navigation = build_navigation(get_string('templatesanditemseditor', 'teamwork'), $cm);
 $pagetitle = strip_tags($course->shortname.': '.get_string('modulename', 'teamwork').': '.format_string($teamwork->name,true).': '.get_string('templatesanditemseditor', 'teamwork'));
 
-print_header($pagetitle, $course->fullname, $navigation, '', '',
-                     true, '',
-                     navmenu($course, $cm));
+print_header($pagetitle, $course->fullname, $navigation, '', '', true, '', navmenu($course, $cm));
 
 echo '<div class="clearer"></div><br />';
 
@@ -80,35 +78,19 @@ switch($section)
             //caso por defecto, mostrar la página principal de la gestión de templates
             default:
 
-                /*//obtener los templates definidos para esta instancia de teamwork
-                if(!$instanciedtpls = get_records('teamwork_tplinstances', 'teamworkid', $cm->instance))
-                {
-                    //construir la tabla
-                    $table = new stdClass;
-                    $table->head = array(get_string('templatesinuse', 'teamwork'));
-                    $table->align = array('center');
-                    $table->size = array('100%');
-                    $table->data[] = array(get_string('notemplateinthisinstance', 'teamwork'));
-                    $table->width = '70%';
-                    $table->tablealign = 'center';
-                    $table->id = 'mitabla';
-                    //imprimir la tabla
-                    print_table($table);
-                    echo '<br />';
-                }*/
-
                 //obtener los templates definidos en el curso
                 if(!$definedtpls = get_records('teamwork_templates', 'courseid', $course->id))
                 {
-                    //construir la tabla
+                    //si no hay, construir la tabla para mostrar mensaje de aviso
                     $table = new stdClass;
                     $table->head = array(get_string('coursetemplateslisting', 'teamwork'));
                     $table->align = array('center');
                     $table->size = array('100%');
-                    $table->data[] = array(get_string('notemplatesforthiscourse', 'teamwork').'<a href="template.php?id='.$cm->id.'&amp;section=templates&amp;action=add"> '.get_string('Add?', 'teamwork').'</a>');
+                    $table->data[] = array(get_string('notemplatesforthiscourse', 'teamwork').'<br /><br />'.print_single_button('template.php', array('id'=>$cm->id, 'section'=>'templates', 'action'=>'add'), get_string('createnewtemplate', 'teamwork'), 'get', '_self', true));
                     $table->width = '70%';
                     $table->tablealign = 'center';
-                    $table->id = 'mitabla';
+                    $table->id = 'notemplatesforthiscoursetable';
+                    
                     //imprimir la tabla
                     print_table($table);
                 }
@@ -118,7 +100,60 @@ switch($section)
 
     //gestion de las plantillas
     case 'templates':
-    
+        switch($action)
+        {
+            //muestra el formulario para añadir un template y en caso de POST lo guarda en la bbbdd
+            case 'add':
+                //cargamos el formulario
+                $form = new teamwork_templates_form('template.php?id='.$cm->id.'&section=templates&action=add');
+
+                //no se ha enviado, se muestra
+                if(!$form->is_submitted())
+                {
+                    //$form->set_data(array('name'=>'mi nombre'));
+                    $form->display();
+                }
+                //se ha enviado pero se ha cancelado, redirigir a página principal
+                elseif($form->is_cancelled())
+                {
+                    redirect('template.php?id='.$cm->id);
+                }
+                //se ha enviado y no valida el formulario...
+                elseif(!$form->is_validated())
+                {
+                    $form->display();
+                }
+                //se ha enviado y es válido, se procesa
+                else
+                {
+                    //obtenemos los datos del formulario
+                    $data = $form->get_data();
+                    $data->courseid = $teamwork->course;
+                    $data->teamworkid = $teamwork->id;
+
+                    //insertamos los datos en la base de datos
+                    $template_id = insert_record('teamwork_templates', $data);
+
+                    //mostramos mensaje
+                    echo '<p align="center">'.get_string('tpladded', 'teamwork').'</p>';
+                    print_continue('template.php?id='.$cm->id.'&section=items&tplid='.$template_id);
+                }
+                
+            break;
+
+            case 'modify':
+
+            break;
+
+            //muestra un aviso de que se va a borrar un template y sus items y pide confirmación de borrado
+            case 'delete':
+
+            break;
+
+            //mensaje de error al no existir la acción especificada
+            default:
+                print_error('actionnotexist', 'teamwork');
+        }
     break;
 
     //gestion de los elementos de las plantillas (items)

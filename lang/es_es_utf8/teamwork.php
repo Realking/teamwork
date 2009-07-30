@@ -69,11 +69,11 @@ $string['managetemplates'] = 'Gestionar las plantillas';
 $string['templatesanditemseditor'] = 'Editor de plantillas e items de evaluación';
 $string['coursetemplateslisting'] = 'Listado de plantillas disponibles y asignadas';
 $string['notemplatesforthiscourse'] = 'No hay plantillas definidas a nivel de curso.';
-$string['Add?'] = '¿Añadir?';
-
+$string['createnewtemplate'] = 'Crear nueva plantilla';
 $string['sectionnotexist'] = 'La sección especificada no existe.';
-$string[''] = '';
-$string[''] = '';
+$string['actionnotexist'] = 'La acción especificada no existe.';
+$string['addtemplate'] = 'Añadir una plantilla';
+$string['tpladded'] = 'Plantilla añadida correctamente';
 $string[''] = '';
 $string[''] = '';
 $string[''] = '';
