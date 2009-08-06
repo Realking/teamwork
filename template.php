@@ -94,6 +94,29 @@ switch($section)
                     //imprimir la tabla
                     print_table($table);
                 }
+
+                //mostrar la tabla con la lista de plantillas existentes
+                $table = new stdClass;
+                $table->width = '70%';
+                $table->tablealign = 'center';
+                $table->id = 'templatesforthiscoursetable';
+                $table->head = array('#', 'Nombre');
+                //$table->size = array('10%', '90%');
+
+                foreach($definedtpls as $tpl)
+                {
+                    $table->align[] = 'center';
+                    $table->data[] = array($tpl->id, $tpl->name, );
+                }
+                
+                
+
+                //imprimir la tabla y el boton de añadir
+                print_heading(get_string('coursetemplateslisting', 'teamwork'));
+                print_table($table);
+                echo '<br /><div align="center">';
+                print_single_button('template.php', array('id'=>$cm->id, 'section'=>'templates', 'action'=>'add'), get_string('createnewtemplate', 'teamwork'));
+                echo '</p>';
         }
     
     break;
