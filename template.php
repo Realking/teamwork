@@ -32,7 +32,7 @@ $section =  optional_param('section', 'instances', PARAM_ALPHA);
 /// obtener datos del contexto donde se ejecuta el modulo
 //
 
-//el objeto $cm contiene los datos dell contexto de la instancia del modulo
+//el objeto $cm contiene los datos del contexto de la instancia del modulo
 if(!$cm = get_coursemodule_from_id('teamwork', $id))
 {
 	error('Course Module ID was incorrect');
@@ -94,29 +94,59 @@ switch($section)
                     //imprimir la tabla
                     print_table($table);
                 }
-
-                //mostrar la tabla con la lista de plantillas existentes
-                $table = new stdClass;
-                $table->width = '70%';
-                $table->tablealign = 'center';
-                $table->id = 'templatesforthiscoursetable';
-                $table->head = array('#', 'Nombre');
-                //$table->size = array('10%', '90%');
-
-                foreach($definedtpls as $tpl)
+                else
                 {
-                    $table->align[] = 'center';
-                    $table->data[] = array($tpl->id, $tpl->name, );
-                }
-                
-                
+                    //mostrar la tabla con la lista de plantillas existentes
+                    $table = new stdClass;
+                    $table->width = '70%';
+                    $table->tablealign = 'center';
+                    $table->id = 'templatesforthiscoursetable';
+                    $table->head = array(get_string('name', 'teamwork'), get_string('description', 'teamwork'), get_string('items', 'teamwork'), get_string('instances', 'teamwork'), get_string('actions', 'teamwork'));
+                    //$table->size = array('10%', '90%');
+                    $table->align = array('center', 'center', 'center', 'center', 'center');
 
-                //imprimir la tabla y el boton de añadir
-                print_heading(get_string('coursetemplateslisting', 'teamwork'));
-                print_table($table);
-                echo '<br /><div align="center">';
-                print_single_button('template.php', array('id'=>$cm->id, 'section'=>'templates', 'action'=>'add'), get_string('createnewtemplate', 'teamwork'));
-                echo '</p>';
+                    foreach($definedtpls as $tpl)
+                    {
+                        $stractions  = '<a href="template.php?id='.$cm->id.'&section=templates&action=modify&tplid='.$tpl->id.'"><img src="images/pencil.png" alt="'.get_string('edit', 'teamwork').'" title="'.get_string('edit', 'teamwork').'" /></a>&nbsp;&nbsp;';
+
+                         //si se puede editar el template mostrar botón
+                        if(teamwork_tpl_is_editable($tpl->id))
+                        {
+                            $stractions .= '<a href="template.php?id='.$cm->id.'&section=items&tplid='.$tpl->id.'"><img src="images/page_edit.png" alt="'.get_string('edititems', 'teamwork').'" title="'.get_string('edititems', 'teamwork').'" /></a>&nbsp;&nbsp;';
+                        }
+
+                        //si se puede borrar el template mostrar botón
+                        if(teamwork_tpl_is_erasable($tpl->id))
+                        {
+                            $stractions .= '<a href="template.php?id='.$cm->id.'&section=templates&action=delete&tplid='.$tpl->id.'"><img src="images/delete.png" alt="'.get_string('deletetpl', 'teamwork').'" title="'.get_string('deletetpl', 'teamwork').'" /></a>&nbsp;&nbsp;';
+                        }
+
+                        $stractions .= '<a href="template.php?id='.$cm->id.'&section=templates&action=copy&tplid='.$tpl->id.'"><img src="images/arrow_divide.png" alt="'.get_string('newtplfrom', 'teamwork').'" title="'.get_string('newtplfrom', 'teamwork').'" /></a>&nbsp;&nbsp;';
+
+                        $stractions .= '<a href="template.php?id='.$cm->id.'&section=templates&action=export&tplid='.$tpl->id.'"><img src="images/page_white_put.png" alt="'.get_string('exporttpl', 'teamwork').'" title="'.get_string('exporttpl', 'teamwork').'" /></a>';
+
+                        $inst = teamwork_tpl_instanced_check($tpl->id);
+
+                        //mostrar los botones de instanciar como evaluacion de grupos e intra
+                        if($inst === false)
+                        {
+                            $stractions .= '&nbsp;&nbsp;<a href="template.php?id='.$cm->id.'&section=instances&action=add&tplid='.$tpl->id.'&type=group"><img src="images/group_add.png" alt="'.get_string('usetemplateforgroupeval', 'teamwork').'" title="'.get_string('usetemplateforgroupeval', 'teamwork').'" /></a>';
+                            $stractions .= '&nbsp;&nbsp;<a href="template.php?id='.$cm->id.'&section=instances&action=add&tplid='.$tpl->id.'&type=intra"><img src="images/user_add.png" alt="'.get_string('usetemplateforintraeval', 'teamwork').'" title="'.get_string('usetemplateforintraeval', 'teamwork').'" /></a>';
+                        }
+
+                        $table->data[] = array($tpl->name, $tpl->description, teamwork_get_items_by_template($tpl->id), teamwork_get_instances_of_tpl($tpl->id), $stractions);
+                    }
+
+                    //imprimir la tabla y el boton de añadir
+                    print_heading(get_string('coursetemplateslisting', 'teamwork'));
+                    print_table($table);
+                    echo '<br /><div align="center"><br />';
+                    //print_single_button('template.php', array('id'=>$cm->id, 'section'=>'templates', 'action'=>'add'), get_string('createnewtemplate', 'teamwork'));
+                    echo '<img src="images/add.png" alt="'.get_string('createnewtemplate', 'teamwork').'" title="'.get_string('createnewtemplate', 'teamwork').'"/> <a href="template.php?id='.$cm->id.'&section=templates&action=add">'.get_string('createnewtemplate', 'teamwork').'</a> | ';
+                    echo '<img src="images/page_white_get.png" alt="'.get_string('importtpl', 'teamwork').'" title="'.get_string('importtpl', 'teamwork').'"/> <a href="template.php?id='.$cm->id.'&section=templates&action=import">'.get_string('importtpl', 'teamwork').'</a> | ';
+                    echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="view.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
+                    echo '</div>';
+                }
         }
     
     break;
@@ -181,7 +211,37 @@ switch($section)
 
     //gestion de los elementos de las plantillas (items)
     case 'items':
-    
+        switch($action)
+        {
+            //caso por defecto, mostrar la página principal de la gestión de items en una plantilla
+            default:
+
+                //se requiere el parámetro tplid con la id del template que estamos editando
+                $tplid = required_param('tplid', PARAM_INT);
+
+                //datos de la plantilla
+                if(!$tpldata = get_record('teamwork_templates', 'id', $tplid))
+                {
+                    print_error('templatenotexist', 'teamwork');
+                }
+
+                //obtener la lista de items asignados a esta plantilla
+                if(!$items = get_records('teamwork_items', 'templateid', $tplid))
+                {
+                    //si no hay, construir la tabla para mostrar mensaje de aviso
+                    $table = new stdClass;
+                    $table->head = array(get_string('itemslisting', 'teamwork', $tpldata->name));
+                    $table->align = array('center');
+                    $table->size = array('100%');
+                    $table->data[] = array(get_string('noitemsforthistemplate', 'teamwork').'<br /><br />'.print_single_button('template.php', array('id'=>$cm->id, 'section'=>'items', 'action'=>'add'), get_string('addnewitem', 'teamwork'), 'get', '_self', true));
+                    $table->width = '70%';
+                    $table->tablealign = 'center';
+                    $table->id = 'noitemsforthistemplatetable';
+
+                    //imprimir la tabla
+                    print_table($table);
+                }
+        }
     break;
 
     //mensaje de error al no existir la sección especificada

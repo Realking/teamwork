@@ -74,13 +74,23 @@ $string['sectionnotexist'] = 'La sección especificada no existe.';
 $string['actionnotexist'] = 'La acción especificada no existe.';
 $string['addtemplate'] = 'Añadir una plantilla';
 $string['tpladded'] = 'Plantilla añadida correctamente';
+$string['itemslisting'] = 'Listado de elementos de evaluación (items) de la plantilla: $a';
+$string['noitemsforthistemplate'] = 'No hay elementos definidos en esta plantilla';
+$string['addnewitem'] = 'Añadir un elemento';
+$string['name'] = 'Nombre';
+$string['items'] = 'Elementos';
+$string['instances'] = 'Instancias';
+$string['actions'] = 'Acciones';
+$string['edit'] = 'Editar';
+$string['edititems'] = 'Editar elementos';
+$string['deletetpl'] = 'Eliminar plantilla';
+$string['newtplfrom'] = 'Crear plantilla nueva a partir de esta';
+$string['exporttpl'] = 'Exportar plantilla (xml)';
+$string['importtpl'] = 'Importar plantilla (xml)';
+$string['templatenotexist'] = 'La plantilla especificada no existe';
+$string['goback'] = 'Volver';
+$string['usetemplateforgroupeval'] = 'Usar plantilla para la evaluación de grupos';
+$string['usetemplateforintraeval'] = 'Usar plantilla para la evaluación entre miembros del equipo';
 $string[''] = '';
 $string[''] = '';
-$string[''] = '';
-$string[''] = '';
-$string[''] = '';
-$string[''] = '';
-$string[''] = '';
-
-
 ?>

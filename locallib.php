@@ -20,54 +20,52 @@ require_once('../../lib/formslib.php');
  */
 function teamwork_show_status_info()
 {
-	global $ismanager, $teamwork, $cm;
+    global $ismanager, $teamwork, $cm;
 	
-	//imprimir nombre
-	print_heading(format_string($teamwork->name));
-	
-	//abrir caja 
-	print_box_start();
-	
-	//imprimir fase actual
-	echo '<b>'.get_string('currentphase', 'teamwork').'</b>: '.teamwork_phase($teamwork).'<br />';
-	
-	//fechas
-	$dates = array(
-        'startsends' => $teamwork->startsends,
-        'endsends' => $teamwork->endsends,
-        'startevals' => $teamwork->startevals,
-        'endevals' => $teamwork->endevals
-    );
+    //imprimir nombre
+    print_heading(format_string($teamwork->name));
+
+    //abrir caja
+    print_box_start();
+
+    //imprimir fase actual
+    echo '<b>'.get_string('currentphase', 'teamwork').'</b>: '.teamwork_phase($teamwork).'<br />';
+
+    //fechas
+    $dates = array(
+    'startsends' => $teamwork->startsends,
+    'endsends' => $teamwork->endsends,
+    'startevals' => $teamwork->startevals,
+    'endevals' => $teamwork->endevals);
 	
     foreach($dates as $type => $date)
-	{
+    {
         if($date)
-		{
+	{
             $strdifference = format_time($date - time());
 			
             if (($date - time()) < 0)
-			{
+            {
                 $strdifference = '<span class="redfont">'.get_string('timeafter', 'teamwork', $strdifference).'</span>';
             }
-			else
-			{
-				$strdifference = get_string('timebefore', 'teamwork', $strdifference);
-			}
+            else
+            {
+                $strdifference = get_string('timebefore', 'teamwork', $strdifference);
+            }
 			
             echo '<b>'.get_string($type, 'teamwork').'</b>: '.userdate($date)." ($strdifference)<br />\n";
         }
     }
 	
-	//si es manager imprimimos aqui enlaces a la administración
-	if($ismanager)
-	{
-		echo "<br />\n";
-		
-		echo '<span class="highlight2">'.get_string('youaremanager', 'teamwork').':</span> <a href="template.php?id='.$cm->id.'">'.get_string('templatesanditemseditor', 'teamwork').'</a>';
-	}
-	
-	//cerrar caja
-	print_box_end();
+    //si es manager imprimir aqui enlaces a la administración
+    if($ismanager)
+    {
+        echo "<br />\n";
+        echo '<span class="highlight2">'.get_string('youaremanager', 'teamwork').':</span> <a href="template.php?id='.$cm->id.'">'.get_string('templatesanditemseditor', 'teamwork').'</a>';
+    }
+
+    //cerrar caja
+    print_box_end();
 }
 
 /**
@@ -79,50 +77,50 @@ function teamwork_show_status_info()
  */
 function teamwork_phase($teamwork, $numeric = false)
 {
-	$time = time();
-	
-	if($time < $teamwork->startsends)
-	{
-		$status = 1;
-		$message = get_string('phase1', 'teamwork');
-	}
-	else if($time < $teamwork->endsends)
-	{
-		$status = 2;
-		$message = get_string('phase2', 'teamwork');
-	}
-	else if($time < $teamwork->startevals)
-	{
-		$status = 3;
-		$message = get_string('phase3', 'teamwork');
-	}
-	else if($time < $teamwork->endevals)
-	{
-		$status = 4;
-		$message = get_string('phase4', 'teamwork');
-	}
-	/*else if($sielalumnohasidocalificado)
-	{
-		$status = 5;
-		$message = get_string('phase5', 'teamwork');
-	}*/
-	else
-	{
-		$status = 6;
-		$message = get_string('phase68', 'teamwork');
-	}
-	
-	//si $numeric es true devolvemos $status
-	if($numeric)
-	{
-		return $status;
-	}
-	
-	return $message;
+    $time = time();
+
+    if($time < $teamwork->startsends)
+    {
+        $status = 1;
+        $message = get_string('phase1', 'teamwork');
+    }
+    else if($time < $teamwork->endsends)
+    {
+        $status = 2;
+        $message = get_string('phase2', 'teamwork');
+    }
+    else if($time < $teamwork->startevals)
+    {
+        $status = 3;
+        $message = get_string('phase3', 'teamwork');
+    }
+    else if($time < $teamwork->endevals)
+    {
+        $status = 4;
+        $message = get_string('phase4', 'teamwork');
+    }
+    /*else if($sielalumnohasidocalificado)
+    {
+        $status = 5;
+        $message = get_string('phase5', 'teamwork');
+    }*/
+    else
+    {
+        $status = 6;
+        $message = get_string('phase6', 'teamwork');
+    }
+
+    //si $numeric es true devolver $status
+    if($numeric)
+    {
+        return $status;
+    }
+
+    return $message;
 }
 
 /**
- * Clase para mostrar el formulario de editar (o añadir) un template
+ * Clase que muestra el formulario de editar (o añadir) un template
  */
 class teamwork_templates_form extends moodleform
 {
@@ -165,5 +163,86 @@ class teamwork_templates_form extends moodleform
         // botones de envío y cancelación
         $this->add_action_buttons();
     }
+}
+
+/**
+ * Obtiene el número de items que tiene asignado un template por la id de este
+ *
+ * @param integer $tplid id del template
+ * @return integer número de items
+ */
+function teamwork_get_items_by_template($tplid)
+{
+    return count_records('teamwork_items', 'templateid', $tplid);
+}
+
+/**
+ * Comprueba si se puede borrar una plantilla (no esté en uso, es decir, que no haya teamworks con evaluaciones que usen esta plantilla)
+ *
+ * @param integer $tplid id del template a comprobar
+ * @return boolean si se puede borrar
+ */
+//TODO realizar la implementación de la funcion tpl_is_erasable
+function teamwork_tpl_is_erasable($tplid)
+{
+    return true;
+}
+
+/**
+ * Comprueba si se puede editar una plantilla (no esté en uso, es decir, que no haya teamworks con evaluaciones que usen esta plantilla)
+ *
+ * @param integer $tplid id del template a comprobar
+ * @return boolean si se puede editar
+ */
+//TODO realizar la implementación de la funcion tpl_is_editable
+function teamwork_tpl_is_editable($tplid)
+{
+    return true;
+}
+
+/**
+ * Comprueba si se puede asignar una plantilla del tipo x al teamwork actual
+ *
+ * @param string $type tipo del template a comprobar
+ * @return boolean si se puede asignar
+ */
+//TODO realizar la implementación de la funcion tpl_is_assignable
+function teamwork_tpl_is_assignable($type)
+{
+    return true;
+}
+
+/**
+ * Obtiene la lista de teamworks que usan un determinado template
+ * 
+ * @param integer $tplid id del template
+ * @return string lista de instancias
+ */
+//TODO realizar la implementación de la función get_instances_of_tpl
+function teamwork_get_instances_of_tpl($tplid)
+{
+    return '-';
+}
+
+/**
+ * Comprueba si la plantilla $tplid se encuentra instanciada en el teamwork actual
+ *
+ * @staticvar array $result cache del resultado de la consulta a la bbdd
+ * @param integer $tplid id del template
+ * @return mixed boolean false si no tiene instancias, el tipo de la instancia en el caso que solo tenga una
+ * o boolean true si se encuentra instanciada en los dos tipos
+ */
+function teamwork_tpl_instanced_check($tplid)
+{
+    global $teamwork;
+    static $result = null;
+
+    //si no hemos realizado la consulta
+    if(is_null($result))
+    {
+        $result = get_records('teamwork_tplinstances', 'teamworkid', $teamwork->id);
+    }
+
+    return false;
 }
 ?>
