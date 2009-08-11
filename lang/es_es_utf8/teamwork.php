@@ -91,6 +91,19 @@ $string['templatenotexist'] = 'La plantilla especificada no existe';
 $string['goback'] = 'Volver';
 $string['usetemplateforgroupeval'] = 'Usar plantilla para la evaluación de grupos';
 $string['usetemplateforintraeval'] = 'Usar plantilla para la evaluación entre miembros del equipo';
+$string['tplupdated'] = 'Plantilla actualizada correctamente';
 $string[''] = '';
 $string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+$string[''] = '';
+
 ?>

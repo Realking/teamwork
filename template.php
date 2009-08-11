@@ -194,7 +194,52 @@ switch($section)
                 
             break;
 
+            //muestra el formulario para editar un template y en caso de POST actualiza la bbdd
             case 'modify':
+                //se requiere el parámetro tplid con la id del template que estamos editando
+                $tplid = required_param('tplid', PARAM_INT);
+                
+                //cargamos el formulario
+                $form = new teamwork_templates_form('template.php?id='.$cm->id.'&section=templates&action=modify');
+
+                //obtenemos los datos de la plantilla
+                if(!$tpldata = get_record('teamwork_templates', 'id', $tplid))
+                {
+                    print_error('templatenotexist', 'teamwork');
+                }
+
+                $tpldata->tplid = $tplid;
+                
+                //no se ha enviado, se muestra
+                if(!$form->is_submitted())
+                {
+                    $form->set_data($tpldata);
+                    $form->display();
+                }
+                //se ha enviado pero se ha cancelado, redirigir a página principal
+                elseif($form->is_cancelled())
+                {
+                    redirect('template.php?id='.$cm->id);
+                }
+                //se ha enviado y no valida el formulario...
+                elseif(!$form->is_validated())
+                {
+                    $form->display();
+                }
+                //se ha enviado y es válido, se procesa
+                else
+                {
+                    //obtenemos los datos del formulario
+                    $data = $form->get_data();
+                    $data->id = $data->tplid;
+
+                    //actualizar los datos en la base de datos
+                    update_record('teamwork_templates', $data);
+
+                    //mostramos mensaje
+                    echo '<p align="center">'.get_string('tplupdated', 'teamwork').'</p>';
+                    print_continue('template.php?id='.$cm->id);
+                }
 
             break;
 
@@ -213,6 +258,10 @@ switch($section)
     case 'items':
         switch($action)
         {
+            case 'add':
+
+            break;
+
             //caso por defecto, mostrar la página principal de la gestión de items en una plantilla
             default:
 

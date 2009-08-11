@@ -159,6 +159,8 @@ class teamwork_templates_form extends moodleform
         $mform->setHelpButton('description', array('writing', 'questions', 'richtext'), false, 'editorhelpbutton');
 		$mform->addRule('description', null, 'required', null, 'server');
 
+        //---> Id del template (para la edicion)
+        $mform->addElement('hidden', 'tplid', '');
 
         // botones de envío y cancelación
         $this->add_action_buttons();
