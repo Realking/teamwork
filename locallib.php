@@ -179,15 +179,14 @@ function teamwork_get_items_by_template($tplid)
 }
 
 /**
- * Comprueba si se puede borrar una plantilla (no esté en uso, es decir, que no haya teamworks con evaluaciones que usen esta plantilla)
+ * Comprueba si se puede borrar una plantilla (que no la esté usando ningún módulo)
  *
  * @param integer $tplid id del template a comprobar
  * @return boolean si se puede borrar
  */
-//TODO realizar la implementación de la funcion tpl_is_erasable
 function teamwork_tpl_is_erasable($tplid)
 {
-    return true;
+    return !(bool) count_records('teamwork_tplinstances', 'templateid', $tplid);
 }
 
 /**

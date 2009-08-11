@@ -245,6 +245,36 @@ switch($section)
 
             //muestra un aviso de que se va a borrar un template y sus items y pide confirmación de borrado
             case 'delete':
+                //se requiere el parámetro tplid con la id del template que estamos editando
+                $tplid = required_param('tplid', PARAM_INT);
+
+                //previamente comprobar que una plantilla pueda ser borrada (porque ya cuente con valoraciones en algun teamwork)
+                if(!teamwork_tpl_is_erasable($tplid))
+                {
+                    print_error('tplcannotbedeleted', 'teamwork', 'template.php?id='.$cm->id);
+                }
+
+                //si la plantilla puede ser borrada, pedir confirmación
+                //si no ha sido enviada, mostrar la confirmacion
+                if(!isset($_POST['tplid']))
+                {
+                    notice_yesno(get_string('confirmationfordeletetpl', 'teamwork'), 'template.php', 'template.php', array('id'=>$cm->id, 'section'=>'templates', 'action'=>'delete', 'tplid'=>$tplid), array('id'=>$cm->id), 'post', 'get');
+                }
+                //si se ha enviado, procesamos
+                else
+                {
+                    //TODO implementar el borrado de las rubricas
+
+                    //borrar items de la plantilla
+                    delete_records('teamwork_items', 'templateid', $tplid);
+
+                    //borrar plantilla en si
+                    delete_records('teamwork_templates', 'id', $tplid);
+
+                    //mostrar mensaje
+                    echo '<p align="center">'.get_string('tpldeleted', 'teamwork').'</p>';
+                    print_continue('template.php?id='.$cm->id);
+                }
 
             break;
 
