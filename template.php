@@ -61,6 +61,9 @@ require_capability('mod/teamwork:manage', $cm->context);
 /// header
 //
 
+//iniciamos el bufer de salida (es posible que tengamos que modificar las cabeceras http y si imprimimos aqui algo no podremos hacerlo)
+ob_start();
+
 $navigation = build_navigation(get_string('templatesanditemseditor', 'teamwork'), $cm);
 $pagetitle = strip_tags($course->shortname.': '.get_string('modulename', 'teamwork').': '.format_string($teamwork->name,true).': '.get_string('templatesanditemseditor', 'teamwork'));
 
@@ -276,6 +279,58 @@ switch($section)
                     print_continue('template.php?id='.$cm->id);
                 }
 
+            break;
+
+            //importa un xml de definición de plantilla al curso y teamwork actual
+            case 'import':
+                require_once($CFG->libdir.'/xmlize.php');
+                $text = file_get_contents('./docs/prototype_template.xml');
+                $content = xmlize($text);
+                var_dump($content['template']['#']['items'][0]['#']['item'][0]['@']);
+
+                
+            break;
+
+            //exporta una plantilla al formato xml
+            case 'export':
+                //TODO implementar la logica de control de que estemos accediendo a exportar templates que sean nuestros
+                //borrar el contenido del buffer de salida
+                ob_clean();
+
+                //se requiere el parámetro tplid con la id del template que estamos editando
+                $tplid = required_param('tplid', PARAM_INT);
+                
+                //TODO implementar cabeceras para forzar la descarga de un archivo http://javierav.com/articulos/php/2009-08-forzar-la-descarga-de-un-archivo-en-php
+                header('Content-Type: application/xml');
+
+                //obtener los datos del template
+                $tpldata = get_record('teamwork_templates', 'id', $tplid);
+
+                //obtener los datos de los items asociados a este template
+                $itemsdata = get_records('teamwork_items', 'templateid', $tplid);
+
+                //contruir el arbol xml en un array
+                
+                //si no hay items asociados
+                if($itemsdata === false)
+                {
+                    $xmlitems = '';
+                }
+                //si tiene elementos
+                else
+                {
+                    //para cada item asociado...
+                    foreach($itemsdata as $item)
+                    {
+                        $xmlitems[] =  array('item', array('order'=>$item->order, 'description'=>$item->description, 'scale'=>$item->scale, 'weight'=>$item->weight), '');
+                    }
+                }
+
+                $xml = array('template', array('name'=>$tpldata->name, 'description'=>$tpldata->description), array('items', null, $xmlitems));
+
+                echo teamwork_array2xml($xml);
+                exit();
+                
             break;
 
             //mensaje de error al no existir la acción especificada

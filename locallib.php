@@ -246,4 +246,108 @@ function teamwork_tpl_instanced_check($tplid)
 
     return false;
 }
+
+/**
+ * Genera el código XML necesario a partir de un array con los datos
+ *
+ * Ej.
+ * <root>
+ *  <name></name>
+ *  <values>
+ *      <value prop1="a" prop2="b">contenido</value>
+ *      <value prop1="c" prop2="d">contenido2</value>
+ *  </values>
+ * </root>
+ *
+ * $xml = array('root', null, array(
+ *                  array('name', null, ''),
+ *                  array('values', null, array(
+ *                              array('value', array('prop'1=>'a', 'prop2'=>'b'), 'contenido'),
+ *                              array('value', array('prop1'=>'c', 'prop2'=>'d'), 'contenido2')
+ *                                             )
+ *                                 )
+ *                    )
+ *        )
+ * 
+ * @param array $array matriz con los datos a formatear en xml
+ * siguiendo la estructura nombre del nodo, array de parametros, contenido (este puede ser otro array de elemento)
+ * @param integer $depth profundidad en el arbol (usado en la recursion)
+ * @return string cadena de texto con el contenido en xml
+ * o boolean false en caso de fallo
+ */
+function teamwork_array2xml($array, $depth = 0)
+{
+    $xml = '';
+    
+    //si la profundidad es 0, generar encabezado
+    if(!$depth)
+    {
+        $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    }
+
+    //si no es array o si está vacío... devolver false
+    if(!is_array($array) OR empty($array))
+    {
+        return false;
+    }
+   
+    //si $array es un array de arrays
+    if(count($array) > 0 AND is_array($array[0]))
+    {
+        //repetir esta tarea por cada subarray
+        foreach($array as $element)
+        {
+            $xml .= teamwork_array2xml_extract($element, $depth);
+        }
+    }
+    //si solo tiene uno
+    else
+    {
+        $xml .= teamwork_array2xml_extract($array, $depth);
+    }
+    
+    return $xml;
+}
+
+/**
+ * Funcion auxiliar para extraer datos para la funcion teamwork_array2xml
+ *
+ * @param array $array matriz de datos
+ * @param integer $depth nivel de profundidad en el arbol
+ * @return string código xml obtenido de parsear los datos
+ */
+function teamwork_array2xml_extract($array, $depth)
+{
+    $xml = '';
+    
+    //extraer datos del elemento
+    list($name, $params, $content) = $array;
+
+    $xml .= str_repeat("\t", $depth).'<'.$name;
+
+    //si contiene argumentos
+    if(!empty($params))
+    {
+        foreach($params as $key => $value)
+        {
+            $xml .= ' '.$key.'="'.$value.'"';
+        }
+    }
+
+    $xml .= ">";
+
+    //si el contenido es otro array es que hay sublementos, obtener contenido
+    if(is_array($content))
+    {
+        $xml .= "\n" . teamwork_array2xml($content, $depth + 1);
+    }
+    else
+    {
+        $xml .= $content;
+    }
+
+    $xml .= str_repeat("\t", $depth) . '</'.$name.">\n";
+
+    return $xml;
+}
 ?>
