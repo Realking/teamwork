@@ -333,7 +333,7 @@ switch($section)
                     //para cada item asociado...
                     foreach($itemsdata as $item)
                     {
-                        $xmlitems[] =  array('item', array('order'=>$item->order, 'description'=>$item->description, 'scale'=>$item->scale, 'weight'=>$item->weight), '');
+                        $xmlitems[] =  array('item', array('order'=>$item->itemorder, 'description'=>$item->description, 'scale'=>$item->scale, 'weight'=>$item->weight), '');
                     }
                 }
 
