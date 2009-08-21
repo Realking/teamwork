@@ -301,13 +301,24 @@ switch($section)
                 $tplid = required_param('tplid', PARAM_INT);
                 
                 //TODO implementar cabeceras para forzar la descarga de un archivo http://javierav.com/articulos/php/2009-08-forzar-la-descarga-de-un-archivo-en-php
-                header('Content-Type: application/xml');
+                //Cabeceras HTTP para forzar la descarga (varia según el navegador)
+                if(isset($_SERVER['HTTP_USER_AGENT']) AND strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE'))
+                {
+                   header('Content-Type: application/force-download');
+                }
+                else
+                {
+                   header('Content-Type: application/octet-stream');
+                }
 
                 //obtener los datos del template
                 $tpldata = get_record('teamwork_templates', 'id', $tplid);
 
                 //obtener los datos de los items asociados a este template
                 $itemsdata = get_records('teamwork_items', 'templateid', $tplid);
+
+                //nombre del archivo descargable
+                header('Content-disposition: attachment; filename=' . teamwork_url_safe($tpldata->name) . '.xml');
 
                 //contruir el arbol xml en un array
                 

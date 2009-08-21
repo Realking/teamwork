@@ -350,4 +350,28 @@ function teamwork_array2xml_extract($array, $depth)
 
     return $xml;
 }
+
+/**
+ * Convert a phrase to a URL-safe title. Note that non-ASCII characters
+ * should be transliterated before using this function.
+ *
+ * @link http://github.com/shadowhand/kohana-core/blob/2a87f0383bdfb7c099333ab3ee7fb4855a797073/classes/kohana/url.php
+ *
+ * @param string phrase to convert
+ * @param string word separator (- or _)
+ * @return string
+ */
+function teamwork_url_safe($title, $separator = '-')
+{
+    $separator = ($separator === '-') ? '-' : '_';
+
+    // Remove all characters that are not the separator, a-z, 0-9, or whitespace
+    $title = preg_replace('/[^'.$separator.'a-z0-9\s]+/', '', strtolower($title));
+
+    // Replace all separator characters and whitespace by a single separator
+    $title = preg_replace('/['.$separator.'\s]+/', $separator, $title);
+
+    // Trim separators from the beginning and end
+    return trim($title, $separator);
+}
 ?>
