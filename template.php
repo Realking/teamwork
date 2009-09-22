@@ -78,6 +78,63 @@ switch($section)
         
         switch($action)
         {
+            case 'add':
+                //es requerido la id de la plantilla la cual asignar
+                $tplid = required_param('tplid', PARAM_INT);
+
+                //es requerido el tipo de asignación
+                $type = required_param('type', PARAM_ALPHA);
+
+                //verificar que la actividad no cuente ya con una plantilla para ese tipo
+                if(teamwork_check_tpl_type($type, $teamwork->id))
+                {
+                    print_error('asignationforthisevaltypeexist', 'teamwork');
+                }
+                
+                //verificar que el tipo de evaluacion es uno de los validos
+                if($type != 'team' AND $type != 'user')
+                {
+                    print_error('evaltypenotexist', 'teamwork');
+                }
+
+                //realizar la asignacion
+                $data = new stdClass;
+                $data->templateid = $tplid;
+                $data->teamworkid = $teamwork->id;
+                $data->evaltype = $type;
+                insert_record('teamwork_tplinstances', $data);
+
+                redirect('template.php?id='.$cm->id);
+
+            break;
+
+            //elimina la asignación de una plantilla a una instancia
+            case 'delete':
+
+                //es requerido la id de la instancia del template a eliminar
+                $instid = required_param('instid', PARAM_INT);
+
+                $result = get_record('teamwork_tplinstances', 'id', $instid, 'teamworkid', $teamwork->id);
+
+                //verificar que esa plantilla se encontraba previamente asignada a esta instancia de la actividad
+                if(!count($result))
+                {
+                    print_error('youdonthavepermissionfordeletethisasignation', 'teamwork');
+                }
+                
+                //verificar que podemos editar el template (señal de que no hay aportaciones de los usuarios
+                if(!teamwork_tpl_is_editable($result->templateid))
+                {
+                    print_error('youdonthavepermissionfordeletethisasignation', 'teamwork');
+                }
+
+                //eliminar la asignación
+                delete_records('teamwork_tplinstances', 'id', $instid);
+
+                redirect('template.php?id='.$cm->id);
+
+            break;
+
             //caso por defecto, mostrar la página principal de la gestión de templates
             default:
 
@@ -110,41 +167,61 @@ switch($section)
 
                     foreach($definedtpls as $tpl)
                     {
-                        $stractions  = '<a href="template.php?id='.$cm->id.'&section=templates&action=modify&tplid='.$tpl->id.'"><img src="images/pencil.png" alt="'.get_string('edit', 'teamwork').'" title="'.get_string('edit', 'teamwork').'" /></a>&nbsp;&nbsp;';
-
-                         //si se puede editar el template mostrar botón
-                        if(teamwork_tpl_is_editable($tpl->id))
-                        {
-                            $stractions .= '<a href="template.php?id='.$cm->id.'&section=items&tplid='.$tpl->id.'"><img src="images/page_edit.png" alt="'.get_string('edititems', 'teamwork').'" title="'.get_string('edititems', 'teamwork').'" /></a>&nbsp;&nbsp;';
-                        }
-
-                        //si se puede borrar el template mostrar botón
-                        if(teamwork_tpl_is_erasable($tpl->id))
-                        {
-                            $stractions .= '<a href="template.php?id='.$cm->id.'&section=templates&action=delete&tplid='.$tpl->id.'"><img src="images/delete.png" alt="'.get_string('deletetpl', 'teamwork').'" title="'.get_string('deletetpl', 'teamwork').'" /></a>&nbsp;&nbsp;';
-                        }
-
-                        $stractions .= '<a href="template.php?id='.$cm->id.'&section=templates&action=copy&tplid='.$tpl->id.'"><img src="images/arrow_divide.png" alt="'.get_string('newtplfrom', 'teamwork').'" title="'.get_string('newtplfrom', 'teamwork').'" /></a>&nbsp;&nbsp;';
-
-                        $stractions .= '<a href="template.php?id='.$cm->id.'&section=templates&action=export&tplid='.$tpl->id.'"><img src="images/page_white_put.png" alt="'.get_string('exporttpl', 'teamwork').'" title="'.get_string('exporttpl', 'teamwork').'" /></a>';
-
-                        $inst = teamwork_tpl_instanced_check($tpl->id);
-
-                        //mostrar los botones de instanciar como evaluacion de grupos e intra
-                        if($inst === false)
-                        {
-                            $stractions .= '&nbsp;&nbsp;<a href="template.php?id='.$cm->id.'&section=instances&action=add&tplid='.$tpl->id.'&type=group"><img src="images/group_add.png" alt="'.get_string('usetemplateforgroupeval', 'teamwork').'" title="'.get_string('usetemplateforgroupeval', 'teamwork').'" /></a>';
-                            $stractions .= '&nbsp;&nbsp;<a href="template.php?id='.$cm->id.'&section=instances&action=add&tplid='.$tpl->id.'&type=intra"><img src="images/user_add.png" alt="'.get_string('usetemplateforintraeval', 'teamwork').'" title="'.get_string('usetemplateforintraeval', 'teamwork').'" /></a>';
-                        }
+                        $stractions = teamwork_tpl_table_options($tpl, $cm);
 
                         $table->data[] = array($tpl->name, $tpl->description, teamwork_get_items_by_template($tpl->id), teamwork_get_instances_of_tpl($tpl->id), $stractions);
                     }
 
-                    //imprimir la tabla y el boton de añadir
+                    //disponibles: imprimir la tabla y el boton de añadir
                     print_heading(get_string('coursetemplateslisting', 'teamwork'));
                     print_table($table);
+
+                    //mostrar la tabla con la lista de plantillas asignadas
+                    echo '<br />';
+                    print_heading(get_string('coursetemplatesasignedlisting', 'teamwork'));
+
+                    if(!$asignedtpls = get_records_sql('select t.id, t.name, i.evaltype, i.id from '.$CFG->prefix.'teamwork_tplinstances i, '.$CFG->prefix.'teamwork_templates t where t.id = i.templateid and i.teamworkid = '.$teamwork->id))
+                    {
+                        //no hay ninguna plantilla asignada
+                        echo '<p align="center">'.get_string('notemplateasigned', 'teamwork').'</p>';
+                    }
+                    else
+                    {
+                        //mostramos la tabla con las plantillas asignadas (nombre, tipo, acciones)
+                        $table = new stdClass;
+                        $table->width = '40%';
+                        $table->tablealign = 'center';
+                        $table->id = 'templatesasignedtable';
+                        $table->head = array(get_string('name', 'teamwork'), get_string('evaltype', 'teamwork'), get_string('actions', 'teamwork'));
+                        $table->align = array('center', 'center', 'center', 'center', 'center');
+
+                        foreach($asignedtpls as $tpl)
+                        {
+                            if($tpl->evaltype == 'team')
+                            {
+                                $evaltype = get_string('evalteam','teamwork');
+                                $stractions = '<a href="template.php?id='.$cm->id.'&section=instances&action=delete&instid='.$tpl->id.'"><img src="images/group_delete.png" alt="'.get_string('notusetemplateforgroupeval', 'teamwork').'" title="'.get_string('notusetemplateforgroupeval', 'teamwork').'" /></a>';
+
+                            }
+                            else
+                            {
+                                $evaltype = get_string('evaluser','teamwork');
+                                $stractions = '<a href="template.php?id='.$cm->id.'&section=instances&action=delete&instid='.$tpl->id.'"><img src="images/user_delete.png" alt="'.get_string('notusetemplateforusereval', 'teamwork').'" title="'.get_string('notusetemplateforusereval', 'teamwork').'" /></a>';
+                            }
+
+
+                            $table->data[] = array($tpl->name, $evaltype, $stractions);
+                        }
+
+                        print_table($table);
+                    }
+
+            
+                    
+
+
+                    //imprimir opciones inferiores
                     echo '<br /><div align="center"><br />';
-                    //print_single_button('template.php', array('id'=>$cm->id, 'section'=>'templates', 'action'=>'add'), get_string('createnewtemplate', 'teamwork'));
                     echo '<img src="images/add.png" alt="'.get_string('createnewtemplate', 'teamwork').'" title="'.get_string('createnewtemplate', 'teamwork').'"/> <a href="template.php?id='.$cm->id.'&section=templates&action=add">'.get_string('createnewtemplate', 'teamwork').'</a> | ';
                     echo '<img src="images/page_white_get.png" alt="'.get_string('importtpl', 'teamwork').'" title="'.get_string('importtpl', 'teamwork').'"/> <a href="template.php?id='.$cm->id.'&section=templates&action=import">'.get_string('importtpl', 'teamwork').'</a> | ';
                     echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="view.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
@@ -300,7 +377,6 @@ switch($section)
                 //se requiere el parámetro tplid con la id del template que estamos editando
                 $tplid = required_param('tplid', PARAM_INT);
                 
-                //TODO implementar cabeceras para forzar la descarga de un archivo http://javierav.com/articulos/php/2009-08-forzar-la-descarga-de-un-archivo-en-php
                 //Cabeceras HTTP para forzar la descarga (varia según el navegador)
                 if(isset($_SERVER['HTTP_USER_AGENT']) AND strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE'))
                 {
@@ -354,8 +430,156 @@ switch($section)
     case 'items':
         switch($action)
         {
+            //añade un nuevo elemento (item o criterio de evaluación) a la plantilla
             case 'add':
 
+                //se requiere el parámetro tplid con la id del template que estamos editando
+                $tplid = required_param('tplid', PARAM_INT);
+
+                //cargamos el formulario
+                $form = new teamwork_items_form('template.php?id='.$cm->id.'&section=items&action=add');
+
+                //no se ha enviado, se muestra
+                if(!$form->is_submitted())
+                {
+                    $form->set_data(array('tplid'=>$tplid));
+                    $form->display();
+                }
+                //se ha enviado pero se ha cancelado, redirigir a página principal
+                elseif($form->is_cancelled())
+                {
+                    redirect('template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
+                }
+                //se ha enviado y no valida el formulario...
+                elseif(!$form->is_validated())
+                {
+                    $form->display();
+                }
+                //se ha enviado y es válido, se procesa
+                else
+                {
+                    //obtenemos los datos del formulario
+                    $formdata = $form->get_data();
+                    unset($formdata->itemid);
+
+                    $data = new StdClass;
+                    $data->description = $formdata->description;
+                    $data->scale = $formdata->scale;
+                    $data->weight = $formdata->weight;
+                    $data->templateid = $formdata->tplid;
+
+                    //obtener el numero de items que ya contiene esta plantilla para calcular el orden
+                    $data->itemorder = count_records('teamwork_items', 'templateid', $formdata->tplid) + 1;
+
+                    //insertamos los datos en la base de datos
+                    insert_record('teamwork_items', $data);
+
+                    //mostramos mensaje
+                    echo '<p align="center">'.get_string('itemadded', 'teamwork').'</p>';
+                    print_continue('template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
+                }
+
+            break;
+
+            //modifica un elemento de una plantilla (siempre que se pueda)
+            case 'modify':
+
+                //se requiere el parámetro tplid con la id del template que estamos editando
+                $tplid = required_param('tplid', PARAM_INT);
+
+                //verificar que se pueda realmente editar este elemento
+                if(!teamwork_tpl_is_editable($tplid))
+                {
+                    print_error('itemnoteditable', 'teamwork');
+                }
+
+                //se requiere el parámetro itemid con la id del elemento que estamos editando
+                $itemid = required_param('itemid', PARAM_INT);
+
+                //cargamos el formulario
+                $form = new teamwork_items_form('template.php?id='.$cm->id.'&section=items&action=modify');
+
+                //no se ha enviado, se muestra
+                if(!$form->is_submitted())
+                {
+                    //obtenemos los datos del elemento
+                    if(!$itemdata = get_record('teamwork_items', 'id', $itemid))
+                    {
+                        print_error('itemnotexist', 'teamwork');
+                    }
+
+                    $itemdata->tplid = $tplid;
+                    $itemdata->itemid = $itemid;
+
+                    $form->set_data($itemdata);
+                    $form->display();
+                }
+                //se ha enviado pero se ha cancelado, redirigir a página principal
+                elseif($form->is_cancelled())
+                {
+                    redirect('template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
+                }
+                //se ha enviado y no valida el formulario...
+                elseif(!$form->is_validated())
+                {
+                    $form->display();
+                }
+                //se ha enviado y es válido, se procesa
+                else
+                {
+                    //obtenemos los datos del formulario
+                    $formdata = $form->get_data();
+                    
+                    $data = new stdClass;
+                    $data->id = $formdata->itemid;
+                    $data->description = $formdata->description;
+                    $data->scale = $formdata->scale;
+                    $data->weight = $formdata->weight;
+
+                    //actualizar los datos en la base de datos
+                    update_record('teamwork_items', $data);
+
+                    //mostramos mensaje
+                    echo '<p align="center">'.get_string('itemupdated', 'teamwork').'</p>';
+                    print_continue('template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
+                }
+
+            break;
+
+            //elimina un elemento de una plantilla (siempre que se pueda)
+            case 'delete':
+
+                //se requiere el parámetro tplid con la id del template que estamos editando
+                $tplid = required_param('tplid', PARAM_INT);
+
+                //verificar que se pueda realmente editar este elemento
+                if(!teamwork_tpl_is_editable($tplid))
+                {
+                    print_error('itemnoteditable', 'teamwork');
+                }
+
+                //se requiere el parámetro itemid con la id del elemento que estamos editando
+                $itemid = required_param('itemid', PARAM_INT);
+
+                //si la plantilla puede ser borrada, pedir confirmación
+                //si no ha sido enviada, mostrar la confirmacion
+                if(!isset($_POST['itemid']))
+                {
+                    notice_yesno(get_string('confirmationfordeleteitem', 'teamwork'), 'template.php', 'template.php', array('id'=>$cm->id, 'section'=>'items', 'action'=>'delete', 'itemid'=>$itemid, 'tplid'=>$tplid), array('id'=>$cm->id, 'section'=>'items', 'tplid'=>$tplid), 'post', 'get');
+                }
+                //si se ha enviado, procesamos
+                else
+                {
+                    //TODO implementar el borrado de las rubricas
+
+                    //borrar items de la plantilla
+                    delete_records('teamwork_items', 'id', $itemid);
+
+                    //mostrar mensaje
+                    echo '<p align="center">'.get_string('itemdeleted', 'teamwork').'</p>';
+                    print_continue('template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
+                }
+                
             break;
 
             //caso por defecto, mostrar la página principal de la gestión de items en una plantilla
@@ -378,13 +602,48 @@ switch($section)
                     $table->head = array(get_string('itemslisting', 'teamwork', $tpldata->name));
                     $table->align = array('center');
                     $table->size = array('100%');
-                    $table->data[] = array(get_string('noitemsforthistemplate', 'teamwork').'<br /><br />'.print_single_button('template.php', array('id'=>$cm->id, 'section'=>'items', 'action'=>'add'), get_string('addnewitem', 'teamwork'), 'get', '_self', true));
+                    $table->data[] = array(get_string('noitemsforthistemplate', 'teamwork').'<br /><br />'.print_single_button('template.php', array('id'=>$cm->id, 'section'=>'items', 'action'=>'add', 'tplid'=>$tplid), get_string('addnewitem', 'teamwork'), 'get', '_self', true));
                     $table->width = '70%';
                     $table->tablealign = 'center';
                     $table->id = 'noitemsforthistemplatetable';
 
                     //imprimir la tabla
                     print_table($table);
+
+                    //imprimir opciones inferiores
+                    echo '<br /><div align="center"><br />';
+                    echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="template.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
+                    echo '</div>';
+                }
+                //si hay elementos que listar
+                else
+                {
+                    $table = new stdClass;
+                    $table->width = '70%';
+                    $table->tablealign = 'center';
+                    $table->id = 'itemstable';
+                    $table->head = array(get_string('evalcriteria', 'teamwork'), get_string('grade'), get_string('elementweight', 'teamwork'), get_string('actions', 'teamwork'));
+                    //$table->size = array('10%', '90%');
+                    $table->align = array('center', 'center', 'center', 'center');
+
+                    foreach($items as $item)
+                    {
+                        $stractions = teamwork_item_table_options($item, $cm, $tpldata);
+
+                        $scale = ($item->scale < 0) ? get_record('scale', 'id', abs($item->scale))->name : $item->scale;
+
+                        $table->data[] = array($item->description, $scale, $item->weight, $stractions);
+                    }
+
+                    //disponibles: imprimir la tabla y el boton de añadir
+                    print_heading(get_string('itemslisting', 'teamwork', $tpldata->name));
+                    print_table($table);
+
+                    //imprimir opciones inferiores
+                    echo '<br /><div align="center"><br />';
+                    echo '<img src="images/add.png" alt="'.get_string('addnewitem', 'teamwork').'" title="'.get_string('addnewitem', 'teamwork').'"/> <a href="template.php?id='.$cm->id.'&section=items&action=add&tplid='.$tplid.'">'.get_string('addnewitem', 'teamwork').'</a> | ';
+                    echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="template.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
+                    echo '</div>';
                 }
         }
     break;

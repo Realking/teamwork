@@ -133,8 +133,8 @@ class teamwork_templates_form extends moodleform
         $mform =& $this->_form;
 
         //marco del formulario
-        $mform->addElement('header', 'general', get_string('addtemplate', 'teamwork'));
-        $mform->setHelpButton('general', array('addtemplate', get_string('addtemplate', 'teamwork'), 'teamwork'));
+        $mform->addElement('header', 'general', get_string('edittemplate', 'teamwork'));
+        $mform->setHelpButton('general', array('edittemplate', get_string('edittemplate', 'teamwork'), 'teamwork'));
 
         //---> Nombre
 
@@ -244,6 +244,32 @@ function teamwork_tpl_instanced_check($tplid)
         $result = get_records('teamwork_tplinstances', 'teamworkid', $teamwork->id);
     }
 
+    $count = 0;
+
+    //si existe algun resultado...
+    if(is_array($result))
+    {
+        //comprobar si la plantilla especificada se encuentra en el resultado
+        foreach($result as $element)
+        {
+            if($element->templateid == $tplid)
+            {
+                $count++;
+                $type = $element->evaltype;
+            }
+        }
+
+        //si hay dos coincidencias, devolver true
+        if($count == 2)
+        {
+            return true;
+        }
+        elseif($count == 1)
+        {
+            return $type;
+        }
+    }
+
     return false;
 }
 
@@ -262,7 +288,7 @@ function teamwork_tpl_instanced_check($tplid)
  * $xml = array('root', null, array(
  *                  array('name', null, ''),
  *                  array('values', null, array(
- *                              array('value', array('prop'1=>'a', 'prop2'=>'b'), 'contenido'),
+ *                              array('value', array('prop1'=>'a', 'prop2'=>'b'), 'contenido'),
  *                              array('value', array('prop1'=>'c', 'prop2'=>'d'), 'contenido2')
  *                                             )
  *                                 )
@@ -373,5 +399,161 @@ function teamwork_url_safe($title, $separator = '-')
 
     // Trim separators from the beginning and end
     return trim($title, $separator);
+}
+
+/**
+ * Genera los botones de acción necesarios para la tabla del listado de plantillas
+ * 
+ * @param object $tpl datos de la plantilla actual
+ * @param object $cm contexto del módulo
+ * @return string html con las acciones
+ */
+function teamwork_tpl_table_options($tpl, $cm)
+{
+    $stractions  = '<a href="template.php?id='.$cm->id.'&section=templates&action=modify&tplid='.$tpl->id.'"><img src="images/pencil.png" alt="'.get_string('edit', 'teamwork').'" title="'.get_string('edit', 'teamwork').'" /></a>&nbsp;&nbsp;';
+
+    //si se puede editar el template mostrar botón
+    if(teamwork_tpl_is_editable($tpl->id))
+    {
+        $stractions .= '<a href="template.php?id='.$cm->id.'&section=items&tplid='.$tpl->id.'"><img src="images/page_edit.png" alt="'.get_string('edititems', 'teamwork').'" title="'.get_string('edititems', 'teamwork').'" /></a>&nbsp;&nbsp;';
+    }
+
+    //si se puede borrar el template mostrar botón
+    if(teamwork_tpl_is_erasable($tpl->id))
+    {
+        $stractions .= '<a href="template.php?id='.$cm->id.'&section=templates&action=delete&tplid='.$tpl->id.'"><img src="images/delete.png" alt="'.get_string('deletetpl', 'teamwork').'" title="'.get_string('deletetpl', 'teamwork').'" /></a>&nbsp;&nbsp;';
+    }
+
+    $stractions .= '<a href="template.php?id='.$cm->id.'&section=templates&action=copy&tplid='.$tpl->id.'"><img src="images/arrow_divide.png" alt="'.get_string('newtplfrom', 'teamwork').'" title="'.get_string('newtplfrom', 'teamwork').'" /></a>&nbsp;&nbsp;';
+
+    $stractions .= '<a href="template.php?id='.$cm->id.'&section=templates&action=export&tplid='.$tpl->id.'"><img src="images/page_white_put.png" alt="'.get_string('exporttpl', 'teamwork').'" title="'.get_string('exporttpl', 'teamwork').'" /></a>';
+
+    $inst = teamwork_tpl_instanced_check($tpl->id);
+
+    //mostrar los botones de instanciar como evaluacion de grupos e intra
+    if($inst === false)
+    {
+        if(!teamwork_check_tpl_type('user', $cm->instance))
+        {
+            $stractions .= '&nbsp;&nbsp;<a href="template.php?id='.$cm->id.'&section=instances&action=add&tplid='.$tpl->id.'&type=user"><img src="images/user_add.png" alt="'.get_string('usetemplateforintraeval', 'teamwork').'" title="'.get_string('usetemplateforintraeval', 'teamwork').'" /></a>';
+        }
+
+        if(!teamwork_check_tpl_type('team', $cm->instance))
+        {
+            $stractions .= '&nbsp;&nbsp;<a href="template.php?id='.$cm->id.'&section=instances&action=add&tplid='.$tpl->id.'&type=team"><img src="images/group_add.png" alt="'.get_string('usetemplateforgroupeval', 'teamwork').'" title="'.get_string('usetemplateforgroupeval', 'teamwork').'" /></a>';
+        }
+    }
+    elseif($inst === 'team' AND !teamwork_check_tpl_type('user', $cm->instance))
+    {
+        $stractions .= '&nbsp;&nbsp;<a href="template.php?id='.$cm->id.'&section=instances&action=add&tplid='.$tpl->id.'&type=user"><img src="images/user_add.png" alt="'.get_string('usetemplateforintraeval', 'teamwork').'" title="'.get_string('usetemplateforintraeval', 'teamwork').'" /></a>';
+    }
+    elseif($inst === 'user' AND !teamwork_check_tpl_type('team', $cm->instance))
+    {
+        $stractions .= '&nbsp;&nbsp;<a href="template.php?id='.$cm->id.'&section=instances&action=add&tplid='.$tpl->id.'&type=team"><img src="images/group_add.png" alt="'.get_string('usetemplateforgroupeval', 'teamwork').'" title="'.get_string('usetemplateforgroupeval', 'teamwork').'" /></a>';
+    }
+
+    return $stractions;
+}
+
+/**
+ * Clase que muestra el formulario de editar (o añadir) un criterio de evaluación o items
+ */
+class teamwork_items_form extends moodleform
+{
+    /**
+     * Define el formulario
+     */
+    function definition()
+    {
+        global $CFG;
+        $mform =& $this->_form;
+
+        //marco del formulario
+        $mform->addElement('header', 'general', get_string('edititem', 'teamwork'));
+        $mform->setHelpButton('general', array('edititem', get_string('edititem', 'teamwork'), 'teamwork'));
+
+        //---> Criterio a evaluar
+
+        //añadir un textarea para la descripción de la actividad
+        $mform->addElement('htmleditor', 'description', get_string('evalcriteria', 'teamwork'), 'wrap="virtual" rows="20" cols="75"');
+        //tipo RAW para mantener el HTML
+        $mform->setType('description', PARAM_RAW);
+        //boton de ayuda unico con tres opciones relacionadas con el editor html
+        $mform->setHelpButton('description', array('writing', 'questions', 'richtext'), false, 'editorhelpbutton');
+        // no puede enviarse sin contenido
+        $mform->addRule('description', null, 'required', null, 'server');
+
+        //---> Escala de calificación
+
+        $mform->addElement('modgrade', 'scale', get_string('grade'));
+        $mform->setDefault('scale', 100);
+        $mform->addRule('scale', null, 'required', null, 'server');
+
+        //---> Nombre
+
+        //nombre de la plantilla
+        $mform->addElement('text', 'weight', get_string('elementweight', 'teamwork'), array('size'=>'64'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('weight', PARAM_TEXT); //funcion definida en moodle/lib/formslib.php
+        } else {
+            $mform->setType('weight', PARAM_CLEAN);
+        }
+        $mform->setHelpButton('weight', array('weight', get_string('elementweight', 'teamwork'), 'teamwork'));
+        //regla de validacion (no puede estar vacio el campo)
+        $mform->addRule('weight', null, 'required', null, 'server');
+
+        //---> Campos ocultos
+
+        //id del template (para la edicion)
+        $mform->addElement('hidden', 'tplid', '');
+
+        //id del elemento (para la edicion)
+        $mform->addElement('hidden', 'itemid', '');
+
+        
+        // botones de envío y cancelación
+        $this->add_action_buttons();
+    }
+}
+
+/**
+ * Genera los botones de acción necesarios para la tabla del listado de elementos de una plantilla
+ *
+ * @param object $item datos del elemento actual
+ * @param object $cm contexto del módulo
+ * @return string html con las acciones
+ */
+function teamwork_item_table_options($item, $cm, $tpl)
+{
+    $stractions = '';
+    
+    //si se puede editar la plantilla, se pueden editar sus elementos, mostrar botón
+    if(teamwork_tpl_is_editable($tpl->id))
+    {
+        $stractions .= '<a href="template.php?id='.$cm->id.'&section=items&action=modify&itemid='.$item->id.'&tplid='.$tpl->id.'"><img src="images/pencil.png" alt="'.get_string('edit', 'teamwork').'" title="'.get_string('edit', 'teamwork').'" /></a>&nbsp;&nbsp;';
+        $stractions .= '<a href="template.php?id='.$cm->id.'&section=items&action=delete&itemid='.$item->id.'&tplid='.$tpl->id.'"><img src="images/delete.png" alt="'.get_string('deleteitem', 'teamwork').'" title="'.get_string('deleteitem', 'teamwork').'" /></a>&nbsp;&nbsp;';
+    }
+
+    return $stractions;
+}
+
+/**
+ * Comprueba si la actividad tiene asignada una plantilla para el tipo de evaluación especificado
+ *
+ * @param string $type tipo a comprobar
+ * @param object $teamwork objeto que representa una actividad teamwork
+ * @return bool true si tiene asignada una plantilla para ese tipo, false si no.
+ */
+function teamwork_check_tpl_type($type, $teamworkid)
+{
+    static $result = null;
+
+    //si no hemos realizado la consulta
+    if(!isset($result[$type]))
+    {
+        $result[$type] = count_records('teamwork_tplinstances', 'evaltype', $type, 'teamworkid', $teamworkid);
+    }
+    
+    return ($result[$type]) ? true : false;
 }
 ?>
