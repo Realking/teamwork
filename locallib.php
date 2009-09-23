@@ -99,11 +99,11 @@ function teamwork_phase($teamwork, $numeric = false)
         $status = 4;
         $message = get_string('phase4', 'teamwork');
     }
-    /*else if($sielalumnohasidocalificado)
+    else if(!teamwork_check_student_evaluated())
     {
         $status = 5;
         $message = get_string('phase5', 'teamwork');
-    }*/
+    }
     else
     {
         $status = 6;
@@ -117,6 +117,17 @@ function teamwork_phase($teamwork, $numeric = false)
     }
 
     return $message;
+}
+
+/**
+ * Comprueba si el estudiante ha sido calificado por el profesor en esta actividad o no
+ * 
+ * @return bool true si ha sido calificado, false en cualquier otro caso 
+ */
+//TODO implementar esta funcion
+function teamwork_check_student_evaluated()
+{
+    return false;
 }
 
 /**
@@ -202,18 +213,6 @@ function teamwork_tpl_is_editable($tplid)
 }
 
 /**
- * Comprueba si se puede asignar una plantilla del tipo x al teamwork actual
- *
- * @param string $type tipo del template a comprobar
- * @return boolean si se puede asignar
- */
-//TODO realizar la implementación de la funcion tpl_is_assignable
-function teamwork_tpl_is_assignable($type)
-{
-    return true;
-}
-
-/**
  * Obtiene la lista de teamworks que usan un determinado template
  * 
  * @param integer $tplid id del template
@@ -222,7 +221,54 @@ function teamwork_tpl_is_assignable($type)
 //TODO realizar la implementación de la función get_instances_of_tpl
 function teamwork_get_instances_of_tpl($tplid)
 {
-    return '-';
+    global $CFG;
+    
+    $result = get_records_sql('select i.id, t.name, i.evaltype, t.id as teamworkid from '.$CFG->prefix.'teamwork_tplinstances i, '.$CFG->prefix.'teamwork t where t.id = i.teamworkid AND i.templateid = '.$tplid);
+
+    if($result === false)
+    {
+        return '-';
+    }
+
+    foreach($result as $item)
+    {
+        if(isset($data[$item->name]))
+        {
+            $data[$item->name][1][1] = $item->evaltype;
+        }
+        else
+        {
+            $data[$item->name] = array($item->teamworkid, array($item->evaltype));
+        }
+    }
+
+    $strresult = '';
+
+    foreach($data as $activity => $opt)
+    {
+        $strresult .= '<a href="view.php?id='.get_coursemodule_from_instance('teamwork', $opt[0])->id.'">'.$activity . '</a> (';
+      
+        foreach($opt[1] as $element)
+        {
+            if($element == 'team')
+            {
+                $strresult .= '<img src="images/group.png" alt="'.get_string('usedbygroupeval', 'teamwork').'" title="'.get_string('usedbygroupeval', 'teamwork').'" />, ';
+            }
+            else
+            {
+                $strresult .= '<img src="images/user.png" alt="'.get_string('usedbyusereval', 'teamwork').'" title="'.get_string('usedbyusereval', 'teamwork').'" />, ';
+            }
+
+        }
+
+        $strresult = substr($strresult, 0, strlen($strresult)-2);
+
+        $strresult .= '), ';
+    }
+
+    $strresult = substr($strresult, 0, strlen($strresult)-2);
+
+    return $strresult;
 }
 
 /**
