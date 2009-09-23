@@ -402,7 +402,7 @@ function teamwork_array2xml_extract($array, $depth)
     {
         foreach($params as $key => $value)
         {
-            $xml .= ' '.$key.'="'.$value.'"';
+            $xml .= ' '.$key.'="'.htmlentities($value).'"';
         }
     }
 
@@ -415,7 +415,7 @@ function teamwork_array2xml_extract($array, $depth)
     }
     else
     {
-        $xml .= $content;
+        $xml .= htmlentities($content);
     }
 
     $xml .= str_repeat("\t", $depth) . '</'.$name.">\n";
