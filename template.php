@@ -420,6 +420,43 @@ switch($section)
                 
             break;
 
+            //crea una plantilla nueva a partir de la que se especifica
+            case 'copy':
+
+                //se requiere el parámetro tplid con la id del template original
+                $tplid = required_param('tplid', PARAM_INT);
+
+                //comprobar que esa plantilla pertenece a este curso y de paso obtenemos los datos de la plantilla original
+                if(!$tpldata = get_record('teamwork_templates', 'id', $tplid, 'courseid', $cm->course))
+                {
+                    print_error('youdonthavepermissiontocopy', 'teamwork');
+                }
+
+                unset($tpldata->id);
+                $tpldata->name .= ' (bis)';
+
+                //insertar los datos de la nueva plantilla
+                $newtplid = insert_record('teamwork_templates', $tpldata);
+
+                //obtenemos los datos de los elementos de esa plantilla
+                $itemdata = get_records('teamwork_items', 'templateid', $tplid);
+
+                foreach($itemdata as $item)
+                {
+                    unset($item->id);
+                    $item->templateid = $newtplid;
+
+                    insert_record('teamwork_items', $item);
+                }
+
+                //TODO implementar el copiado de las rubricas
+
+                //mostrar mensaje
+                echo '<p align="center">'.get_string('tplcopiedok', 'teamwork').'</p>';
+                print_continue('template.php?id='.$cm->id);
+
+            break;
+
             //mensaje de error al no existir la acción especificada
             default:
                 print_error('actionnotexist', 'teamwork');
