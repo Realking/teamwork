@@ -370,7 +370,6 @@ switch($section)
 
             //exporta una plantilla al formato xml
             case 'export':
-                //TODO implementar la logica de control de que estemos accediendo a exportar templates que sean nuestros
                 //borrar el contenido del buffer de salida
                 ob_clean();
 
@@ -389,6 +388,12 @@ switch($section)
 
                 //obtener los datos del template
                 $tpldata = get_record('teamwork_templates', 'id', $tplid);
+
+                //verificar que la plantilla que intentamos exportar sea de esta actividad
+                if($tpldata->teamworkid != $teamwork->id)
+                {
+                    print_error('youdonthavepermissiontoexportthistemplate','teamwork');
+                }
 
                 //obtener los datos de los items asociados a este template
                 $itemsdata = get_records('teamwork_items', 'templateid', $tplid);
