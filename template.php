@@ -401,13 +401,17 @@ switch($section)
                     $itemdata = new stdClass;
                     $itemdata->templateid = $newtplid;
 
+                    $scale_error = false;
+
                     foreach($content['template']['#']['items'][0]['#']['item'] as $item)
                     {
                         $itemdata->itemorder = $item['@']['order'];
                         $itemdata->description = $item['@']['description'];
 
                         //comprobar que la escala existe y la tenemos disponible en esta actividad
-                        $itemdata->scale = ($item['@']['scale'] >= 0 or teamwork_check_scale(abs($item['@']['scale']))) ? $item['@']['scale'] : 0;
+                        $status = teamwork_check_scale(abs($item['@']['scale']));
+                        $itemdata->scale = ($item['@']['scale'] >= 0 or $status) ? $item['@']['scale'] : 0;
+                        $scale_error = (!$status) ? true : $scale_error;
                         
                         $itemdata->weight = $item['@']['weight'];
 
@@ -419,6 +423,7 @@ switch($section)
 
                     //mostrar mensaje
                     echo '<p align="center">'.get_string('templateimportok', 'teamwork').'</p>';
+                    if($scale_error){ notify(get_string('importscaleerror', 'teamwork')); }
                     print_continue('template.php?id='.$cm->id);
                 }
                 

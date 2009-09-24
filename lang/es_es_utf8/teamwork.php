@@ -122,6 +122,7 @@ $string['tplcopiedok'] = 'La plantilla se ha copiado correctamente';
 $string['youdonthavepermissiontoexportthistemplate'] = 'No tiene permiso para exportar esta plantilla';
 $string['importtemplate'] = 'Importar plantilla';
 $string['templateimportok'] = 'Plantilla importada correctamente';
+$string['importscaleerror'] = '¡Atención! La escala de uno o varios elementos importados no se encuentra disponible en este curso, por lo que se ha establecido un valor de 0. Revise los elementos.';
 $string[''] = '';
 $string[''] = '';
 $string[''] = '';
