@@ -215,18 +215,14 @@ switch($section)
 
                         print_table($table);
                     }
-
-            
-                    
-
-
-                    //imprimir opciones inferiores
-                    echo '<br /><div align="center"><br />';
-                    echo '<img src="images/add.png" alt="'.get_string('createnewtemplate', 'teamwork').'" title="'.get_string('createnewtemplate', 'teamwork').'"/> <a href="template.php?id='.$cm->id.'&section=templates&action=add">'.get_string('createnewtemplate', 'teamwork').'</a> | ';
-                    echo '<img src="images/page_white_get.png" alt="'.get_string('importtpl', 'teamwork').'" title="'.get_string('importtpl', 'teamwork').'"/> <a href="template.php?id='.$cm->id.'&section=templates&action=import">'.get_string('importtpl', 'teamwork').'</a> | ';
-                    echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="view.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
-                    echo '</div>';
                 }
+
+                //imprimir opciones inferiores
+                echo '<br /><div align="center"><br />';
+                echo '<img src="images/add.png" alt="'.get_string('createnewtemplate', 'teamwork').'" title="'.get_string('createnewtemplate', 'teamwork').'"/> <a href="template.php?id='.$cm->id.'&section=templates&action=add">'.get_string('createnewtemplate', 'teamwork').'</a> | ';
+                echo '<img src="images/page_white_get.png" alt="'.get_string('importtpl', 'teamwork').'" title="'.get_string('importtpl', 'teamwork').'"/> <a href="template.php?id='.$cm->id.'&section=templates&action=import">'.get_string('importtpl', 'teamwork').'</a> | ';
+                echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="view.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
+                echo '</div>';
         }
     
     break;
