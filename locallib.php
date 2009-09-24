@@ -61,7 +61,8 @@ function teamwork_show_status_info()
     if($ismanager)
     {
         echo "<br />\n";
-        echo '<span class="highlight2">'.get_string('youaremanager', 'teamwork').':</span> <a href="template.php?id='.$cm->id.'">'.get_string('templatesanditemseditor', 'teamwork').'</a>';
+        echo '<span class="highlight2">'.get_string('youaremanager', 'teamwork').':</span> <a href="template.php?id='.$cm->id.'">'.get_string('templatesanditemseditor', 'teamwork').'</a> | ';
+        echo '<a href="group.php?id='.$cm->id.'">'.get_string('groupseditor', 'teamwork').'</a>';
     }
 
     //cerrar caja

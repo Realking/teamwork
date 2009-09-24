@@ -21,7 +21,7 @@ require_once('locallib.php');
 //el id del recurso (no es la instancia que esta guardada en la tabla teamwork)
 $id = required_param('id', PARAM_INT);
 
-//la accion ha realizar
+//la accion a realizar
 $action =  optional_param('action', '', PARAM_ALPHA);
 
 //la seccion donde realizar la accion

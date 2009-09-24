@@ -125,7 +125,7 @@ $string['templateimportok'] = 'Plantilla importada correctamente';
 $string['importscaleerror'] = '¡Atención! La escala de uno o varios elementos importados no se encuentra disponible en este curso, por lo que se ha establecido un valor de 0. Revise los elementos.';
 
 //en el editor de grupos group.php
-$string['groupseditor'] = 'Editor de grupos';
+$string['groupseditor'] = 'Editor de grupos de usuarios';
 $string[''] = '';
 $string[''] = '';
 $string[''] = '';

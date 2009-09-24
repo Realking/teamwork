@@ -21,11 +21,8 @@ require_once('locallib.php');
 //el id del recurso (no es la instancia que esta guardada en la tabla teamwork)
 $id = required_param('id', PARAM_INT);
 
-//la accion ha realizar
-$action =  optional_param('action', '', PARAM_ALPHA);
-
-//la seccion donde realizar la accion
-$section =  optional_param('section', 'instances', PARAM_ALPHA);
+//la accion a realizar
+$action =  optional_param('action', 'list', PARAM_ALPHA);
 
 
 //
@@ -68,20 +65,47 @@ print_header($pagetitle, $course->fullname, $navigation, '', '', true, '', navme
 
 echo '<div class="clearer"></div><br />';
 
-//selección de la sección que debemos mostrar
-switch($section)
+//selección de la acción a realizar
+switch($action)
 {
-    case '':
-
-        //selección de la acción a realizar en esta sección
-        switch($action)
-        {
-            case '':
-
-            break;
-        }
+    //muestra la lista de grupos actualmente existentes en esta actividad
+    case 'list':
         
     break;
+
+    //añade un grupo vacio
+    case 'groupadd':
+
+    break;
+
+    //edita la información sobre un grupo ya creado (no edita los usuarios)
+    case 'groupedit':
+
+    break;
+
+    //elimina un grupo existente
+    case 'groupdelete':
+
+    break;
+
+    //muestra la lista de usuarios disponibles y le asigna el especificado al grupo
+    case 'useradd':
+
+    break;
+
+    //muestra la lista de miembros del grupo y elimina el especificado
+    case 'userdelete':
+
+    break;
+
+    //establece un nuevo lider en el grupo
+    case 'leaderset':
+
+    break;
+
+    //mensaje de error al no existir la acción especificada
+    default:
+        print_error('actionnotexist', 'teamwork');
 }
 
 //
