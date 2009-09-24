@@ -602,4 +602,26 @@ function teamwork_check_tpl_type($type, $teamworkid)
     
     return ($result[$type]) ? true : false;
 }
+
+/**
+ * Comprueba si una escala existe en el sistema y la tenemos disponible en el curso actual
+ *
+ * @global object $course objeto que hace referencia al curso actual
+ * @staticvar array $result cache de resultados de las consultas
+ * @param int $scale referencia a la id de la escala usada
+ * @return bool true si existe, false si no.
+ */
+function teamwork_check_scale($scale)
+{
+    static $result = null;
+    global $course, $CFG;
+
+    //si no hemos realizado la consulta
+    if(!isset($result[$scale]))
+    {
+        $result[$scale] = count_records_sql('select count(s.id) from '.$CFG->prefix.'scale s where s.id = '.$scale.' and (s.courseid = '.$course->id.' or s.courseid = 0)');
+    }
+
+    return ($result[$scale]) ? true : false;
+}
 ?>
