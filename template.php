@@ -104,7 +104,7 @@ switch($section)
                 $data->evaltype = $type;
                 insert_record('teamwork_tplinstances', $data);
 
-                redirect('template.php?id='.$cm->id);
+                redirect('template.php?id='.$cm->id, '', 0);
 
             break;
 
@@ -131,7 +131,7 @@ switch($section)
                 //eliminar la asignación
                 delete_records('teamwork_tplinstances', 'id', $instid);
 
-                redirect('template.php?id='.$cm->id);
+                redirect('template.php?id='.$cm->id, '', 0);
 
             break;
 
@@ -245,7 +245,7 @@ switch($section)
                 //se ha enviado pero se ha cancelado, redirigir a página principal
                 elseif($form->is_cancelled())
                 {
-                    redirect('template.php?id='.$cm->id);
+                    redirect('template.php?id='.$cm->id, '', 0);
                 }
                 //se ha enviado y no valida el formulario...
                 elseif(!$form->is_validated())
@@ -295,7 +295,7 @@ switch($section)
                 //se ha enviado pero se ha cancelado, redirigir a página principal
                 elseif($form->is_cancelled())
                 {
-                    redirect('template.php?id='.$cm->id);
+                    redirect('template.php?id='.$cm->id, '', 0);
                 }
                 //se ha enviado y no valida el formulario...
                 elseif(!$form->is_validated())
@@ -553,7 +553,7 @@ switch($section)
                 //se ha enviado pero se ha cancelado, redirigir a página principal
                 elseif($form->is_cancelled())
                 {
-                    redirect('template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
+                    redirect('template.php?id='.$cm->id.'&section=items&tplid='.$tplid, '', 0);
                 }
                 //se ha enviado y no valida el formulario...
                 elseif(!$form->is_validated())
@@ -622,7 +622,7 @@ switch($section)
                 //se ha enviado pero se ha cancelado, redirigir a página principal
                 elseif($form->is_cancelled())
                 {
-                    redirect('template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
+                    redirect('template.php?id='.$cm->id.'&section=items&tplid='.$tplid, '', 0);
                 }
                 //se ha enviado y no valida el formulario...
                 elseif(!$form->is_validated())
