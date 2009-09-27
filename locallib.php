@@ -671,11 +671,23 @@ class teamwork_groups_form extends moodleform
         //---> Campos ocultos
 
         //id del grupo (para la edicion)
-        $mform->addElement('hidden', 'teamid', '');
+        $mform->addElement('hidden', 'tid', '');
         
 
         // botones de envío y cancelación
         $this->add_action_buttons();
     }
+}
+
+/**
+ * Comprueba si se puede editar cualquier parte de esta instancia de actividad
+ * 
+ * @param object $teamwork referencia al teamwork actual
+ * @return bool true si se puede editar, en otro caso false
+ */
+//TODO implementar la funcion is_editable
+function teamwork_is_editable($teamwork)
+{
+    return true;
 }
 ?>

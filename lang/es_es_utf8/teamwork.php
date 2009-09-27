@@ -132,11 +132,16 @@ $string['addnewgroup'] = 'Añadir nuevo grupo';
 $string['editgroup'] = 'Editar grupo';
 $string['groupname'] = 'Nombre del grupo';
 $string['groupcreated'] = 'Grupo creado correctamente';
-$string[''] = '';
-$string[''] = '';
+$string['teamnotexist'] = 'El equipo no existe';
+$string['teamupdated'] = 'Grupo actualizado correctamente';
 
 //en el archivo locallib.php
 $string['upitem'] = 'Subir elemento';
 $string['downitem'] = 'Bajar elemento';
 
+//generales
+$string['teamworkisnoeditable'] = 'No se puede editar la actividad';
+
+
+$string[''] = '';
 ?>

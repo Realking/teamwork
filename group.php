@@ -80,6 +80,12 @@ switch($action)
 
     //añade un grupo vacio
     case 'groupadd':
+        //verificar que se pueda realmente editar este teamwork
+        if(!teamwork_is_editable($teamwork))
+        {
+            print_error('teamworkisnoeditable', 'teamwork');
+        }
+        
         //cargamos el formulario
         $form = new teamwork_groups_form('group.php?id='.$cm->id.'&action=groupadd');
 
@@ -121,6 +127,60 @@ switch($action)
     //edita la información sobre un grupo ya creado (no edita los usuarios)
     case 'groupedit':
 
+        //verificar que se pueda realmente editar este teamwork
+        if(!teamwork_is_editable($teamwork))
+        {
+            print_error('teamworkisnoeditable', 'teamwork');
+        }
+
+        //parametros requeridos
+        $tid = required_param('tid', PARAM_INT);
+
+        //cargamos el formulario
+        $form = new teamwork_groups_form('group.php?id='.$cm->id.'&action=groupedit');
+
+        //no se ha enviado, se muestra
+        if(!$form->is_submitted())
+        {
+            //obtenemos los datos del elemento
+            if(!$teamdata = get_record('teamwork_teams', 'id', $tid))
+            {
+                print_error('teamnotexist', 'teamwork');
+            }
+
+            $teamdata->tid = $tid;
+
+            $form->set_data($teamdata);
+            $form->display();
+        }
+        //se ha enviado pero se ha cancelado, redirigir a página principal
+        elseif($form->is_cancelled())
+        {
+            redirect('group.php?id='.$cm->id, '', 0);
+        }
+        //se ha enviado y no valida el formulario...
+        elseif(!$form->is_validated())
+        {
+            $form->display();
+        }
+        //se ha enviado y es válido, se procesa
+        else
+        {
+            //obtenemos los datos del formulario
+            $formdata = $form->get_data();
+
+            $data = new stdClass;
+            $data->id = $tid;
+            $data->teamname = $formdata->teamname;
+
+            //actualizar los datos en la base de datos
+            update_record('teamwork_teams', $data);
+
+            //mostramos mensaje
+            echo '<p align="center">'.get_string('teamupdated', 'teamwork').'</p>';
+            print_continue('group.php?id='.$cm->id);
+        }
+        
     break;
 
     //elimina un grupo existente
