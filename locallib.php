@@ -570,7 +570,7 @@ class teamwork_items_form extends moodleform
  * @param object $cm contexto del módulo
  * @return string html con las acciones
  */
-function teamwork_item_table_options($item, $cm, $tpl)
+function teamwork_item_table_options($item, $cm, $tpl, $nitems, $current_item, $prev_item, $next_item)
 {
     $stractions = '';
     
@@ -579,6 +579,18 @@ function teamwork_item_table_options($item, $cm, $tpl)
     {
         $stractions .= '<a href="template.php?id='.$cm->id.'&section=items&action=modify&itemid='.$item->id.'&tplid='.$tpl->id.'"><img src="images/pencil.png" alt="'.get_string('edit', 'teamwork').'" title="'.get_string('edit', 'teamwork').'" /></a>&nbsp;&nbsp;';
         $stractions .= '<a href="template.php?id='.$cm->id.'&section=items&action=delete&itemid='.$item->id.'&tplid='.$tpl->id.'"><img src="images/delete.png" alt="'.get_string('deleteitem', 'teamwork').'" title="'.get_string('deleteitem', 'teamwork').'" /></a>&nbsp;&nbsp;';
+    }
+
+    //si el elemento no es el primero, mostrar flecha de subir el orden
+    if($current_item != 1)
+    {
+        $stractions .= '<a href="template.php?id='.$cm->id.'&section=items&action=order&itemid='.$item->id.'&tplid='.$tpl->id.'&o='.$prev_item->id.'"><img src="images/arrow_up.png" alt="'.get_string('upitem', 'teamwork').'" title="'.get_string('upitem', 'teamwork').'" /></a>&nbsp;&nbsp;';
+    }
+
+    //si el elemento no es el último, mostrar flecha de bajar el orden
+    if($current_item != $nitems)
+    {
+        $stractions .= '<a href="template.php?id='.$cm->id.'&section=items&action=order&itemid='.$item->id.'&tplid='.$tpl->id.'&o='.$next_item->id.'"><img src="images/arrow_down.png" alt="'.get_string('downitem', 'teamwork').'" title="'.get_string('downitem', 'teamwork').'" /></a>&nbsp;&nbsp;';
     }
 
     return $stractions;

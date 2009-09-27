@@ -687,6 +687,44 @@ switch($section)
                 
             break;
 
+            //cambiar el orden de los elementos
+            case 'order':
+
+                $tplid = required_param('tplid', PARAM_INT);
+                $itemid = required_param('itemid', PARAM_INT);
+                $o = required_param('o', PARAM_INT);
+
+                //comprobar que el template que intentamos editar sea nuestro
+                if(!get_record('teamwork_templates', 'id', $tplid, 'courseid', $course->id))
+                {
+                    print_error('youdonthavepermissiontochangeorder', 'teamwork');
+                }
+
+                //obtenemos los datos del elemento 1
+                if(!$a = get_record('teamwork_items', 'id', $itemid, 'templateid', $tplid))
+                {
+                    print_error('youdonthavepermissiontochangeorder2', 'teamwork');
+                }
+
+                //obtenemos los datos del elemento 2
+                if(!$b = get_record('teamwork_items', 'id', $o, 'templateid', $tplid))
+                {
+                    print_error('youdonthavepermissiontochangeorder3', 'teamwork');
+                }
+
+                //intercambiamos el orden
+                $aux = $a->itemorder;
+                $a->itemorder = $b->itemorder;
+                $b->itemorder = $aux;
+
+                //actualizamos los datos
+                update_record('teamwork_items', $a);
+                update_record('teamwork_items', $b);
+
+                redirect('template.php?id='.$cm->id.'&section=items&tplid='.$tplid, '', 0);
+
+            break;
+
             //caso por defecto, mostrar la página principal de la gestión de items en una plantilla
             default:
 
@@ -700,7 +738,7 @@ switch($section)
                 }
 
                 //obtener la lista de items asignados a esta plantilla
-                if(!$items = get_records('teamwork_items', 'templateid', $tplid))
+                if(!$items = get_records('teamwork_items', 'templateid', $tplid, 'itemorder'))
                 {
                     //si no hay, construir la tabla para mostrar mensaje de aviso
                     $table = new stdClass;
@@ -723,6 +761,8 @@ switch($section)
                 //si hay elementos que listar
                 else
                 {
+                    $items = array_values($items);
+                    
                     $table = new stdClass;
                     $table->width = '70%';
                     $table->tablealign = 'center';
@@ -731,13 +771,18 @@ switch($section)
                     //$table->size = array('10%', '90%');
                     $table->align = array('center', 'center', 'center', 'center');
 
-                    foreach($items as $item)
+                    $nitems = count($items);
+
+                    for($i=0; $i < $nitems; $i++)
                     {
-                        $stractions = teamwork_item_table_options($item, $cm, $tpldata);
+                        $prev_item = ($i == 0) ? null : $items[$i-1];
+                        $next_item = ($i == $nitems-1) ? null : $items[$i+1];
 
-                        $scale = ($item->scale < 0) ? get_record('scale', 'id', abs($item->scale))->name : $item->scale;
+                        $stractions = teamwork_item_table_options($items[$i], $cm, $tpldata, $nitems, $i+1, $prev_item, $next_item);
 
-                        $table->data[] = array($item->description, $scale, $item->weight, $stractions);
+                        $scale = ($items[$i]->scale < 0) ? get_record('scale', 'id', abs($items[$i]->scale))->name : $items[$i]->scale;
+
+                        $table->data[] = array($items[$i]->description, $scale, $items[$i]->weight, $stractions);
                     }
 
                     //disponibles: imprimir la tabla y el boton de añadir

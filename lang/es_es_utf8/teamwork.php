@@ -123,6 +123,8 @@ $string['youdonthavepermissiontoexportthistemplate'] = 'No tiene permiso para ex
 $string['importtemplate'] = 'Importar plantilla';
 $string['templateimportok'] = 'Plantilla importada correctamente';
 $string['importscaleerror'] = '¡Atención! La escala de uno o varios elementos importados no se encuentra disponible en este curso, por lo que se ha establecido un valor de 0. Revise los elementos.';
+$string['youdonthavepermissiontochangeorder'] = 'No tiene permiso para cambiar el orden de estos elementos';
+
 
 //en el editor de grupos group.php
 $string['groupseditor'] = 'Editor de grupos de usuarios';
@@ -132,5 +134,9 @@ $string[''] = '';
 $string[''] = '';
 $string[''] = '';
 $string[''] = '';
+
+//en el archivo locallib.php
+$string['upitem'] = 'Subir elemento';
+$string['downitem'] = 'Bajar elemento';
 
 ?>
