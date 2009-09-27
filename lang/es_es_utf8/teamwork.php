@@ -128,10 +128,10 @@ $string['youdonthavepermissiontochangeorder'] = 'No tiene permiso para cambiar e
 
 //en el editor de grupos group.php
 $string['groupseditor'] = 'Editor de grupos de usuarios';
-$string[''] = '';
-$string[''] = '';
-$string[''] = '';
-$string[''] = '';
+$string['addnewgroup'] = 'Añadir nuevo grupo';
+$string['editgroup'] = 'Editar grupo';
+$string['groupname'] = 'Nombre del grupo';
+$string['groupcreated'] = 'Grupo creado correctamente';
 $string[''] = '';
 $string[''] = '';
 

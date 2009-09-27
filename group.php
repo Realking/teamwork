@@ -71,10 +71,50 @@ switch($action)
     //muestra la lista de grupos actualmente existentes en esta actividad
     case 'list':
         
+        //imprimir opciones inferiores
+        echo '<br /><div align="center"><br />';
+        echo '<img src="images/add.png" alt="'.get_string('addnewgroup', 'teamwork').'" title="'.get_string('addnewgroup', 'teamwork').'"/> <a href="group.php?id='.$cm->id.'&action=groupadd">'.get_string('addnewgroup', 'teamwork').'</a> | ';
+        echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="view.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
+        echo '</div>';
     break;
 
     //añade un grupo vacio
     case 'groupadd':
+        //cargamos el formulario
+        $form = new teamwork_groups_form('group.php?id='.$cm->id.'&action=groupadd');
+
+        //no se ha enviado, se muestra
+        if(!$form->is_submitted())
+        {
+            $form->display();
+        }
+        //se ha enviado pero se ha cancelado, redirigir a página principal
+        elseif($form->is_cancelled())
+        {
+            redirect('group.php?id='.$cm->id, '', 0);
+        }
+        //se ha enviado y no valida el formulario...
+        elseif(!$form->is_validated())
+        {
+            $form->display();
+        }
+        //se ha enviado y es válido, se procesa
+        else
+        {
+            //obtenemos los datos del formulario
+            $formdata = $form->get_data();
+
+            $data = new stdClass;
+            $data->teamworkid = $teamwork->id;
+            $data->teamname = $formdata->teamname;
+
+            //insertar los datos
+            $tid = insert_record('teamwork_teams', $data);
+
+            //mostramos mensaje
+            echo '<p align="center">'.get_string('groupcreated', 'teamwork').'</p>';
+            print_continue('group.php?id='.$cm->id.'&action=useradd&tid='.$tid);
+        }
 
     break;
 

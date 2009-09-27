@@ -637,4 +637,45 @@ function teamwork_check_scale($scale)
 
     return ($result[$scale]) ? true : false;
 }
+
+/**
+ * Clase que muestra el formulario de editar (o añadir) un grupo de usuarios
+ */
+class teamwork_groups_form extends moodleform
+{
+    /**
+     * Define el formulario
+     */
+    function definition()
+    {
+        global $CFG;
+        $mform =& $this->_form;
+
+        //marco del formulario
+        $mform->addElement('header', 'general', get_string('editgroup', 'teamwork'));
+        $mform->setHelpButton('general', array('editgroup', get_string('editgroup', 'teamwork'), 'teamwork'));
+
+        //---> Nombre
+
+        //nombre de la plantilla
+        $mform->addElement('text', 'teamname', get_string('groupname', 'teamwork'), array('size'=>'64'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('teamname', PARAM_TEXT); //funcion definida en moodle/lib/formslib.php
+        } else {
+            $mform->setType('teamname', PARAM_CLEAN);
+        }
+        $mform->setHelpButton('teamname', array('teamname', get_string('teamname', 'teamwork'), 'teamwork'));
+        //regla de validacion (no puede estar vacio el campo)
+        $mform->addRule('teamname', null, 'required', null, 'server');
+
+        //---> Campos ocultos
+
+        //id del grupo (para la edicion)
+        $mform->addElement('hidden', 'teamid', '');
+        
+
+        // botones de envío y cancelación
+        $this->add_action_buttons();
+    }
+}
 ?>
