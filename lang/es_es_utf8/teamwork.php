@@ -134,6 +134,8 @@ $string['groupname'] = 'Nombre del grupo';
 $string['groupcreated'] = 'Grupo creado correctamente';
 $string['teamnotexist'] = 'El equipo no existe';
 $string['teamupdated'] = 'Grupo actualizado correctamente';
+$string['confirmationfordeletegroup'] = '¿Desea realmente borrar el grupo?';
+$string['teamdeleted'] = 'Grupo borrado correctamente';
 
 //en el archivo locallib.php
 $string['upitem'] = 'Subir elemento';

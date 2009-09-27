@@ -185,7 +185,32 @@ switch($action)
 
     //elimina un grupo existente
     case 'groupdelete':
+        //verificar que se pueda realmente editar este teamwork
+        if(!teamwork_is_editable($teamwork))
+        {
+            print_error('teamworkisnoeditable', 'teamwork');
+        }
 
+        //parametros requeridos
+        $tid = required_param('tid', PARAM_INT);
+
+        //si el grupo puede ser borrado, pedir confirmación
+        //si no ha sido enviada, mostrar la confirmacion
+        if(!isset($_POST['tid']))
+        {
+            notice_yesno(get_string('confirmationfordeletegroup', 'teamwork'), 'group.php', 'group.php', array('id'=>$cm->id, 'action'=>'groupdelete', 'tid'=>$tid), array('id'=>$cm->id), 'post', 'get');
+        }
+        //si se ha enviado, procesamos
+        else
+        {
+            //borrar items de la plantilla
+            delete_records('teamwork_teams', 'id', $tid);
+
+            //mostrar mensaje
+            echo '<p align="center">'.get_string('teamdeleted', 'teamwork').'</p>';
+            print_continue('group.php?id='.$cm->id);
+        }
+        
     break;
 
     //muestra la lista de usuarios disponibles y le asigna el especificado al grupo
