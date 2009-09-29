@@ -62,7 +62,7 @@ function teamwork_show_status_info()
     {
         echo "<br />\n";
         echo '<span class="highlight2">'.get_string('youaremanager', 'teamwork').':</span> <a href="template.php?id='.$cm->id.'">'.get_string('templatesanditemseditor', 'teamwork').'</a> | ';
-        echo '<a href="group.php?id='.$cm->id.'">'.get_string('groupseditor', 'teamwork').'</a>';
+        echo '<a href="team.php?id='.$cm->id.'">'.get_string('teamseditor', 'teamwork').'</a>';
     }
 
     //cerrar caja
@@ -652,13 +652,13 @@ class teamwork_groups_form extends moodleform
         $mform =& $this->_form;
 
         //marco del formulario
-        $mform->addElement('header', 'general', get_string('editgroup', 'teamwork'));
-        $mform->setHelpButton('general', array('editgroup', get_string('editgroup', 'teamwork'), 'teamwork'));
+        $mform->addElement('header', 'general', get_string('editteam', 'teamwork'));
+        $mform->setHelpButton('general', array('editteam', get_string('editteam', 'teamwork'), 'teamwork'));
 
         //---> Nombre
 
         //nombre de la plantilla
-        $mform->addElement('text', 'teamname', get_string('groupname', 'teamwork'), array('size'=>'64'));
+        $mform->addElement('text', 'teamname', get_string('teamname', 'teamwork'), array('size'=>'64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('teamname', PARAM_TEXT); //funcion definida en moodle/lib/formslib.php
         } else {
@@ -689,5 +689,52 @@ class teamwork_groups_form extends moodleform
 function teamwork_is_editable($teamwork)
 {
     return true;
+}
+
+
+function teamwork_group_table_options($team)
+{
+    global $cm, $teamwork;
+
+    $stractions = '';
+    
+    //opcion de editar el nombre del grupo (siempre se puede)
+    $stractions .= '<a href="team.php?id='.$cm->id.'&action=editteam&tid='.$team->id.'"><img src="images/pencil.png" alt="'.get_string('editteam', 'teamwork').'" title="'.get_string('editteam', 'teamwork').'" /></a>&nbsp;&nbsp;';
+
+    //solo si se puede editar el teamwork
+    if(teamwork_is_editable($teamwork))
+    {
+        //boton de editar los miembros del grupo
+        $stractions .= '<a href="team.php?id='.$cm->id.'&action=userlist&tid='.$team->id.'"><img src="images/page_edit.png" alt="'.get_string('editmembers', 'teamwork').'" title="'.get_string('editmembers', 'teamwork').'" /></a>&nbsp;&nbsp;';
+
+        //boton de eliminar grupo
+        $stractions .= '<a href="team.php?id='.$cm->id.'&action=deleteteam&tid='.$team->id.'"><img src="images/delete.png" alt="'.get_string('deleteteam', 'teamwork').'" title="'.get_string('deleteteam', 'teamwork').'" /></a>&nbsp;&nbsp;';
+    }
+
+    return $stractions;
+}
+
+/**
+ * Obtiene la lista de los miembros de un equipo
+ * 
+ * @param object $team referfencia al equipo
+ * @return string lista de miembros 
+ */
+//TODO implementar la funcion get_team_members
+function teamwork_get_team_members($team)
+{
+    global $CFG;
+    
+    //obtenemos los nombres de los usuarios
+    if(!$result = get_records_sql('select u.id, u.firstname, u.lastname from '.$CFG->prefix.'teamwork_users_teams ut, '.$CFG->prefix.'user u where u.id = ut.userid and ut.teamid = '.$team->id))
+    {
+        //no hay usuarios
+        return '-';
+    }
+    //hay usuarios
+    else
+    {
+        return '';
+    }
 }
 ?>

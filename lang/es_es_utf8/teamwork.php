@@ -127,15 +127,20 @@ $string['youdonthavepermissiontochangeorder'] = 'No tiene permiso para cambiar e
 
 
 //en el editor de grupos group.php
-$string['groupseditor'] = 'Editor de grupos de usuarios';
-$string['addnewgroup'] = 'Añadir nuevo grupo';
-$string['editgroup'] = 'Editar grupo';
-$string['groupname'] = 'Nombre del grupo';
-$string['groupcreated'] = 'Grupo creado correctamente';
+$string['teamseditor'] = 'Editor de equipos de usuarios';
+$string['addnewteam'] = 'Añadir nuevo equipo';
+$string['editteam'] = 'Editar equipo';
+$string['teamname'] = 'Nombre del equipo';
+$string['teamcreated'] = 'Equipo creado correctamente';
 $string['teamnotexist'] = 'El equipo no existe';
-$string['teamupdated'] = 'Grupo actualizado correctamente';
-$string['confirmationfordeletegroup'] = '¿Desea realmente borrar el grupo?';
-$string['teamdeleted'] = 'Grupo borrado correctamente';
+$string['teamupdated'] = 'Equipo actualizado correctamente';
+$string['confirmationfordeleteteam'] = '¿Desea realmente borrar el equipo?';
+$string['teamdeleted'] = 'Equipo borrado correctamente';
+$string['definedteamlist'] = 'Lista de equipos definidos';
+$string['notexistanyteam'] = 'No se han definido equipos. ¡Debe definir al menos dos para que la actividad funcione!';
+$string['teammembers'] = 'Miembros del equipo';
+$string['editmembers'] = 'Editar miembros';
+$string['deleteteam'] = 'Borrar equipo';
 
 //en el archivo locallib.php
 $string['upitem'] = 'Subir elemento';

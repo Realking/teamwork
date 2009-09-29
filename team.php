@@ -58,8 +58,8 @@ require_capability('mod/teamwork:manage', $cm->context);
 /// header
 //
 
-$navigation = build_navigation(get_string('groupseditor', 'teamwork'), $cm);
-$pagetitle = strip_tags($course->shortname.': '.get_string('modulename', 'teamwork').': '.format_string($teamwork->name,true).': '.get_string('groupseditor', 'teamwork'));
+$navigation = build_navigation(get_string('teamseditor', 'teamwork'), $cm);
+$pagetitle = strip_tags($course->shortname.': '.get_string('modulename', 'teamwork').': '.format_string($teamwork->name,true).': '.get_string('teamseditor', 'teamwork'));
 
 print_header($pagetitle, $course->fullname, $navigation, '', '', true, '', navmenu($course, $cm));
 
@@ -70,16 +70,47 @@ switch($action)
 {
     //muestra la lista de grupos actualmente existentes en esta actividad
     case 'list':
-        
+
+        //obtener la lista de grupos existente en este teamwork
+        if(!$teams = get_records('teamwork_teams', 'teamworkid', $teamwork->id))
+        {
+            //no hay grupos definidos
+            print_heading(get_string('definedteamlist', 'teamwork'));
+            echo '<p align="center">'.get_string('notexistanyteam', 'teamwork').'</p>';
+
+        }
+        //tenemos grupos, mostramos la lista
+        else
+        {
+            $table = new stdClass;
+            $table->width = '70%';
+            $table->tablealign = 'center';
+            $table->id = 'teamstable';
+            $table->head = array(get_string('teamname', 'teamwork'), get_string('teammembers', 'teamwork'), get_string('actions', 'teamwork'));
+            $table->align = array('center', 'center', 'center');
+
+            foreach($teams as $team)
+            {
+                $stractions = teamwork_group_table_options($team);
+                $members = teamwork_get_team_members($team);
+
+                $table->data[] = array($team->teamname, $members, $stractions);
+            }
+
+            //disponibles: imprimir la tabla y el boton de añadir
+            print_heading(get_string('definedteamlist', 'teamwork'));
+            print_table($table);
+        }
+
         //imprimir opciones inferiores
         echo '<br /><div align="center"><br />';
-        echo '<img src="images/add.png" alt="'.get_string('addnewgroup', 'teamwork').'" title="'.get_string('addnewgroup', 'teamwork').'"/> <a href="group.php?id='.$cm->id.'&action=groupadd">'.get_string('addnewgroup', 'teamwork').'</a> | ';
+        echo '<img src="images/add.png" alt="'.get_string('addnewteam', 'teamwork').'" title="'.get_string('addnewteam', 'teamwork').'"/> <a href="team.php?id='.$cm->id.'&action=addteam">'.get_string('addnewteam', 'teamwork').'</a> | ';
         echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="view.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
         echo '</div>';
     break;
 
     //añade un grupo vacio
-    case 'groupadd':
+    case 'addteam':
         //verificar que se pueda realmente editar este teamwork
         if(!teamwork_is_editable($teamwork))
         {
@@ -87,7 +118,7 @@ switch($action)
         }
         
         //cargamos el formulario
-        $form = new teamwork_groups_form('group.php?id='.$cm->id.'&action=groupadd');
+        $form = new teamwork_groups_form('team.php?id='.$cm->id.'&action=addteam');
 
         //no se ha enviado, se muestra
         if(!$form->is_submitted())
@@ -97,7 +128,7 @@ switch($action)
         //se ha enviado pero se ha cancelado, redirigir a página principal
         elseif($form->is_cancelled())
         {
-            redirect('group.php?id='.$cm->id, '', 0);
+            redirect('team.php?id='.$cm->id, '', 0);
         }
         //se ha enviado y no valida el formulario...
         elseif(!$form->is_validated())
@@ -118,14 +149,14 @@ switch($action)
             $tid = insert_record('teamwork_teams', $data);
 
             //mostramos mensaje
-            echo '<p align="center">'.get_string('groupcreated', 'teamwork').'</p>';
-            print_continue('group.php?id='.$cm->id.'&action=useradd&tid='.$tid);
+            echo '<p align="center">'.get_string('teamcreated', 'teamwork').'</p>';
+            print_continue('team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
         }
 
     break;
 
     //edita la información sobre un grupo ya creado (no edita los usuarios)
-    case 'groupedit':
+    case 'editteam':
 
         //verificar que se pueda realmente editar este teamwork
         if(!teamwork_is_editable($teamwork))
@@ -137,7 +168,7 @@ switch($action)
         $tid = required_param('tid', PARAM_INT);
 
         //cargamos el formulario
-        $form = new teamwork_groups_form('group.php?id='.$cm->id.'&action=groupedit');
+        $form = new teamwork_groups_form('team.php?id='.$cm->id.'&action=editteam');
 
         //no se ha enviado, se muestra
         if(!$form->is_submitted())
@@ -156,7 +187,7 @@ switch($action)
         //se ha enviado pero se ha cancelado, redirigir a página principal
         elseif($form->is_cancelled())
         {
-            redirect('group.php?id='.$cm->id, '', 0);
+            redirect('team.php?id='.$cm->id, '', 0);
         }
         //se ha enviado y no valida el formulario...
         elseif(!$form->is_validated())
@@ -178,13 +209,13 @@ switch($action)
 
             //mostramos mensaje
             echo '<p align="center">'.get_string('teamupdated', 'teamwork').'</p>';
-            print_continue('group.php?id='.$cm->id);
+            print_continue('team.php?id='.$cm->id);
         }
         
     break;
 
     //elimina un grupo existente
-    case 'groupdelete':
+    case 'deleteteam':
         //verificar que se pueda realmente editar este teamwork
         if(!teamwork_is_editable($teamwork))
         {
@@ -198,7 +229,7 @@ switch($action)
         //si no ha sido enviada, mostrar la confirmacion
         if(!isset($_POST['tid']))
         {
-            notice_yesno(get_string('confirmationfordeletegroup', 'teamwork'), 'group.php', 'group.php', array('id'=>$cm->id, 'action'=>'groupdelete', 'tid'=>$tid), array('id'=>$cm->id), 'post', 'get');
+            notice_yesno(get_string('confirmationfordeleteteam', 'teamwork'), 'team.php', 'team.php', array('id'=>$cm->id, 'action'=>'deleteteam', 'tid'=>$tid), array('id'=>$cm->id), 'post', 'get');
         }
         //si se ha enviado, procesamos
         else
@@ -206,25 +237,33 @@ switch($action)
             //borrar items de la plantilla
             delete_records('teamwork_teams', 'id', $tid);
 
+            //borrar lista de asociaciones usuario-equipo
+            delete_records('teamwork_users_teams', 'teamid', $tid);
+
             //mostrar mensaje
             echo '<p align="center">'.get_string('teamdeleted', 'teamwork').'</p>';
-            print_continue('group.php?id='.$cm->id);
+            print_continue('team.php?id='.$cm->id);
         }
         
     break;
 
     //muestra la lista de usuarios disponibles y le asigna el especificado al grupo
-    case 'useradd':
+    case 'userlist':
+
+    break;
+
+    //asigna un usuario a un grupo
+    case 'adduser':
 
     break;
 
     //muestra la lista de miembros del grupo y elimina el especificado
-    case 'userdelete':
+    case 'deleteuser':
 
     break;
 
     //establece un nuevo lider en el grupo
-    case 'leaderset':
+    case 'setleader':
 
     break;
 
