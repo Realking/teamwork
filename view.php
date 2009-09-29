@@ -72,45 +72,30 @@ if($ismanager AND count_records('teamwork_tplinstances', 'teamworkid', $teamwork
 }
 
 //
-/// header
+/// cabecera
 //
 
 $navigation = build_navigation('', $cm);
 $pagetitle = strip_tags($course->shortname.': '.get_string('modulename', 'teamwork').': '.format_string($teamwork->name,true));
 
-print_header($pagetitle, $course->fullname, $navigation, '', '',
-                     true, update_module_button($cm->id, $course->id, get_string('modulename', 'teamwork')),
-                     navmenu($course, $cm));
-
-//muestra el cuadro de selección de grupos, en nuestro caso no se aplica aunque se deja aqui documentado
-//groups_print_activity_menu($cm, 'view.php?id=' . $cm->id);
+print_header($pagetitle, $course->fullname, $navigation, '', '', true, update_module_button($cm->id, $course->id, get_string('modulename', 'teamwork')), navmenu($course, $cm));
 
 echo '<div class="clearer"></div><br />';
 
 
+
+//
+/// contenido
+//
+
+//mostrar el cuadro de información
 teamwork_show_status_info();
 
 
 
-
-print_box_start();
-echo "holaaaa";
-print_box_end();
-
-print_heading(get_string("notavailable", "workshop"));
-print_heading_block('balabl');
-print_headline('dsadas');
-print_side_block('titleeee', 'content');
-
-notify('mensaje de notificacion');
-notice_yesno('¿te has liado cual pata de un romano?', 'si.php', 'no.php');
-
-echo '$cm: ';
-var_dump($cm);
-echo '$course: ';
-var_dump($course);
-echo '$teamwork: ';
-var_dump($teamwork);
+//
+/// pie de pagina
+//
 
 print_footer($course);
 ?>
