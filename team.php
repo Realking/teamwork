@@ -247,18 +247,69 @@ switch($action)
         
     break;
 
-    //muestra la lista de usuarios disponibles y le asigna el especificado al grupo
+    //muestra la lista de usuarios disponibles
     case 'userlist':
+        //parametros requeridos
+        $tid = required_param('tid', PARAM_INT);
 
+        $team = get_record('teamwork_teams', 'id', $tid);
+
+        //obtener la lista de componentes del grupo
+        if(!$members = get_records_sql('select u.id, u.firstname, u.lastname from '.$CFG->prefix.'user u, '.$CFG->prefix.'teamwork_users_teams t where t.teamid = '.$tid.' and u.id = t.userid'))
+        {
+            //no hay grupos definidos
+            print_heading(get_string('teammembers', 'teamwork', $team->teamname));
+            echo '<p align="center">'.get_string('donothaveanyuserinthisteam', 'teamwork').'</p>';
+
+        }
+        //tenemos grupos, mostramos la lista
+        else
+        {
+            $table = new stdClass;
+            $table->width = '40%';
+            $table->tablealign = 'center';
+            $table->id = 'usersteamstable';
+            $table->head = array(get_string('studentname', 'teamwork'), get_string('actions', 'teamwork'));
+            $table->align = array('center', 'center');
+            $table->size = array('90%', '10%');
+
+            foreach($members as $member)
+            {
+                $stractions = teamwork_usersteams_table_options($member, $tid);
+                $name = '<a href="../../user/view.php?id='.$member->id.'&course='.$course->id.'" target="_blank">'.$member->firstname.' '.$member->lastname.'</a>';
+                
+                $table->data[] = array($name, $stractions);
+            }
+
+            //disponibles: imprimir la tabla y el boton de añadir
+            print_heading(get_string('teammembers', 'teamwork', $team->teamname));
+            print_table($table);
+        }
+        
+        //imprimir opciones inferiores
+        echo '<br /><div align="center"><br />';
+        echo '<img src="images/add.png" alt="'.get_string('addnewusers', 'teamwork').'" title="'.get_string('addnewusers', 'teamwork').'"/> <a href="team.php?id='.$cm->id.'&action=adduser&tid='.$tid.'">'.get_string('addnewusers', 'teamwork').'</a> | ';
+        echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="team.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
+        echo '</div>';
     break;
 
     //asigna un usuario a un grupo
     case 'adduser':
-
+        //verificar que se pueda realmente editar este teamwork
+        if(!teamwork_is_editable($teamwork))
+        {
+            print_error('teamworkisnoeditable', 'teamwork');
+        }
+        
     break;
 
     //muestra la lista de miembros del grupo y elimina el especificado
     case 'deleteuser':
+        //verificar que se pueda realmente editar este teamwork
+        if(!teamwork_is_editable($teamwork))
+        {
+            print_error('teamworkisnoeditable', 'teamwork');
+        }
 
     break;
 

@@ -138,9 +138,13 @@ $string['confirmationfordeleteteam'] = '¿Desea realmente borrar el equipo?';
 $string['teamdeleted'] = 'Equipo borrado correctamente';
 $string['definedteamlist'] = 'Lista de equipos definidos';
 $string['notexistanyteam'] = 'No se han definido equipos. ¡Debe definir al menos dos para que la actividad funcione!';
-$string['teammembers'] = 'Miembros del equipo';
+$string['teammembers'] = 'Miembros del equipo: $a';
 $string['editmembers'] = 'Editar miembros';
 $string['deleteteam'] = 'Borrar equipo';
+$string['addnewusers'] = 'Añadir usuarios al grupo';
+$string['donothaveanyuserinthisteam'] = 'Este equipo no tiene miembros. ¡Añádalos!';
+$string['studentname'] = 'Nombre del alumno';
+$string['removeuserfromteam'] = 'Quitar el usuario del grupo';
 
 //en el archivo locallib.php
 $string['upitem'] = 'Subir elemento';

@@ -737,4 +737,18 @@ function teamwork_get_team_members($team)
         return '';
     }
 }
+
+function teamwork_usersteams_table_options($member, $tid)
+{
+    global $cm, $teamwork;
+
+    //solo si se puede editar el teamwork
+    if(teamwork_is_editable($teamwork))
+    {
+        //boton de quitar el miembro del grupo
+        return '<a href="team.php?id='.$cm->id.'&action=deleteuser&tid='.$tid.'&uid='.$member->id.'"><img src="images/delete.png" alt="'.get_string('removeuserfromteam', 'teamwork').'" title="'.get_string('removeuserfromteam', 'teamwork').'" /></a>&nbsp;&nbsp;';
+    }
+
+    return '';
+}
 ?>
