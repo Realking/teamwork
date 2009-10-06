@@ -301,6 +301,154 @@ switch($action)
             print_error('teamworkisnoeditable', 'teamwork');
         }
         
+        //parametros requeridos
+        $tid = required_param('tid', PARAM_INT);
+
+        //si se envia la lista de los miembros a incorporar...
+        if(isset($_POST['submit']))
+        {
+
+        }
+        //si no, mostramos la lista de los alumnos del curso
+        else
+        {
+            //cargar la lista de miembros del equipo para eliminarlos de los disponibles
+            $current_members = get_records('teamwork_users_teams', 'teamid', $tid);
+
+            if($current_members !== false)
+            {
+                foreach($current_members as $item)
+                {
+                    $aux[] = $item->userid;
+                }
+
+                $current_members = $aux;
+                unset($aux);
+            }
+            else
+            {
+                $current_members = array();
+            }
+
+            //cargar la lista de alumnos de un curso
+            $students = get_course_students($course->id, 'u.lastname ASC', '', '', '', '', '', null, '', 'u.id, firstname, lastname, picture, imagealt');
+
+            //obtener una lista de los alumnos del curso que se encuentran asignados a algun grupo, que es lo mismo que
+            //obtener la lista de grupos de la actividad y sus alumnos asociados
+            $students_in_groups = get_records_sql('select ut.userid from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_users_teams ut
+                                                   where t.teamworkid = '.$teamwork->id.' and ut.teamid = t.id');
+            
+            if( $students_in_groups !== false)
+            {
+                foreach( $students_in_groups as $item)
+                {
+                    $aux[] = $item->userid;
+                }
+
+                 $students_in_groups = $aux;
+                unset($aux);
+            }
+            else
+            {
+                 $students_in_groups = array();
+            }
+
+            //mostrar una tabla con la lista de miembros
+            /*$table = new stdClass;
+            $table->width = '40%';
+            $table->tablealign = 'center';
+            $table->id = 'userstable';
+            $table->head = array('', get_string('studentname', 'teamwork'), get_string('actions', 'teamwork'));
+            $table->align = array('center', 'center', 'center');
+            $table->size = array('10%','80%', '10%');
+
+            $table->rowclass = array('teamwork_highlight_green', 'teamwork_highlight_red', 'teamwork_highlight_green', 'teamwork_highlight_red');*/
+
+            //titulo
+            $team = get_record('teamwork_teams', 'id', $tid);
+            print_heading(get_string('teammembers', 'teamwork', $team->teamname));
+
+            //menu de ordenacion alfabetica
+            $base_url = $CFG->wwwroot.'/mod/teamwork/team.php?id='.$cm->id.'&action=adduser&tid='.$tid;
+            $sfirst = optional_param('sfirst', null);
+            $slast = optional_param('slast', null);
+
+            echo '<p align="center">';
+            $base_url_mod = ($slast !== null) ? $base_url . '&slast='.$slast : $base_url;
+            echo get_string('name') . ': ' . teamwork_alphabetical_list($base_url_mod, 'sfirst');
+            echo '<br />';
+            $base_url_mod = ($sfirst !== null) ? $base_url . '&sfirst='.$sfirst : $base_url;
+            echo get_string('lastname') . ': ' . teamwork_alphabetical_list($base_url_mod, 'slast');
+            echo '</p>';
+            
+            //inicio del formulario
+            echo '<form method="post" action="'.$base_url.'">';
+
+            //cabecera de la tabla
+            echo '<table width="40%" cellspacing="1" cellpadding="5" id="userstable" class="generaltable boxaligncenter">';
+            echo '<tbody><tr>';
+            echo '<th scope="col" class="header c0" style="vertical-align: top; text-align: center; width: 10%; white-space: nowrap;"/>';
+            echo '<th scope="col" class="header c1" style="vertical-align: top; text-align: center; width: 80%; white-space: nowrap;">'.get_string('name').' / '.get_string('lastname').'</th>';
+            echo '<th scope="col" class="header c2 lastcol" style="vertical-align: top; text-align: center; width: 10%; white-space: nowrap;">'.get_string('actions', 'teamwork').'</th>';
+            echo '</tr>';
+
+            foreach($students as $student)
+            {
+                $name = '<a href="../../user/view.php?id='.$student->id.'&course='.$course->id.'" target="_blank">'.$student->firstname.' '.$student->lastname.'</a>';
+                $css = '';
+
+                //$table->data[] = array( print_user_picture($student, $course->id, null, 0, true), $name, '');
+
+                //si el usuario existe en el grupo
+                if(in_array($student->id, $current_members))
+                {
+                    //el alumno ya esta en el grupo, marcamos el fondo de verde
+                    $css = ' teamwork_highlight_green';
+                }
+                elseif(in_array($student->id, $students_in_groups))
+                {
+                    //el alumno ya pertenece a algun grupo de esta actividad, lo marcamos de rojo
+                    $css = ' teamwork_highlight_red';
+                }
+
+                echo '<tr class="r0">';
+                    echo '<td class="cell c0'.$css.'" style="text-align: center; width: 10%;">';
+                        echo print_user_picture($student, $course->id, null, 0, true);
+                    echo '</td>';
+                    echo '<td class="cell c1'.$css.'" style="text-align: center; width: 80%;">';
+                        echo $name;
+                    echo '</td>';
+                    echo '<td class="cell c2 lastcol'.$css.'" style="text-align: center; width: 10%;">';
+                    //si css esta vacio (no pertenece a ningun grupo), mostramos el marcador para seleccionar el usuario
+                    if(empty($css))
+                    {
+                        echo '<input type="checkbox" name="selection[]" value="'.$student->id.'" />';
+                    }
+                    echo '</td>';
+		echo '</tr>';
+            }
+            
+            //print_table($table);
+            //pie de la tabla
+            echo '</tbody></table>';
+
+            //fin de formulario
+            echo '<p align="center"><input type="submit" name="submit" value="'.get_string('addnewusers', 'teamwork').'" /></p>';
+            echo '</form>';
+
+            //leyenda
+            $var = new stdClass();
+            $var->red = '<span class="teamwork_highlight_red">&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+            $var->green = '<span class="teamwork_highlight_green">&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+            echo '<br /><p align="center">'.get_string('asignusertogroupleyend', 'teamwork', $var).'</p>';
+
+            //imprimir opciones inferiores
+            echo '<br /><div align="center">';
+            echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="team.php?id='.$cm->id.'&action=userlist&tid='.$tid.'">'.get_string('goback', 'teamwork').'</a>';
+            echo '</div>';
+        }
+
+        
     break;
 
     //muestra la lista de miembros del grupo y elimina el especificado

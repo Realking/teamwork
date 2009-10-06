@@ -691,7 +691,14 @@ function teamwork_is_editable($teamwork)
     return true;
 }
 
-
+/**
+ * Acciones de la tabla con la lista de equipos
+ *
+ * @global object $cm contexto del modulo
+ * @global object $teamwork referencia al teamwork
+ * @param object $team datos del equipo
+ * @return string html de las acciones
+ */
 function teamwork_group_table_options($team)
 {
     global $cm, $teamwork;
@@ -738,6 +745,15 @@ function teamwork_get_team_members($team)
     }
 }
 
+/**
+ * Acciones de la tabla con la lista de miembros de un equipo
+ * 
+ * @global object $cm contexto del modulo
+ * @global object $teamwork referencia al teamwork
+ * @param object $member datos del usuario
+ * @param integer $tid id del equipo
+ * @return string html de las acciones
+ */
 function teamwork_usersteams_table_options($member, $tid)
 {
     global $cm, $teamwork;
@@ -750,5 +766,37 @@ function teamwork_usersteams_table_options($member, $tid)
     }
 
     return '';
+}
+
+/**
+ * Genera una lista del estilo de Nombre : Todos A B C D E F G H I J K L M N O P Q R S T U V W X Y Z con enlaces
+ * 
+ * @param string $urlbase url base para los enlaces
+ * @param string $param_name nombre de la variable que indica la letra elegida
+ * @return string html con la lista
+ */
+function teamwork_alphabetical_list($url_base, $param_name)
+{
+    $selected = optional_param($param_name, null);
+    $output = '';
+
+    $chars = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+
+    $output .= ($selected === null) ? '<b>'.get_string('all').'</b>&nbsp;' : '<a href="'.$url_base.'">'.get_string('all').'</a>&nbsp;';
+
+    foreach($chars as $char)
+    {
+        //si es la variable pasada por get, la ponemos en negrita
+        if(strtolower($char) == $selected)
+        {
+            $output .= '<b>'.$char.'</b>&nbsp;';
+        }
+        else
+        {
+            $output .= '<a href="'.$url_base.'&'.$param_name.'='.strtolower($char).'">'.$char.'</a>&nbsp;';
+        }
+    }
+
+    return $output;
 }
 ?>

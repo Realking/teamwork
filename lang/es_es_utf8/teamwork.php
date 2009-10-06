@@ -126,7 +126,7 @@ $string['importscaleerror'] = '¡Atención! La escala de uno o varios elementos 
 $string['youdonthavepermissiontochangeorder'] = 'No tiene permiso para cambiar el orden de estos elementos';
 
 
-//en el editor de grupos group.php
+//en el editor de equipos team.php
 $string['teamseditor'] = 'Editor de equipos de usuarios';
 $string['addnewteam'] = 'Añadir nuevo equipo';
 $string['editteam'] = 'Editar equipo';
@@ -145,6 +145,8 @@ $string['addnewusers'] = 'Añadir usuarios al grupo';
 $string['donothaveanyuserinthisteam'] = 'Este equipo no tiene miembros. ¡Añádalos!';
 $string['studentname'] = 'Nombre del alumno';
 $string['removeuserfromteam'] = 'Quitar el usuario del grupo';
+$string['select'] = 'Seleccionar';
+$string['asignusertogroupleyend'] = 'Leyenda: &nbsp; $a->red alumnos en otro grupo &nbsp; $a->green alumnos que ya están en este grupo';
 
 //en el archivo locallib.php
 $string['upitem'] = 'Subir elemento';
