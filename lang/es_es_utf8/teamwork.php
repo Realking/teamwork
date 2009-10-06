@@ -148,6 +148,8 @@ $string['removeuserfromteam'] = 'Quitar el usuario del grupo';
 $string['select'] = 'Seleccionar';
 $string['asignusertogroupleyend'] = 'Leyenda: &nbsp; $a->red alumnos en otro grupo &nbsp; $a->green alumnos que ya están en este grupo';
 $string['usersaddedok'] = 'Usuarios añadidos correctamente';
+$string['confirmationfordeleteuserfromteam'] = '¿Desea realmente quitar este alumno del equipo?';
+$string['userdeletedfromteam'] = 'El usuario ya no pertenece al aquipo';
 
 //en el archivo locallib.php
 $string['upitem'] = 'Subir elemento';

@@ -505,6 +505,27 @@ switch($action)
             print_error('teamworkisnoeditable', 'teamwork');
         }
 
+        //parametros requeridos
+        $tid = required_param('tid', PARAM_INT);
+        $uid = required_param('uid', PARAM_INT);
+
+        //si el grupo puede ser borrado, pedir confirmación
+        //si no ha sido enviada, mostrar la confirmacion
+        if(!isset($_POST['tid']))
+        {
+            notice_yesno(get_string('confirmationfordeleteuserfromteam', 'teamwork'), 'team.php', 'team.php', array('id'=>$cm->id, 'action'=>'deleteuser', 'tid'=>$tid, 'uid'=>$uid), array('id'=>$cm->id, 'action'=>'userlist', 'tid'=>$tid), 'post', 'get');
+        }
+        //si se ha enviado, procesamos
+        else
+        {
+            //borrar alumno del equipo
+            delete_records('teamwork_users_teams', 'userid', $uid, 'teamid', $tid);
+
+            //mostrar mensaje
+            echo '<p align="center">'.get_string('userdeletedfromteam', 'teamwork').'</p>';
+            print_continue('team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
+        }
+
     break;
 
     //establece un nuevo lider en el grupo
