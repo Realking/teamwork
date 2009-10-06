@@ -275,8 +275,14 @@ switch($action)
 
             foreach($members as $member)
             {
-                $stractions = teamwork_usersteams_table_options($member, $tid);
+                $stractions = teamwork_usersteams_table_options($member, $tid, $team);
                 $name = '<a href="../../user/view.php?id='.$member->id.'&course='.$course->id.'" target="_blank">'.$member->firstname.' '.$member->lastname.'</a>';
+
+                //si es el lider del equipo
+                if($member->id == $team->teamleader)
+                {
+                    $name .= '&nbsp;&nbsp;<img src="images/leader.png" alt="'.get_string('thisuserisleader', 'teamwork').'" title="'.get_string('thisuserisleader', 'teamwork').'" />';
+                }
                 
                 $table->data[] = array($name, $stractions);
             }
@@ -297,6 +303,7 @@ switch($action)
     break;
 
     //asigna un usuario a un grupo
+    //TODO si es el primer usuario del grupo, hacerlo lider del mismo
     case 'adduser':
         //verificar que se pueda realmente editar este teamwork
         if(!teamwork_is_editable($teamwork))
@@ -498,6 +505,7 @@ switch($action)
     break;
 
     //muestra la lista de miembros del grupo y elimina el especificado
+    //TODO si el usuario que se elimina es el lider, pasar el cargo a otro y si no hay nadie a null
     case 'deleteuser':
         //verificar que se pueda realmente editar este teamwork
         if(!teamwork_is_editable($teamwork))
@@ -530,6 +538,38 @@ switch($action)
 
     //establece un nuevo lider en el grupo
     case 'setleader':
+        //verificar que se pueda realmente editar este teamwork
+        if(!teamwork_is_editable($teamwork))
+        {
+            print_error('teamworkisnoeditable', 'teamwork');
+        }
+
+        //parametros requeridos
+        $tid = required_param('tid', PARAM_INT);
+        $uid = required_param('uid', PARAM_INT);
+
+        //verificar que el usuario pertenezca al grupo
+        if(!count_records('teamwork_users_teams', 'userid', $uid, 'teamid', $tid))
+        {
+            print_error('thisusernotisinthisgroup', 'teamwork');
+        }
+
+        //verificar que el equipo pertenezca a este teamwork
+        if(!count_records('teamwork_teams', 'id', $tid, 'teamworkid', $teamwork->id))
+        {
+            print_error('thisteamnotisinthisactivity', 'teamwork');
+        }
+
+        //establecer el nuevo lider
+        $data = new stdClass;
+        $data->id = $tid;
+        $data->teamleader = $uid;
+
+        update_record('teamwork_teams', $data);
+
+        //mostrar mensaje
+        echo '<p align="center">'.get_string('leaderseterok', 'teamwork').'</p>';
+        print_continue('team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
 
     break;
 

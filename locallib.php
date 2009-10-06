@@ -752,20 +752,29 @@ function teamwork_get_team_members($team)
  * @global object $teamwork referencia al teamwork
  * @param object $member datos del usuario
  * @param integer $tid id del equipo
+ * @param object $team referencia al equipo
  * @return string html de las acciones
  */
-function teamwork_usersteams_table_options($member, $tid)
+function teamwork_usersteams_table_options($member, $tid, $team)
 {
     global $cm, $teamwork;
+
+    $output = '';
 
     //solo si se puede editar el teamwork
     if(teamwork_is_editable($teamwork))
     {
         //boton de quitar el miembro del grupo
-        return '<a href="team.php?id='.$cm->id.'&action=deleteuser&tid='.$tid.'&uid='.$member->id.'"><img src="images/delete.png" alt="'.get_string('removeuserfromteam', 'teamwork').'" title="'.get_string('removeuserfromteam', 'teamwork').'" /></a>&nbsp;&nbsp;';
+        $output .= '<a href="team.php?id='.$cm->id.'&action=deleteuser&tid='.$tid.'&uid='.$member->id.'"><img src="images/delete.png" alt="'.get_string('removeuserfromteam', 'teamwork').'" title="'.get_string('removeuserfromteam', 'teamwork').'" /></a>&nbsp;&nbsp;';
+
+        //boton de establecer como lider
+        if($member->id != $team->teamleader)
+        {
+            $output .= '<a href="team.php?id='.$cm->id.'&action=setleader&tid='.$tid.'&uid='.$member->id.'"><img src="images/leader_set.png" alt="'.get_string('setthisuserasteamleader', 'teamwork').'" title="'.get_string('setthisuserasteamleader', 'teamwork').'" /></a>&nbsp;&nbsp;';
+        }
     }
 
-    return '';
+    return $output;
 }
 
 /**

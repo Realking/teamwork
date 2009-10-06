@@ -150,6 +150,11 @@ $string['asignusertogroupleyend'] = 'Leyenda: &nbsp; $a->red alumnos en otro gru
 $string['usersaddedok'] = 'Usuarios añadidos correctamente';
 $string['confirmationfordeleteuserfromteam'] = '¿Desea realmente quitar este alumno del equipo?';
 $string['userdeletedfromteam'] = 'El usuario ya no pertenece al aquipo';
+$string['setthisuserasteamleader'] = 'Establecer este usuario como líder del equipo';
+$string['thisuserisleader'] = 'Líder del equipo';
+$string['thisusernotisinthisgroup'] = 'Este usuario no pertenece al equipo indicado';
+$string['thisteamnotisinthisactivity'] = 'Este equipo no pertenece a esta actividad';
+$string['leaderseterok'] = 'Líder establecido correctamente';
 
 //en el archivo locallib.php
 $string['upitem'] = 'Subir elemento';
