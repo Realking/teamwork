@@ -255,7 +255,7 @@ switch($action)
         $team = get_record('teamwork_teams', 'id', $tid);
 
         //obtener la lista de componentes del grupo
-        if(!$members = get_records_sql('select u.id, u.firstname, u.lastname from '.$CFG->prefix.'user u, '.$CFG->prefix.'teamwork_users_teams t where t.teamid = '.$tid.' and u.id = t.userid'))
+        if(!$members = get_records_sql('select u.id, u.firstname, u.lastname from '.$CFG->prefix.'user u, '.$CFG->prefix.'teamwork_users_teams t where t.teamid = '.$tid.' and u.id = t.userid order by u.lastname asc'))
         {
             //no hay grupos definidos
             print_heading(get_string('teammembers', 'teamwork', $team->teamname));
@@ -303,7 +303,6 @@ switch($action)
     break;
 
     //asigna un usuario a un grupo
-    //TODO si es el primer usuario del grupo, hacerlo lider del mismo
     case 'adduser':
         //verificar que se pueda realmente editar este teamwork
         if(!teamwork_is_editable($teamwork))
@@ -358,17 +357,30 @@ switch($action)
                  $students_in_groups = array();
             }
 
+            $count_members = count_records('teamwork_users_teams', 'teamid', $tid);
+
+            $data = new stdClass;
+
             foreach($selection as $user)
             {
                 //si el estudiante pertenece a este curso Y no se encuentra en algun grupo
                 if(in_array($user, $students) AND !in_array($user, $students_in_groups))
                 {
                     //insertamos el usuario en el equipo
-                    $data = new stdClass;
                     $data->userid = $user;
                     $data->teamid = $tid;
                     insert_record('teamwork_users_teams', $data);
                 }
+            }
+
+            //si el grupo no tiene ningún usuario, el primero de los añadidos será el nuevo lider
+            if(!$count_members AND count($selection) > 0)
+            {
+                unset($data);
+                $data = new stdClass;
+                $data->id = $tid;
+                $data->teamleader = $selection[0];
+                update_record('teamwork_teams', $data);
             }
 
             //mostrar mensaje
@@ -528,6 +540,19 @@ switch($action)
         {
             //borrar alumno del equipo
             delete_records('teamwork_users_teams', 'userid', $uid, 'teamid', $tid);
+
+            $leader = get_record('teamwork_teams', 'id', $tid)->teamleader;
+            $members = array_values(get_records('teamwork_users_teams', 'teamid', $tid));
+
+            if($leader == $uid)
+            {
+                $value = (count($members) > 0) ? $members[0]->userid : 0;
+
+                $data = new stdClass;
+                $data->id = $tid;
+                $data->teamleader = $value;
+                update_record('teamwork_teams', $data);
+            }
 
             //mostrar mensaje
             echo '<p align="center">'.get_string('userdeletedfromteam', 'teamwork').'</p>';
