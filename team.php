@@ -247,7 +247,7 @@ switch($action)
         
     break;
 
-    //muestra la lista de usuarios disponibles
+    //muestra la lista de usuarios asignados al equipo
     case 'userlist':
         //parametros requeridos
         $tid = required_param('tid', PARAM_INT);
@@ -288,7 +288,10 @@ switch($action)
         
         //imprimir opciones inferiores
         echo '<br /><div align="center"><br />';
-        echo '<img src="images/add.png" alt="'.get_string('addnewusers', 'teamwork').'" title="'.get_string('addnewusers', 'teamwork').'"/> <a href="team.php?id='.$cm->id.'&action=adduser&tid='.$tid.'">'.get_string('addnewusers', 'teamwork').'</a> | ';
+        if(teamwork_is_editable($teamwork))
+        {
+            echo '<img src="images/add.png" alt="'.get_string('addnewusers', 'teamwork').'" title="'.get_string('addnewusers', 'teamwork').'"/> <a href="team.php?id='.$cm->id.'&action=adduser&tid='.$tid.'">'.get_string('addnewusers', 'teamwork').'</a> | ';
+        }
         echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="team.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
         echo '</div>';
     break;
@@ -307,6 +310,63 @@ switch($action)
         //si se envia la lista de los miembros a incorporar...
         if(isset($_POST['submit']))
         {
+            //usuarios a añadir
+            $selection = optional_param('selection', array());
+
+            //cargar la lista de alumnos de un curso para comprobar si los alumnos a insertar son de este curso
+            $students = get_course_students($course->id, 'u.lastname ASC', '', '', '', '', '', null, '', 'u.id');
+
+            if($students !== false)
+            {
+                foreach($students as $item)
+                {
+                    $aux[] = $item->id;
+                }
+
+                $students = $aux;
+                unset($aux);
+            }
+            else
+            {
+                $students = array();
+            }
+
+            //obtener una lista de los alumnos del curso que se encuentran asignados a algun grupo, que es lo mismo que
+            //obtener la lista de grupos de la actividad y sus alumnos asociados
+            $students_in_groups = get_records_sql('select ut.userid from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_users_teams ut
+                                                   where t.teamworkid = '.$teamwork->id.' and ut.teamid = t.id');
+
+            if( $students_in_groups !== false)
+            {
+                foreach( $students_in_groups as $item)
+                {
+                    $aux[] = $item->userid;
+                }
+
+                 $students_in_groups = $aux;
+                unset($aux);
+            }
+            else
+            {
+                 $students_in_groups = array();
+            }
+
+            foreach($selection as $user)
+            {
+                //si el estudiante pertenece a este curso Y no se encuentra en algun grupo
+                if(in_array($user, $students) AND !in_array($user, $students_in_groups))
+                {
+                    //insertamos el usuario en el equipo
+                    $data = new stdClass;
+                    $data->userid = $user;
+                    $data->teamid = $tid;
+                    insert_record('teamwork_users_teams', $data);
+                }
+            }
+
+            //mostrar mensaje
+            echo '<p align="center">'.get_string('usersaddedok', 'teamwork').'</p>';
+            print_continue('team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
 
         }
         //si no, mostramos la lista de los alumnos del curso
@@ -353,17 +413,6 @@ switch($action)
                  $students_in_groups = array();
             }
 
-            //mostrar una tabla con la lista de miembros
-            /*$table = new stdClass;
-            $table->width = '40%';
-            $table->tablealign = 'center';
-            $table->id = 'userstable';
-            $table->head = array('', get_string('studentname', 'teamwork'), get_string('actions', 'teamwork'));
-            $table->align = array('center', 'center', 'center');
-            $table->size = array('10%','80%', '10%');
-
-            $table->rowclass = array('teamwork_highlight_green', 'teamwork_highlight_red', 'teamwork_highlight_green', 'teamwork_highlight_red');*/
-
             //titulo
             $team = get_record('teamwork_teams', 'id', $tid);
             print_heading(get_string('teammembers', 'teamwork', $team->teamname));
@@ -397,8 +446,6 @@ switch($action)
                 $name = '<a href="../../user/view.php?id='.$student->id.'&course='.$course->id.'" target="_blank">'.$student->firstname.' '.$student->lastname.'</a>';
                 $css = '';
 
-                //$table->data[] = array( print_user_picture($student, $course->id, null, 0, true), $name, '');
-
                 //si el usuario existe en el grupo
                 if(in_array($student->id, $current_members))
                 {
@@ -428,7 +475,6 @@ switch($action)
 		echo '</tr>';
             }
             
-            //print_table($table);
             //pie de la tabla
             echo '</tbody></table>';
 
