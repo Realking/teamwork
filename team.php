@@ -517,7 +517,6 @@ switch($action)
     break;
 
     //muestra la lista de miembros del grupo y elimina el especificado
-    //TODO si el usuario que se elimina es el lider, pasar el cargo a otro y si no hay nadie a null
     case 'deleteuser':
         //verificar que se pueda realmente editar este teamwork
         if(!teamwork_is_editable($teamwork))

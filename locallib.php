@@ -727,10 +727,9 @@ function teamwork_group_table_options($team)
  * @param object $team referfencia al equipo
  * @return string lista de miembros 
  */
-//TODO implementar la funcion get_team_members
 function teamwork_get_team_members($team)
 {
-    global $CFG;
+    global $CFG, $course;
     
     //obtenemos los nombres de los usuarios
     if(!$result = get_records_sql('select u.id, u.firstname, u.lastname from '.$CFG->prefix.'teamwork_users_teams ut, '.$CFG->prefix.'user u where u.id = ut.userid and ut.teamid = '.$team->id))
@@ -741,7 +740,14 @@ function teamwork_get_team_members($team)
     //hay usuarios
     else
     {
-        return '';
+        $output = '';
+
+        foreach($result as $user)
+        {
+            $output .= ' <a href="../../user/view.php?id='.$user->id.'&course='.$course->id.'" target="_blank">'.$user->firstname.' '.$user->lastname.'</a>,';
+        }
+
+        return substr($output, 0, strlen($output)-1);
     }
 }
 
