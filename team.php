@@ -255,7 +255,7 @@ switch($action)
         $team = get_record('teamwork_teams', 'id', $tid);
 
         //obtener la lista de componentes del grupo
-        if(!$members = get_records_sql('select u.id, u.firstname, u.lastname from '.$CFG->prefix.'user u, '.$CFG->prefix.'teamwork_users_teams t where t.teamid = '.$tid.' and u.id = t.userid order by u.lastname asc'))
+        if(!$members = get_records_sql('select u.id, u.firstname, u.lastname, u.picture, u.imagealt from '.$CFG->prefix.'user u, '.$CFG->prefix.'teamwork_users_teams t where t.teamid = '.$tid.' and u.id = t.userid order by u.lastname asc'))
         {
             //no hay grupos definidos
             print_heading(get_string('teammembers', 'teamwork', $team->teamname));
@@ -269,9 +269,9 @@ switch($action)
             $table->width = '40%';
             $table->tablealign = 'center';
             $table->id = 'usersteamstable';
-            $table->head = array(get_string('studentname', 'teamwork'), get_string('actions', 'teamwork'));
-            $table->align = array('center', 'center');
-            $table->size = array('90%', '10%');
+            $table->head = array('', get_string('studentname', 'teamwork'), get_string('actions', 'teamwork'));
+            $table->align = array('center','center', 'center');
+            $table->size = array('10%','80%', '10%');
 
             foreach($members as $member)
             {
@@ -284,7 +284,7 @@ switch($action)
                     $name .= '&nbsp;&nbsp;<img src="images/leader.png" alt="'.get_string('thisuserisleader', 'teamwork').'" title="'.get_string('thisuserisleader', 'teamwork').'" />';
                 }
                 
-                $table->data[] = array($name, $stractions);
+                $table->data[] = array(print_user_picture($member, $course->id, null, 0, true),$name, $stractions);
             }
 
             //disponibles: imprimir la tabla y el boton de añadir
