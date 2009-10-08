@@ -797,7 +797,7 @@ function teamwork_alphabetical_list($url_base, $param_name)
 
     $chars = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
 
-    $output .= ($selected === null) ? '<b>'.get_string('all').'</b>&nbsp;' : '<a href="'.$url_base.'">'.get_string('all').'</a>&nbsp;';
+    $output .= ($selected === null) ? '<b>'.get_string('all').'</b>&nbsp;' : '<a href="'.teamwork_create_url($url_base, array(), array($param_name)).'">'.get_string('all').'</a>&nbsp;';
 
     foreach($chars as $char)
     {
@@ -808,10 +808,53 @@ function teamwork_alphabetical_list($url_base, $param_name)
         }
         else
         {
-            $output .= '<a href="'.$url_base.'&'.$param_name.'='.strtolower($char).'">'.$char.'</a>&nbsp;';
+            $output .= '<a href="'.teamwork_create_url($url_base, array($param_name=>strtolower($char))).'">'.$char.'</a>&nbsp;';
         }
     }
 
     return $output;
+}
+
+/**
+ * Genera una url de raiz este módulo en base a una serie de parametros
+ * 
+ * @param string $url_base ruta al archivo a partir de ...moodle/mod/teamwork/
+ * @param array $set array de nombre=>valor que le asigno a una variable
+ * @param array $delete array de variables que se eliminarán de esta url. Si es true borra todos los existentes
+ */
+function teamwork_create_url($url_base = '', $set = array(), $delete = array())
+{
+    global $CFG;
+
+    $active_params = array();
+
+    //para cada parametro enviado...
+    foreach($_GET as $param => $value)
+    {    
+        //el parametro se ha enviado
+        $active_params[$param] = $value;
+    }
+
+    //para cada parametro que yo establezco
+    foreach($set as $key => $value)
+    {
+        //establecemos el parametro
+        $active_params[$key] = $value;
+    }
+
+    //para cada parametro que quiero quitar
+    foreach($delete as $name)
+    {
+        //eliminamos el parametro
+        unset($active_params[$name]);
+    }
+
+    $url = http_build_query($active_params);
+
+    $url = (!empty($url)) ? '?' . $url : $url;
+
+    $url = $CFG->wwwroot . '/mod/teamwork/' . $url_base . $url;
+
+    return $url;
 }
 ?>

@@ -383,9 +383,18 @@ switch($action)
                 update_record('teamwork_teams', $data);
             }
 
-            //mostrar mensaje
-            echo '<p align="center">'.get_string('usersaddedok', 'teamwork').'</p>';
-            print_continue('team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
+            //mostrar mensaje si se han añadido usuarios
+            if(count($selection) > 0)
+            {
+                echo '<p align="center">'.get_string('usersaddedok', 'teamwork').'</p>';
+                print_continue('team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
+            }
+            //si no, redireccionar directamente
+            else
+            {
+                redirect('team.php?id='.$cm->id.'&action=userlist&tid='.$tid, '', 0);
+            }
+            
 
         }
         //si no, mostramos la lista de los alumnos del curso
@@ -409,8 +418,37 @@ switch($action)
                 $current_members = array();
             }
 
+            $ofirst = optional_param('ofirst', null);
+            $olast = optional_param('olast', 'asc');
+
+            if($ofirst !== null)
+            {
+                if($ofirst == 'asc')
+                {
+                    $orderby = 'u.firstname ASC';
+                }
+                else
+                {
+                    $orderby = 'u.firstname DESC';
+                }
+            }
+            else
+            {
+                if($olast == 'desc')
+                {
+                    $orderby = 'u.lastname DESC';
+                }
+                else
+                {
+                    $orderby = 'u.lastname ASC';
+                }
+            }
+
+            $firstinitial = optional_param('sfirst', '');
+            $lastinitial = optional_param('slast', '');
+
             //cargar la lista de alumnos de un curso
-            $students = get_course_students($course->id, 'u.lastname ASC', '', '', '', '', '', null, '', 'u.id, firstname, lastname, picture, imagealt');
+            $students = get_course_students($course->id, $orderby, '', '', '', $firstinitial, $lastinitial, null, '', 'u.id, firstname, lastname, picture, imagealt');
 
             //obtener una lista de los alumnos del curso que se encuentran asignados a algun grupo, que es lo mismo que
             //obtener la lista de grupos de la actividad y sus alumnos asociados
@@ -438,25 +476,25 @@ switch($action)
 
             //menu de ordenacion alfabetica
             $base_url = $CFG->wwwroot.'/mod/teamwork/team.php?id='.$cm->id.'&action=adduser&tid='.$tid;
-            $sfirst = optional_param('sfirst', null);
-            $slast = optional_param('slast', null);
 
             echo '<p align="center">';
-            $base_url_mod = ($slast !== null) ? $base_url . '&slast='.$slast : $base_url;
-            echo get_string('name') . ': ' . teamwork_alphabetical_list($base_url_mod, 'sfirst');
+            echo get_string('name') . ': ' . teamwork_alphabetical_list('team.php', 'sfirst');
             echo '<br />';
-            $base_url_mod = ($sfirst !== null) ? $base_url . '&sfirst='.$sfirst : $base_url;
-            echo get_string('lastname') . ': ' . teamwork_alphabetical_list($base_url_mod, 'slast');
+            echo get_string('lastname') . ': ' . teamwork_alphabetical_list('team.php', 'slast');
             echo '</p>';
             
             //inicio del formulario
-            echo '<form method="post" action="'.$base_url.'">';
+            echo '<form method="post" action="'.teamwork_create_url('team.php').'">';
 
             //cabecera de la tabla
             echo '<table width="40%" cellspacing="1" cellpadding="5" id="userstable" class="generaltable boxaligncenter">';
             echo '<tbody><tr>';
             echo '<th scope="col" class="header c0" style="vertical-align: top; text-align: center; width: 10%; white-space: nowrap;"/>';
-            echo '<th scope="col" class="header c1" style="vertical-align: top; text-align: center; width: 80%; white-space: nowrap;">'.get_string('name').' / '.get_string('lastname').'</th>';
+            $firstname = (!isset($_GET['ofirst'])) ? teamwork_create_url('team.php', array('ofirst'=>'desc'), array('olast')) : teamwork_create_url('team.php', array('ofirst'=>(($ofirst == 'asc') ? 'desc' : 'asc')), array('olast'));
+            $lastname = (!isset($_GET['olast'])) ? teamwork_create_url('team.php', array('olast'=>'desc'), array('ofirst')) : teamwork_create_url('team.php', array('olast'=>(($olast == 'asc') ? 'desc' : 'asc')), array('ofirst'));
+            $imgfirst = ($ofirst == 'asc' AND !isset($_GET['olast'])) ? '&nbsp;<img src="../../pix/t/up.gif" />' : (($ofirst == 'desc' AND !isset($_GET['olast'])) ? '&nbsp;<img src="../../pix/t/down.gif" />': '');
+            $imglast = ($olast == 'asc'  AND !isset($_GET['ofirst'])) ? '&nbsp;<img src="../../pix/t/up.gif" />' : (($olast == 'desc'  AND !isset($_GET['ofirst'])) ? '&nbsp;<img src="../../pix/t/down.gif" />': '');
+            echo '<th scope="col" class="header c1" style="vertical-align: top; text-align: center; width: 80%; white-space: nowrap;"><a href="'.$firstname.'">'.get_string('name').'</a>'.$imgfirst.' / <a href="'.$lastname.'">'.get_string('lastname').'</a>'.$imglast.'</th>';
             echo '<th scope="col" class="header c2 lastcol" style="vertical-align: top; text-align: center; width: 10%; white-space: nowrap;">'.get_string('actions', 'teamwork').'</th>';
             echo '</tr>';
 
