@@ -155,6 +155,25 @@ $string['thisuserisleader'] = 'Líder del equipo';
 $string['thisusernotisinthisgroup'] = 'Este usuario no pertenece al equipo indicado';
 $string['thisteamnotisinthisactivity'] = 'Este equipo no pertenece a esta actividad';
 $string['leaderseterok'] = 'Líder establecido correctamente';
+$string['teamgenerator'] = 'Generador automático de equipos';
+$string['createrandomteams'] = 'Crear equipos aleatoriamente';
+$string['numberofteams'] = 'Número de equipos';
+$string['membersperteam'] = 'Miembros por equipo';
+$string['typeofspecify'] = 'Especificar';
+$string['numberofteams-members'] = 'Número de equipos / miembros';
+$string['distribution'] = 'Distribuir alumnos';
+$string['random'] = 'Aleatoriamente';
+$string['byfirstname'] = 'Alfabéticamente por Nombres';
+$string['bylastname'] = 'Alfabéticamente por Apellidos';
+$string['namingscheme'] = 'Esquema de nombrado';
+$string['namingschemetpl'] = 'Equipo #';
+$string['thiscoursenothavestudents'] = 'Este curso no tiene estudiantes';
+$string['randomteampreviewteam'] = 'Equipos ($a)';
+$string['randomteampreviewmembers'] = 'Miembros del Equipo';
+$string['randomteampreviewcount'] = 'Nº Miembros ($a)';
+$string['youdontusetherandombecauseteamsexist'] = 'No puedes usar el generador ya que existen equipos creados';
+$string['numberteammemberscannotbezero'] = 'Este valor debe ser 1 o más';
+$string['badnamingscheme'] = "Debe contener exactamente un caracter '@' o '#'";
 
 //en el archivo locallib.php
 $string['upitem'] = 'Subir elemento';
@@ -162,6 +181,7 @@ $string['downitem'] = 'Bajar elemento';
 
 //generales
 $string['teamworkisnoeditable'] = 'No se puede editar la actividad';
+$string['submit'] = 'Enviar';
 
 
 $string[''] = '';

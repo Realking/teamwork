@@ -105,6 +105,11 @@ switch($action)
         //imprimir opciones inferiores
         echo '<br /><div align="center"><br />';
         echo '<img src="images/add.png" alt="'.get_string('addnewteam', 'teamwork').'" title="'.get_string('addnewteam', 'teamwork').'"/> <a href="team.php?id='.$cm->id.'&action=addteam">'.get_string('addnewteam', 'teamwork').'</a> | ';
+        //solo si no hay ningún equipo creado se puede usar el generador de equipos
+        if($teams === false)
+        {
+            echo '<img src="images/asterisk.png" alt="'.get_string('teamgenerator', 'teamwork').'" title="'.get_string('teamgenerator', 'teamwork').'"/> <a href="team.php?id='.$cm->id.'&action=teamgenerator">'.get_string('teamgenerator', 'teamwork').'</a> | ';
+        }
         echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="view.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
         echo '</div>';
     break;
@@ -632,6 +637,180 @@ switch($action)
         //mostrar mensaje
         echo '<p align="center">'.get_string('leaderseterok', 'teamwork').'</p>';
         print_continue('team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
+
+    break;
+
+    //generador de equipos aleatoriamente en base a unas premisas...
+    case 'teamgenerator':
+
+        //solo estará disponible esta funcionalidad si no hay equipos creados para esta actividad
+        if(count_records('teamwork_teams', 'teamworkid', $teamwork->id))
+        {
+            print_error('youdontusetherandombecauseteamsexist', 'teamwork');
+        }
+
+        //cargamos el formulario
+        $form = new teamwork_randomteams_form('team.php?id='.$cm->id.'&action=teamgenerator');
+
+        //no se ha enviado, se muestra
+        if(!$form->is_submitted())
+        {
+            //$form->set_data(array('name'=>'mi nombre'));
+            $form->display();
+        }
+        //se ha enviado pero se ha cancelado, redirigir a página principal
+        elseif($form->is_cancelled())
+        {
+            redirect('team.php?id='.$cm->id, '', 0);
+        }
+        //se ha enviado y no valida el formulario...
+        elseif(!$form->is_validated())
+        {
+            $form->display();
+        }
+        //se ha enviado y es válido, se procesa
+        else
+        {
+            //obtenemos los datos del formulario
+            $data = $form->get_data();
+
+            //
+            /// Operaciones de creacion de los equipos
+            //
+
+            //segun el tipo de distribucion
+            if($data->distribution == 'firstname')
+            {
+                $orderby = 'u.firstname ASC';
+            }
+            else
+            {
+                $orderby = 'u.lastname ASC';
+            }
+
+            //cargar la lista de alumnos de un curso
+            if(! $students = get_course_students($course->id, $orderby, '', '', '', '', '', null, '', 'u.id, firstname, lastname'))
+            {
+                print_error('thiscoursenothavestudents', 'teamwork');
+            }
+
+            $students = array_values($students);
+            $nstudents = count($students);
+
+            //si la asignacion es aleatoria, barajamos el array de datos
+            if($data->distribution == 'random')
+            {
+                shuffle($students);
+            }
+
+            //segun el tipo de agrupación
+            if(! (int) $data->specify)
+            {
+                //Especifica el número de equipos
+                $nteams = (int) $data->number;
+                $nusersperteam = floor($nstudents/$nteams);
+            }
+            else
+            {
+                //Especifica el numero de alumnos por equipo
+                $nusersperteam = (int) $data->number;
+                $nteams = ceil($nstudents/$nusersperteam);
+            }
+            
+            //repartir alumnos a los equipos
+            $teams = array();
+
+            for($i = 0; $i < $nteams; $i++)
+            {
+                //nombre del grupo
+                $teams[$i]['name'] = groups_parse_name(trim($data->namingscheme), $i);
+
+                //miembros del equipo
+                for($j = 0; $j < $nusersperteam; $j++)
+                {
+                    $user = array_shift($students);
+
+                    if($user === null)
+                    {
+                        break 2;
+                    }
+
+                    $teams[$i]['members'][] = $user;
+                }
+            }
+
+            //
+            /// Operaciones de inserción de equipos o de vista previa
+            //
+
+            //si se pide solo una vista previa de como quedarían los equipos...
+            if(isset($data->preview))
+            {
+                $table = new stdClass;
+                $table->width = '100%';
+                $table->tablealign = 'center';
+                $table->id = 'previewteams';
+                $table->head = array(get_string('randomteampreviewteam', 'teamwork', $nteams), get_string('randomteampreviewmembers', 'teamwork'), get_string('randomteampreviewcount', 'teamwork', $nstudents));
+                $table->align = array('center', 'center', 'center');
+
+                foreach($teams as $team)
+                {
+                    $line = array();
+                    
+                    //nombre del equipo
+                    $line[] = $team['name'];
+
+                    $unames = array();
+
+                    foreach($team['members'] as $member)
+                    {
+                        $unames[] = fullname($member, true);
+                    }
+
+                    $line[] = implode(', ', $unames);
+                    $line[] = count($team['members']);
+
+                    $table->data[] = $line;
+                }
+
+                //volvemos a mostrar el formulario
+                $form->display();
+
+                //mostramos la tabla
+                print_table($table);
+            }
+            //si se quiere crear los equipos definitivamente
+            else
+            {
+                $teamdata = new stdClass;
+                $userdata = new stdClass;
+
+                //para cada equipo a crear
+                foreach($teams as $team)
+                {
+                    //crear los datos del equipo
+                    $teamdata->teamworkid = $teamwork->id;
+                    $teamdata->teamname = $team['name'];
+                    $teamdata->teamleader = $team['members'][0]->id;
+
+                    //insertar los datos
+                    $teamid = insert_record('teamwork_teams', $teamdata);
+
+                    foreach($team['members'] as $member)
+                    {
+                        //datos de la asignación
+                        $userdata->userid = $member->id;
+                        $userdata->teamid = $teamid;
+
+                        //insertar datos de la asignación
+                        insert_record('teamwork_users_teams', $userdata);
+                    }
+                }
+
+                //redireccionar a la página con la lista de miembros del equipo
+                redirect('team.php?id='.$cm->id, '', 0);
+            }
+        }
 
     break;
 

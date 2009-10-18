@@ -857,4 +857,85 @@ function teamwork_create_url($url_base = '', $set = array(), $delete = array())
 
     return $url;
 }
+
+/**
+ * Clase que muestra el formulario de la generación aleatoria de equipos
+ */
+class teamwork_randomteams_form extends moodleform
+{
+    /**
+     * Define el formulario
+     */
+    function definition()
+    {
+        global $CFG;
+        $mform =& $this->_form;
+
+        //marco del formulario
+        $mform->addElement('header', 'general', get_string('createrandomteams', 'teamwork'));
+        $mform->setHelpButton('general', array('createrandomteams', get_string('createrandomteams', 'teamwork'), 'teamwork'));
+
+
+        //---> Especifidad
+
+        $options = array(get_string('numberofteams', 'teamwork'), get_string('membersperteam', 'teamwork'));
+        $mform->addElement('select', 'specify', get_string('typeofspecify', 'teamwork'), $options);
+
+
+        //---> Numero especificado
+
+        $mform->addElement('text', 'number', get_string('numberofteams-members', 'teamwork'),'maxlength="4" size="4"');
+        $mform->setType('number', PARAM_INT);
+        $mform->addRule('number', null, 'numeric', null, 'server');
+        $mform->addRule('number', get_string('required'), 'required', null, 'server');
+
+
+        //---> Tipo de distribución
+
+        $options = array('random'    => get_string('random', 'teamwork'),
+                         'firstname' => get_string('byfirstname', 'teamwork'),
+                         'lastname'  => get_string('bylastname', 'teamwork'));
+        $mform->addElement('select', 'distribution', get_string('distribution', 'teamwork'), $options);
+        $mform->setDefault('distribution', 'random');
+
+
+        //---> Esquema de nombrado
+
+        $mform->addElement('text', 'namingscheme', get_string('namingscheme', 'teamwork'));
+        $mform->setHelpButton('namingscheme', array('namingscheme', get_string('namingscheme', 'teamwork'), 'teamwork'));
+        $mform->addRule('namingscheme', get_string('required'), 'required', null, 'server');
+        $mform->setType('namingscheme', PARAM_MULTILANG);
+        $mform->setDefault('namingscheme', get_string('namingschemetpl', 'teamwork'));
+
+
+        // botones de envío y cancelación
+        //$this->add_action_buttons();
+        $buttonarray = array();
+        $buttonarray[] = &$mform->createElement('submit', 'preview', get_string('preview'), 'xx');
+        $buttonarray[] = &$mform->createElement('submit', 'submitbutton', get_string('submit', 'teamwork'));
+        $buttonarray[] = &$mform->createElement('cancel');
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->closeHeaderBefore('buttonar');
+    }
+
+    function validation($data, $files) {
+    	global $CFG, $COURSE;
+        $errors = parent::validation($data, $files);
+
+        //el numero no puede ser menor que 1
+        if($data['number'] < 1)
+        {
+            $errors['number'] = get_string('numberteammemberscannotbezero', 'teamwork');
+        }
+
+       /// Check the naming scheme
+        $matchcnt = preg_match_all('/[#@]{1,1}/', $data['namingscheme'], $matches);
+
+        if ($matchcnt != 1) {
+            $errors['namingscheme'] = get_string('badnamingscheme', 'teamwork');
+        }
+
+        return $errors;
+    }
+}
 ?>
