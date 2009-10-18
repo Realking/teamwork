@@ -104,7 +104,7 @@ switch($section)
                 $data->evaltype = $type;
                 insert_record('teamwork_tplinstances', $data);
 
-                redirect('template.php?id='.$cm->id, '', 0);
+                header('Location: template.php?id='.$cm->id);
 
             break;
 
@@ -131,7 +131,7 @@ switch($section)
                 //eliminar la asignación
                 delete_records('teamwork_tplinstances', 'id', $instid);
 
-                redirect('template.php?id='.$cm->id, '', 0);
+                header('Location: template.php?id='.$cm->id);
 
             break;
 
@@ -245,7 +245,7 @@ switch($section)
                 //se ha enviado pero se ha cancelado, redirigir a página principal
                 elseif($form->is_cancelled())
                 {
-                    redirect('template.php?id='.$cm->id, '', 0);
+                    header('Location: template.php?id='.$cm->id);
                 }
                 //se ha enviado y no valida el formulario...
                 elseif(!$form->is_validated())
@@ -263,9 +263,8 @@ switch($section)
                     //insertamos los datos en la base de datos
                     $template_id = insert_record('teamwork_templates', $data);
 
-                    //mostramos mensaje
-                    echo '<p align="center">'.get_string('tpladded', 'teamwork').'</p>';
-                    print_continue('template.php?id='.$cm->id.'&section=items&tplid='.$template_id);
+                    //redireccionar
+                    header('Location: template.php?id='.$cm->id.'&section=items&tplid='.$template_id);
                 }
                 
             break;
@@ -295,7 +294,7 @@ switch($section)
                 //se ha enviado pero se ha cancelado, redirigir a página principal
                 elseif($form->is_cancelled())
                 {
-                    redirect('template.php?id='.$cm->id, '', 0);
+                    header('Location: template.php?id='.$cm->id);
                 }
                 //se ha enviado y no valida el formulario...
                 elseif(!$form->is_validated())
@@ -313,8 +312,7 @@ switch($section)
                     update_record('teamwork_templates', $data);
 
                     //mostramos mensaje
-                    echo '<p align="center">'.get_string('tplupdated', 'teamwork').'</p>';
-                    print_continue('template.php?id='.$cm->id);
+                    header('Location: template.php?id='.$cm->id);
                 }
 
             break;
@@ -347,9 +345,8 @@ switch($section)
                     //borrar plantilla en si
                     delete_records('teamwork_templates', 'id', $tplid);
 
-                    //mostrar mensaje
-                    echo '<p align="center">'.get_string('tpldeleted', 'teamwork').'</p>';
-                    print_continue('template.php?id='.$cm->id);
+                    //redireccionar
+                    header('Location: template.php?id='.$cm->id);
                 }
 
             break;
@@ -422,9 +419,15 @@ switch($section)
                     //TODO implementar la importación de las rubricas
 
                     //mostrar mensaje
-                    echo '<p align="center">'.get_string('templateimportok', 'teamwork').'</p>';
-                    if($scale_error){ notify(get_string('importscaleerror', 'teamwork')); }
-                    print_continue('template.php?id='.$cm->id);
+                    if($scale_error)
+                    {
+                        notify(get_string('importscaleerror', 'teamwork'));
+                        print_continue('template.php?id='.$cm->id);
+                    }
+                    else
+                    {
+                        header('Location: template.php?id='.$cm->id);
+                    }
                 }
                 
             break;
@@ -519,9 +522,8 @@ switch($section)
 
                 //TODO implementar el copiado de las rubricas
 
-                //mostrar mensaje
-                echo '<p align="center">'.get_string('tplcopiedok', 'teamwork').'</p>';
-                print_continue('template.php?id='.$cm->id);
+                //redireccionar
+                header('Location: template.php?id='.$cm->id);
 
             break;
 
@@ -553,7 +555,7 @@ switch($section)
                 //se ha enviado pero se ha cancelado, redirigir a página principal
                 elseif($form->is_cancelled())
                 {
-                    redirect('template.php?id='.$cm->id.'&section=items&tplid='.$tplid, '', 0);
+                    header('Location: template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
                 }
                 //se ha enviado y no valida el formulario...
                 elseif(!$form->is_validated())
@@ -579,9 +581,8 @@ switch($section)
                     //insertamos los datos en la base de datos
                     insert_record('teamwork_items', $data);
 
-                    //mostramos mensaje
-                    echo '<p align="center">'.get_string('itemadded', 'teamwork').'</p>';
-                    print_continue('template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
+                    //redireccionar
+                    header('Location: template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
                 }
 
             break;
@@ -622,7 +623,7 @@ switch($section)
                 //se ha enviado pero se ha cancelado, redirigir a página principal
                 elseif($form->is_cancelled())
                 {
-                    redirect('template.php?id='.$cm->id.'&section=items&tplid='.$tplid, '', 0);
+                    header('Location: template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
                 }
                 //se ha enviado y no valida el formulario...
                 elseif(!$form->is_validated())
@@ -644,9 +645,8 @@ switch($section)
                     //actualizar los datos en la base de datos
                     update_record('teamwork_items', $data);
 
-                    //mostramos mensaje
-                    echo '<p align="center">'.get_string('itemupdated', 'teamwork').'</p>';
-                    print_continue('template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
+                    //redireccionar
+                    header('Location: template.php?id='.$cm->id.'&section=items&tplid='.$tplid):
                 }
 
             break;
@@ -680,9 +680,8 @@ switch($section)
                     //borrar items de la plantilla
                     delete_records('teamwork_items', 'id', $itemid);
 
-                    //mostrar mensaje
-                    echo '<p align="center">'.get_string('itemdeleted', 'teamwork').'</p>';
-                    print_continue('template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
+                    //redireccionar
+                    header('Location: template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
                 }
                 
             break;
@@ -721,7 +720,7 @@ switch($section)
                 update_record('teamwork_items', $a);
                 update_record('teamwork_items', $b);
 
-                redirect('template.php?id='.$cm->id.'&section=items&tplid='.$tplid, '', 0);
+                header('Location: template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
 
             break;
 

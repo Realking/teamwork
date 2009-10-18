@@ -58,6 +58,9 @@ require_capability('mod/teamwork:manage', $cm->context);
 /// header
 //
 
+//iniciamos el bufer de salida (es posible que tengamos que modificar las cabeceras http y si imprimimos aqui algo no podremos hacerlo)
+ob_start();
+
 $navigation = build_navigation(get_string('teamseditor', 'teamwork'), $cm);
 $pagetitle = strip_tags($course->shortname.': '.get_string('modulename', 'teamwork').': '.format_string($teamwork->name,true).': '.get_string('teamseditor', 'teamwork'));
 
@@ -133,7 +136,7 @@ switch($action)
         //se ha enviado pero se ha cancelado, redirigir a página principal
         elseif($form->is_cancelled())
         {
-            redirect('team.php?id='.$cm->id, '', 0);
+            header('Location: team.php?id='.$cm->id);
         }
         //se ha enviado y no valida el formulario...
         elseif(!$form->is_validated())
@@ -153,9 +156,8 @@ switch($action)
             //insertar los datos
             $tid = insert_record('teamwork_teams', $data);
 
-            //mostramos mensaje
-            echo '<p align="center">'.get_string('teamcreated', 'teamwork').'</p>';
-            print_continue('team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
+            //redireccionamos a la lista de miembros de un equipo
+            header('Location: team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
         }
 
     break;
@@ -192,7 +194,7 @@ switch($action)
         //se ha enviado pero se ha cancelado, redirigir a página principal
         elseif($form->is_cancelled())
         {
-            redirect('team.php?id='.$cm->id, '', 0);
+            header('Location: team.php?id='.$cm->id);
         }
         //se ha enviado y no valida el formulario...
         elseif(!$form->is_validated())
@@ -213,8 +215,7 @@ switch($action)
             update_record('teamwork_teams', $data);
 
             //mostramos mensaje
-            echo '<p align="center">'.get_string('teamupdated', 'teamwork').'</p>';
-            print_continue('team.php?id='.$cm->id);
+            header('Location: team.php?id='.$cm->id);
         }
         
     break;
@@ -246,8 +247,7 @@ switch($action)
             delete_records('teamwork_users_teams', 'teamid', $tid);
 
             //mostrar mensaje
-            echo '<p align="center">'.get_string('teamdeleted', 'teamwork').'</p>';
-            print_continue('team.php?id='.$cm->id);
+            header('Location: team.php?id='.$cm->id);
         }
         
     break;
@@ -388,17 +388,7 @@ switch($action)
                 update_record('teamwork_teams', $data);
             }
 
-            //mostrar mensaje si se han añadido usuarios
-            if(count($selection) > 0)
-            {
-                echo '<p align="center">'.get_string('usersaddedok', 'teamwork').'</p>';
-                print_continue('team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
-            }
-            //si no, redireccionar directamente
-            else
-            {
-                redirect('team.php?id='.$cm->id.'&action=userlist&tid='.$tid, '', 0);
-            }
+            header('Location: team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
             
 
         }
@@ -596,9 +586,8 @@ switch($action)
                 update_record('teamwork_teams', $data);
             }
 
-            //mostrar mensaje
-            echo '<p align="center">'.get_string('userdeletedfromteam', 'teamwork').'</p>';
-            print_continue('team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
+            //redireccionar
+            header('Location: team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
         }
 
     break;
@@ -635,8 +624,7 @@ switch($action)
         update_record('teamwork_teams', $data);
 
         //mostrar mensaje
-        echo '<p align="center">'.get_string('leaderseterok', 'teamwork').'</p>';
-        print_continue('team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
+        header('Location: team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
 
     break;
 
@@ -661,7 +649,7 @@ switch($action)
         //se ha enviado pero se ha cancelado, redirigir a página principal
         elseif($form->is_cancelled())
         {
-            redirect('team.php?id='.$cm->id, '', 0);
+            header('Location: team.php?id='.$cm->id);
         }
         //se ha enviado y no valida el formulario...
         elseif(!$form->is_validated())
@@ -808,7 +796,7 @@ switch($action)
                 }
 
                 //redireccionar a la página con la lista de miembros del equipo
-                redirect('team.php?id='.$cm->id, '', 0);
+                header('Location: team.php?id='.$cm->id);
             }
         }
 
