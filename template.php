@@ -646,7 +646,7 @@ switch($section)
                     update_record('teamwork_items', $data);
 
                     //redireccionar
-                    header('Location: template.php?id='.$cm->id.'&section=items&tplid='.$tplid):
+                    header('Location: template.php?id='.$cm->id.'&section=items&tplid='.$tplid);
                 }
 
             break;
