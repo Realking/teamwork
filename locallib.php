@@ -72,8 +72,12 @@ function teamwork_show_status_info()
     if($ismanager)
     {
         echo "<br />\n";
-        echo '<span class="highlight2">'.get_string('youaremanager', 'teamwork').':</span> <a href="template.php?id='.$cm->id.'">'.get_string('templatesanditemseditor', 'teamwork').'</a> | ';
-        echo '<a href="team.php?id='.$cm->id.'">'.get_string('teamseditor', 'teamwork').'</a>';
+        echo '<span class="highlight2">'.get_string('youaremanager', 'teamwork').':</span> <a href="template.php?id='.$cm->id.'">'.get_string('templatesanditemseditor', 'teamwork').'</a>';
+        echo ' | <a href="team.php?id='.$cm->id.'">'.get_string('teamseditor', 'teamwork').'</a>';
+        if(time() > $teamwork->endsends)
+        {
+            echo ' | <a href="assign.php?id='.$cm->id.'">'.get_string('assignseditor', 'teamwork').'</a>';
+        }
     }
 
     //cerrar caja
