@@ -181,6 +181,9 @@ $string['badnamingscheme'] = "Debe contener exactamente un caracter '@' o '#'";
 $string['upitem'] = 'Subir elemento';
 $string['downitem'] = 'Bajar elemento';
 
+//en el archivo assign.php
+$string['assignseditor'] = 'Editor de Asignaciones';
+
 //generales
 $string['teamworkisnoeditable'] = 'No se puede editar la actividad';
 $string['submit'] = 'Enviar';
