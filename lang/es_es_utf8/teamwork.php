@@ -63,6 +63,8 @@ $string['timebefore'] = 'faltan $a';
 $string['timeafter'] = '$a después';
 $string['youaremanager'] = 'Usted tiene permisos de gestión';
 $string['managetemplates'] = 'Gestionar las plantillas';
+$string['groupbelong'] = 'Grupo al que perteneces';
+$string['youareleader'] = '¡Eres el líder del grupo!';
 
 
 //en el editor de templates template.php

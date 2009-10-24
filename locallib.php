@@ -20,13 +20,13 @@ require_once('../../lib/formslib.php');
  */
 function teamwork_show_status_info()
 {
-    global $ismanager, $teamwork, $cm;
+    global $ismanager, $teamwork, $cm, $CFG, $USER;
 	
     //imprimir nombre
     print_heading(format_string($teamwork->name));
 
     //abrir caja
-    print_box_start();
+    print_simple_box_start('center', '', '', 0, 'generalbox', 'intro');
 
     //imprimir fase actual
     echo '<b>'.get_string('currentphase', 'teamwork').'</b>: '.teamwork_phase($teamwork).'<br />';
@@ -56,6 +56,17 @@ function teamwork_show_status_info()
             echo '<b>'.get_string($type, 'teamwork').'</b>: '.userdate($date)." ($strdifference)<br />\n";
         }
     }
+
+    //grupo al que pertenece
+    $result = get_record_sql('select t.teamname, t.teamleader from '.$CFG->prefix.'teamwork_users_teams ut, '.$CFG->prefix.'teamwork_teams t where ut.userid = '.$USER->id.' AND t.id = ut.teamid AND t.teamworkid = '.$teamwork->id);
+
+    if($result)
+    {
+        echo "<br />";
+        $leader = ($result->teamleader == $USER->id) ? '(<span class="redfont">'.get_string('youareleader', 'teamwork').'</span>)' : '';
+        $link = link_to_popup_window($CFG->wwwroot.'/mod/teamwork/view.php?id='.$cm->id.'&teamcomponents=true', null, $result->teamname, 400, 500, get_string('teammembers', 'teamwork', $result->teamname), null, true);
+        echo '<b>'.get_string('groupbelong', 'teamwork').'</b>: '.$link." $leader<br />\n";
+    }
 	
     //si es manager imprimir aqui enlaces a la administración
     if($ismanager)
@@ -66,7 +77,7 @@ function teamwork_show_status_info()
     }
 
     //cerrar caja
-    print_box_end();
+    print_simple_box_end();
 }
 
 /**
