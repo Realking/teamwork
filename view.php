@@ -73,10 +73,10 @@ if($teamcomponents !== null)
     echo '<div class="clearer"></div>';
 
     //obtenemos el equipo al que pertenece el usuario
-    $team = get_record_sql('select t.id, t.teamname from '.$CFG->prefix.'teamwork_users_teams ut, '.$CFG->prefix.'teamwork_teams t where ut.userid = '.$USER->id.' AND t.id = ut.teamid AND t.teamworkid = '.$teamwork->id);
+    $team = get_record_sql('select t.id, t.teamname, t.teamleader from '.$CFG->prefix.'teamwork_users_teams ut, '.$CFG->prefix.'teamwork_teams t where ut.userid = '.$USER->id.' AND t.id = ut.teamid AND t.teamworkid = '.$teamwork->id);
 
     //obtenemos los miembros del grupo
-    if($members = get_records_sql('select u.id, u.firstname, u.lastname, u.picture, u.imagealt from '.$CFG->prefix.'user u, '.$CFG->prefix.'teamwork_users_teams ut where ut.teamid = '.$team->id.' AND u.id = ut.userid'))
+    if($members = get_records_sql('select u.id, u.firstname, u.lastname, u.picture, u.imagealt from '.$CFG->prefix.'user u, '.$CFG->prefix.'teamwork_users_teams ut where ut.teamid = '.$team->id.' AND u.id = ut.userid order by u.lastname ASC'))
     {
         echo print_heading(get_string('teammembers', 'teamwork', $team->teamname));
         echo '<br />';
@@ -91,7 +91,8 @@ if($teamcomponents !== null)
 
         foreach($members as $member)
         {
-            $name = '<a href="../../user/view.php?id='.$member->id.'&course='.$course->id.'" target="_blank">'.$member->firstname.' '.$member->lastname.'</a>';
+            $leader = ($team->teamleader == $member->id) ? '&nbsp; <img src="images/leader.png" alt="'.get_string('thisuserisleader', 'teamwork').'" title="'.get_string('thisuserisleader', 'teamwork').'" />' : '';
+            $name = '<a href="../../user/view.php?id='.$member->id.'&course='.$course->id.'" target="_blank">'.$member->firstname.' '.$member->lastname.'</a>'.$leader;
             $table->data[] = array(print_user_picture($member, $course->id, null, 0, true),$name);
         }
 
