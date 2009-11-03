@@ -65,6 +65,12 @@ $string['youaremanager'] = 'Usted tiene permisos de gestión';
 $string['managetemplates'] = 'Gestionar las plantillas';
 $string['groupbelong'] = 'Grupo al que perteneces';
 $string['youareleader'] = '¡Eres el líder del grupo!';
+$string['teamsubmission'] = 'Envío del equipo';
+$string['submissionnothavetext'] = 'Este envío no contiene texto.';
+$string['attachedfiles'] = 'Archivos adjuntos:';
+$string['editsubmission'] = 'Editar el envío';
+$string['submissioncontent'] = 'Contenido del envío';
+$string['attachfile'] = 'Adjuntar archivo';
 
 
 //en el editor de templates template.php

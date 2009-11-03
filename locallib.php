@@ -29,7 +29,7 @@ function teamwork_show_status_info()
     print_simple_box_start('center', '', '', 0, 'generalbox', 'intro');
 
     //imprimir fase actual
-    echo '<b>'.get_string('currentphase', 'teamwork').'</b>: '.teamwork_phase($teamwork).'<br />';
+    echo '<b>'.get_string('currentphase', 'teamwork').'</b>: '.teamwork_phase($teamwork).'<br /><br />';
 
     //fechas
     $dates = array(
@@ -951,6 +951,113 @@ class teamwork_randomteams_form extends moodleform
         }
 
         return $errors;
+    }
+}
+
+/**
+ * Obtiene la ruta al archivo enviado por el grupo
+ *
+ * @param object $team referencia al equipo
+ * @return mixed string ruta al archivo, bool false si no se ha enviado ningún archivo
+ */
+function teamwork_get_team_submit_file($team)
+{
+    global $teamwork, $course, $CFG;
+
+    //ruta al directorio con los archivos
+    $filepath = $CFG->dataroot.'/'.$course->id.'/'.$CFG->moddata.'/teamwork/'.$teamwork->id.'/'.$team->id;
+
+    if(is_dir($filepath))
+    {
+        //obtenemos el nombre del archivo
+        if($files = get_directory_list($filepath))
+        {
+            if(count($files) == 1)
+            {
+                $o = new stdClass;
+                $o->name = $files[0];
+                $o->path = $filepath.'/'.$files[0];
+                $o->download = '/'.$course->id.'/'.$CFG->moddata.'/teamwork/'.$teamwork->id.'/'.$team->id.'/'.$files[0];
+                
+                return $o;
+            }   
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Obtiene el html necesario para imprimir un archivo subido
+ * 
+ * @global object $CFG datos de configuracion
+ * @param object $file datos del archivo a mostrar
+ * @param bool $return true si debemos devolverlo en la función, false para imprimirlo directamente
+ * @return mixed string o nada 
+ */
+function teamwork_print_team_file($file, $return = false)
+{
+    global $CFG;
+    
+    $output = '';
+
+    require_once($CFG->libdir.'/filelib.php');
+
+    $icon = mimeinfo('icon', $file->path);
+    $ffurl = get_file_url($file->download);
+
+    $output .= '<img src="'.$CFG->pixpath.'/f/'.$icon.'" class="icon" alt="'.$icon.'" />'.
+            '<a href="'.$ffurl.'" >'.$file->name.'</a><br />';
+
+    $output = '<div class="files">'.$output.'</div>';
+
+    if ($return)
+    {
+        return $output;
+    }
+    
+    echo $output;
+}
+
+/**
+ * Clase que muestra el formulario de la generación aleatoria de equipos
+ */
+class teamwork_edit_submission_form extends moodleform
+{
+    /**
+     * Define el formulario
+     */
+    function definition()
+    {
+        global $CFG, $course;
+        $mform =& $this->_form;
+
+        $this->set_upload_manager(new upload_manager('attachedfile', true, false, null, false, 0, false, true, true));
+
+        //marco del formulario
+        $mform->addElement('header', 'general', get_string('editsubmission', 'teamwork'));
+        $mform->setHelpButton('general', array('editsubmission', get_string('editsubmission', 'teamwork'), 'teamwork'));
+
+        //---> Contenido del trabajo
+
+        //añadir un textarea para la descripción de la actividad
+        $mform->addElement('htmleditor', 'description', get_string('submissioncontent', 'teamwork'), 'wrap="virtual" rows="20" cols="75"');
+        //tipo RAW para mantener el HTML
+        $mform->setType('description', PARAM_RAW);
+        //boton de ayuda unico con tres opciones relacionadas con el editor html
+        $mform->setHelpButton('description', array('writing', 'questions', 'richtext'), false, 'editorhelpbutton');
+ 
+
+        //---> Archivo adjunto
+
+        //añadir un textarea para la descripción de la actividad
+        $mform->addElement('file', 'attachedfile', get_string('attachfile', 'teamwork'));
+        //boton de ayuda unico con tres opciones relacionadas con el editor html
+        $mform->setHelpButton('attachedfile', array('attachfile', get_string('attachfile', 'teamwork'), 'teamwork'));
+
+
+        // botones de envío y cancelación
+        $this->add_action_buttons();
     }
 }
 ?>

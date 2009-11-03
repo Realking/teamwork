@@ -106,6 +106,9 @@ if($teamcomponents !== null)
 /// cabecera
 //
 
+//iniciamos el bufer de salida (es posible que tengamos que modificar las cabeceras http y si imprimimos aqui algo no podremos hacerlo)
+ob_start();
+
 $navigation = build_navigation('', $cm);
 $pagetitle = strip_tags($course->shortname.': '.get_string('modulename', 'teamwork').': '.format_string($teamwork->name,true));
 
@@ -126,6 +129,101 @@ teamwork_show_status_info();
 echo '<br />';
 print_heading(get_string('activity'));
 print_simple_box($teamwork->description, 'center', '', '', 0, 'generalbox', 'intro');
+
+//obtener los datos del equipo al que pertenezco
+$team = get_record_sql('select t.id, t.teamname, t.teamleader, t.workdescription from '.$CFG->prefix.'teamwork_users_teams ut, '.$CFG->prefix.'teamwork_teams t where ut.userid = '.$USER->id.' AND t.id = ut.teamid AND t.teamworkid = '.$teamwork->id);
+
+//si pertenezco a un grupo
+if($team !== false)
+{
+    //mi envio
+    echo '<br />';
+    print_heading(get_string('teamsubmission', 'teamwork'));
+
+    //si existe en la bbdd algun texto del trabajo enviado, lo mostramos
+    if(!empty($team->workdescription))
+    {
+        print_simple_box($team->workdescription, 'center', '', '', 0, 'generalbox', 'intro');
+    }
+    //si no mostramos mensaje
+    else
+    {
+        print_simple_box(get_string('submissionnothavetext','teamwork'), 'center', '', '', 0, 'generalbox', 'intro');
+    }
+
+    //si existe algún archivo adjuntado, lo mostramos
+    $file = teamwork_get_team_submit_file($team);
+
+    if( $file !== false)
+    {
+        $text = '<b>'.get_string('attachedfiles', 'teamwork').'</b><br /><br />'.teamwork_print_team_file($file, true);
+        print_simple_box($text, 'center', '', '', 0, 'generalbox', 'intro');
+    }
+
+    //si soy el lider del equipo y estamos en el plazo, puedo editar el envío
+    if($team->teamleader == $USER->id AND $teamwork->startsends < time() AND time() < $teamwork->endsends)
+    {
+        //si se quiere editar el envio
+        if(optional_param('edit', 0))
+        {
+            //cargamos el formulario
+            $form = new teamwork_edit_submission_form('view.php?id='.$cm->id.'&edit=1');
+
+            //no se ha enviado, se muestra
+            if(!$form->is_submitted())
+            {
+                if(!empty($team->workdescription))
+                {
+                    $form->set_data(array('description' => $team->workdescription));
+                }
+                
+                $form->display();
+            }
+            //se ha enviado pero se ha cancelado, redirigir a página principal
+            elseif($form->is_cancelled())
+            {
+                header('Location: view.php?id='.$cm->id);
+            }
+            //se ha enviado y no valida el formulario...
+            elseif(!$form->is_validated())
+            {
+                $form->display();
+            }
+            //se ha enviado y es válido, se procesa
+            else
+            {
+                //obtenemos los datos del formulario
+                $data = $form->get_data();
+
+                //actualizar los datos del trabajo
+                $d = new stdClass;
+                $d->workdescription = $data->description;
+                $d->id = $team->id;
+                $d->worktime = time();
+
+                update_record('teamwork_teams', $d);
+
+                //procesamos la subida de archivos si se produce
+                $filepath = $CFG->dataroot.'/'.$course->id.'/'.$CFG->moddata.'/teamwork/'.$teamwork->id.'/'.$team->id;
+
+                require_once($CFG->dirroot.'/lib/uploadlib.php');
+                $um = new upload_manager('attachedfile', true, false, null, false, 0, false, true, true);
+                $um->process_file_uploads($filepath);
+
+                //redireccionar
+                header('Location: view.php?id='.$cm->id);
+            }
+        }
+        else
+        {
+            echo '<div align="center">';
+            print_single_button('view.php', array('id'=>$cm->id, 'edit'=>1), get_string('editsubmission', 'teamwork'));
+            echo '</div>';
+        }
+    }
+}
+
+
 
 
 
