@@ -183,12 +183,21 @@ $string['youdontusetherandombecauseteamsexist'] = 'No puedes usar el generador y
 $string['numberteammemberscannotbezero'] = 'Este valor debe ser 1 o más';
 $string['badnamingscheme'] = "Debe contener exactamente un caracter '@' o '#'";
 
+
 //en el archivo locallib.php
 $string['upitem'] = 'Subir elemento';
 $string['downitem'] = 'Bajar elemento';
 
+
 //en el archivo assign.php
 $string['assignseditor'] = 'Editor de Asignaciones';
+
+
+//en el archivo index.php
+$string['noinstances'] = 'No hay ninguna instancia de este módulo';
+$string['areyouleader?'] = '¿Eres el líder?';
+$string['duedate'] = 'Fecha límite';
+
 
 //generales
 $string['teamworkisnoeditable'] = 'No se puede editar la actividad';
