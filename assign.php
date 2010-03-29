@@ -67,6 +67,84 @@ print_header($pagetitle, $course->fullname, $navigation, '', '', true, '', navme
 
 echo '<div class="clearer"></div><br />';
 
+//
+/// cuerpo
+//
+
+switch($action)
+{
+  case 'list':
+
+    //mostrar la tabla con la lista de trabajos enviados
+    $table = new stdClass;
+    $table->width = '70%';
+    $table->tablealign = 'center';
+    $table->id = 'sentworkstable';
+    $table->head = array(get_string('teamname', 'teamwork'), get_string('teamsthatevalthiswork', 'teamwork'), get_string('actions', 'teamwork'));
+    $table->size = array('25%', '65%', '10%');
+    $table->align = array('center', 'center', 'center');
+
+    print_heading(get_string('sentworkslist', 'teamwork'));
+
+    // Si hay trabajos enviados
+    if($works = get_records_sql('select * from '.$CFG->prefix.'teamwork_teams t where t.teamworkid = '.$teamwork->id.' and t.worktime != 0 order by t.teamname'))
+    {
+      foreach($works as $work)
+      {
+        $stractions = teamwork_sent_works_table_options($work);
+
+        //listar todos los trabajos que tiene asignado
+        $evaluators = get_records_sql('select t.id, t.teamname from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_evals e, '.$CFG->prefix.'teamwork_users_teams ut where
+                                 e.teamevaluated = '.$work->id.' AND ut.userid = e.evaluator AND t.id = ut.teamid');
+
+        var_dump($evaluators);
+
+        $table->data[] = array($work->teamname, '', $stractions);
+      }
+
+      //disponibles: imprimir la tabla y el boton de añadir
+      print_table($table);
+    }
+    // Si no hay trabajos
+    else
+    {
+      echo '<br /><div align="center">';
+      echo get_string('donothavesentworks', 'teamwork');
+      echo '</div>';
+    }
+
+    //imprimir opciones inferiores
+    echo '<br /><div align="center"><br />';
+    echo '<img src="images/asterisk.png" alt="'.get_string('symbolicwork', 'teamwork').'" title="'.get_string('symbolicwork', 'teamwork').'"/> <a href="assign.php?id='.$cm->id.'&action=symbolicworks">'.get_string('symbolicwork', 'teamwork').'</a> | ';
+    echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="view.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
+    echo '</div>';
+
+  break;
+
+  case 'editevaluators':
+
+    //imprimir opciones inferiores
+    echo '<br /><div align="center"><br />';
+    echo '<img src="images/add.png" alt="'.get_string('addevaluators', 'teamwork').'" title="'.get_string('addevaluators', 'teamwork').'"/> <a href="assign.php?id='.$cm->id.'&action=addevaluators">'.get_string('addevaluators', 'teamwork').'</a> | ';
+    echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="assign.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
+    echo '</div>';
+
+  break;
+
+  //añade evaluadores a un equipo
+  case 'addevaluators':
+
+
+
+  break;
+
+  //elimina un evaluador de un equipo
+  case 'deleteevaluator':
+
+
+
+  break;
+}
 
 
 //

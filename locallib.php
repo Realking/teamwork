@@ -1060,4 +1060,35 @@ class teamwork_edit_submission_form extends moodleform
         $this->add_action_buttons();
     }
 }
+
+/**
+ * Acciones de la tabla con la lista de trabajos enviados
+ *
+ * @global object $cm contexto del modulo
+ * @global object $teamwork referencia al teamwork
+ * @param object $work datos del equipo que envia el trabajo
+ * @return string html de las acciones
+ */
+function teamwork_sent_works_table_options($work)
+{
+    global $cm, $teamwork;
+
+    $stractions = '';
+    $now = time();
+
+    //solo si estamos en el periodo de asignaciones, podemos asignar equipos a los trabajos
+    if($teamwork->endsends < $now AND $now < $teamwork->startevals)
+    {
+        //boton de editar los equipos que corrigen el trabajo
+        $stractions .= '<a href="assign.php?id='.$cm->id.'&action=editevaluators&tid='.$work->id.'"><img src="images/page_edit.png" alt="'.get_string('editevaluators', 'teamwork').'" title="'.get_string('editevaluators', 'teamwork').'" /></a>&nbsp;&nbsp;';
+    }
+
+    if($teamwork->startsends < $now AND $now < $teamwork->startevals)
+    {
+        //boton de eliminar trabajo
+        $stractions .= '<a href="assign.php?id='.$cm->id.'&action=deletework&tid='.$work->id.'"><img src="images/delete.png" alt="'.get_string('deletework', 'teamwork').'" title="'.get_string('deletework', 'teamwork').'" /></a>&nbsp;&nbsp;';
+    }
+
+    return $stractions;
+}
 ?>

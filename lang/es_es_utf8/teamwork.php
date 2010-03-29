@@ -191,6 +191,13 @@ $string['downitem'] = 'Bajar elemento';
 
 //en el archivo assign.php
 $string['assignseditor'] = 'Editor de Asignaciones';
+$string['sentworkslist'] = 'Lista de Trabajos Enviados';
+$string['teamsthatevalthiswork'] = 'Equipos que evalúan a este trabajo';
+$string['editevaluators'] = 'Editar los equipos que corrigen a este equipo';
+$string['deletework'] = 'Eliminar el trabajo';
+$string['symbolicwork'] = 'Crear trabajos simbólicos';
+$string['addevaluators'] = 'Añadir evaluadores';
+$string['donothavesentworks'] = 'No se ha enviado ningún trabajo';
 
 
 //en el archivo index.php
