@@ -141,6 +141,9 @@ if($team !== false)
     echo '<br />';
     print_heading(get_string('teamsubmission', 'teamwork'));
 
+    // Buscamos si se ha enviado algún archivo
+    $file = teamwork_get_team_submit_file($team);
+
     //si existe en la bbdd algun texto del trabajo enviado, lo mostramos
     if(!empty($team->workdescription))
     {
@@ -149,12 +152,19 @@ if($team !== false)
     //si no mostramos mensaje
     else
     {
-        print_simple_box(get_string('submissionnothavetext','teamwork'), 'center', '', '', 0, 'generalbox', 'intro');
+        // Si ya ha pasado la fecha de envios, es que no se ha enviado nada
+        if(time() > $teamwork->endsends AND $file === false)
+        {
+          print_simple_box(get_string('submissionnotsent','teamwork'), 'center', '', '', 0, 'generalbox', 'intro');
+        }
+        // Si aun no ha pasado...
+        else
+        {
+          print_simple_box(get_string('submissionnothavetext','teamwork'), 'center', '', '', 0, 'generalbox', 'intro');
+        }
     }
 
     //si existe algún archivo adjuntado, lo mostramos
-    $file = teamwork_get_team_submit_file($team);
-
     if( $file !== false)
     {
         $text = '<b>'.get_string('attachedfiles', 'teamwork').'</b><br /><br />'.teamwork_print_team_file($file, true);
