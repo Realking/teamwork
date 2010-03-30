@@ -71,6 +71,7 @@ $string['attachedfiles'] = 'Archivos adjuntos:';
 $string['editsubmission'] = 'Editar el envío';
 $string['submissioncontent'] = 'Contenido del envío';
 $string['attachfile'] = 'Adjuntar archivo';
+$string['submissionnotsent'] = 'Este grupo no ha realizado ningún envío';
 
 
 //en el editor de templates template.php
@@ -198,6 +199,8 @@ $string['deletework'] = 'Eliminar el trabajo';
 $string['symbolicwork'] = 'Crear trabajos simbólicos';
 $string['addevaluators'] = 'Añadir evaluadores';
 $string['donothavesentworks'] = 'No se ha enviado ningún trabajo';
+$string['viewwork'] = 'Ver el trabajo';
+$string['confirmationfordeletework'] = '¿Desea realmente borrar el trabajo?';
 
 
 //en el archivo index.php

@@ -144,6 +144,43 @@ switch($action)
 
 
   break;
+
+  // Elimina un trabajo enviado
+  case 'deletework':
+
+    //verificar que se pueda realmente editar este teamwork
+    if(!teamwork_is_editable($teamwork))
+    {
+        print_error('teamworkisnoeditable', 'teamwork');
+    }
+
+    //parametros requeridos
+    $tid = required_param('tid', PARAM_INT);
+
+    //si el grupo puede ser borrado, pedir confirmación
+    //si no ha sido enviada, mostrar la confirmacion
+    if(!isset($_POST['tid']))
+    {
+      notice_yesno(get_string('confirmationfordeletework', 'teamwork'), 'assign.php', 'assign.php', array('id'=>$cm->id, 'action'=>'deletework', 'tid'=>$tid), array('id'=>$cm->id), 'post', 'get');
+    }
+    //si se ha enviado, procesamos
+    else
+    {
+      // Borrar el contenido de la base de datos
+      $data = new stdClass;
+      $data->id = $tid;
+      $data->worktime = 0;
+      $data->workdescription = '';
+      update_record('teamwork_teams', $data);
+
+      // Borrar el archivo subido si existiere
+      remove_dir( $CFG->dataroot.'/'.$course->id.'/'.$CFG->moddata.'/teamwork/'.$teamwork->id.'/'.$tid );
+
+      // Redireccionar a la pagina de asignaciones
+      header('Location: assign.php?id='.$cm->id);
+    }
+
+  break;
 }
 
 
