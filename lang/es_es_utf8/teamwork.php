@@ -201,6 +201,8 @@ $string['addevaluators'] = 'Añadir evaluadores';
 $string['donothavesentworks'] = 'No se ha enviado ningún trabajo';
 $string['viewwork'] = 'Ver el trabajo';
 $string['confirmationfordeletework'] = '¿Desea realmente borrar el trabajo?';
+$string['symbolycworktext'] = 'Texto generado automáticamente por la aplicación';
+$string['youcannotcreatesymbolicworks'] = 'No se pueden crear trabajos simbólicos';
 
 
 //en el archivo index.php

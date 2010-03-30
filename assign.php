@@ -115,7 +115,10 @@ switch($action)
 
     //imprimir opciones inferiores
     echo '<br /><div align="center"><br />';
-    echo '<img src="images/asterisk.png" alt="'.get_string('symbolicwork', 'teamwork').'" title="'.get_string('symbolicwork', 'teamwork').'"/> <a href="assign.php?id='.$cm->id.'&action=symbolicworks">'.get_string('symbolicwork', 'teamwork').'</a> | ';
+    if(count_records_sql('select count(*) from '.$CFG->prefix.'teamwork_teams t where t.teamworkid = '.$teamwork->id.' and t.worktime != 0 order by t.teamname') == 0)
+    {
+      echo '<img src="images/asterisk.png" alt="'.get_string('symbolicwork', 'teamwork').'" title="'.get_string('symbolicwork', 'teamwork').'"/> <a href="assign.php?id='.$cm->id.'&action=symbolicworks">'.get_string('symbolicwork', 'teamwork').'</a> | ';
+    }
     echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="view.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
     echo '</div>';
 
@@ -180,6 +183,35 @@ switch($action)
       header('Location: assign.php?id='.$cm->id);
     }
 
+  break;
+
+  // Crea trabajos simbólicos para todos los equipos existentes
+  case 'symbolicworks':
+
+    //verificar que se pueda realmente editar este teamwork
+    if(!teamwork_is_editable($teamwork))
+    {
+        print_error('teamworkisnoeditable', 'teamwork');
+    }    
+
+    // Obtener la lista de trabajos enviados
+    $works = count_records_sql('select count(*) from '.$CFG->prefix.'teamwork_teams t where t.teamworkid = '.$teamwork->id.' and t.worktime != 0 order by t.teamname');
+
+    // Para que se puedan crear trabajos simbolicos es necesario que ningún grupo haya subido nada y que esté cerrado el plazo de envio
+    if($works == 0 AND $teamwork->endsends < time())
+    {
+      // Actualizar los equipos de esta instancia con los datos por defecto
+      execute_sql('update '.$CFG->prefix."teamwork_teams set workdescription = '" . get_string('symbolycworktext', 'teamwork') . "', worktime = ".time()." where teamworkid = ".$teamwork->id);
+
+      // Redireccionar a la lista de trabajos enviados
+      header('Location: assign.php?id='.$cm->id);
+    }
+    else
+    {
+      // No se puede crear trabajos simbólicos si ya existen o aun está abierto el plazo de envíos...
+      print_error('youcannotcreatesymbolicworks', 'teamwork');
+    }
+    
   break;
 }
 
