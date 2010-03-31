@@ -124,7 +124,48 @@ switch($action)
 
   break;
 
+  // Muestra la lista de evaluadores del equipo
   case 'editevaluators':
+
+    // Parametros requeridos
+    $tid = required_param('tid', PARAM_INT);
+
+    // Obtenemos el nombre del equipo
+    $team = get_record('teamwork_teams', 'id', $tid);
+
+    // Obtenemos la lista de equipos que evaluan al equipo $tid
+    $sql = 'select distinct t.id, t.teamname from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_evals e, '.$CFG->prefix.'teamwork_users_teams u
+            where e.teamevaluated = "'.$tid.'" and u.userid = e.evaluator and t.id = u.teamid';
+
+    print_heading(get_string('teamevaluators', 'teamwork', $team->teamname));
+
+    if( !$evaluators = get_records_sql($sql) )
+    {
+      // No hay nadie que evalúe a este equipo
+      echo '<p align="center">'.get_string('donothaveanyevaluatorforthisteam', 'teamwork').'</p>';
+    }
+    else
+    {
+      // Mostramos los equipos que lo evalúan
+      $table = new stdClass;
+      $table->width = '40%';
+      $table->tablealign = 'center';
+      $table->id = 'usersteamstable';
+      $table->head = array(get_string('teamname', 'teamwork'), get_string('actions', 'teamwork'));
+      $table->align = array('center', 'center');
+      $table->size = array('80%', '20%');
+
+      foreach($evaluators as $evaluator)
+      {
+        $stractions = '<a href="assign.php?id='.$cm->id.'&action=deleteevaluator&tid='.$tid.'&eid='.$evaluator->id.'"><img src="images/delete.png" alt="'.get_string('removeteamforeval', 'teamwork').'" title="'.get_string('removeteamforeval', 'teamwork').'" /></a>&nbsp;&nbsp;';
+        $name = '<a href="team.php?id='.$cm->id.'&action=userlist&tid='.$evaluator->id.'" target="_blank">'.$evaluator->teamname.'</a>';
+
+        $table->data[] = array($name, $stractions);
+      }
+
+      // Imprimir tabla
+      print_table($table);
+    }
 
     //imprimir opciones inferiores
     echo '<br /><div align="center"><br />';

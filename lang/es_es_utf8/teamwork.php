@@ -203,6 +203,9 @@ $string['viewwork'] = 'Ver el trabajo';
 $string['confirmationfordeletework'] = '¿Desea realmente borrar el trabajo?';
 $string['symbolycworktext'] = 'Texto generado automáticamente por la aplicación';
 $string['youcannotcreatesymbolicworks'] = 'No se pueden crear trabajos simbólicos';
+$string['teamevaluators'] = 'Equipos que evalúan al equipo: $a';
+$string['donothaveanyevaluatorforthisteam'] = 'No hay ningún equipo que evalúe a este';
+$string['removeteamforeval'] = 'Quitar equipo de la evaluación';
 
 
 //en el archivo index.php
