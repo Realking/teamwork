@@ -1089,7 +1089,7 @@ function teamwork_sent_works_table_options($work)
       $stractions .= '<a href="viewer.php?id='.$cm->id.'&tid='.$work->id.'"><img src="images/viewer.png" alt="'.get_string('viewwork', 'teamwork').'" title="'.get_string('viewwork', 'teamwork').'" /></a>&nbsp;&nbsp;';
     }
 
-    if($teamwork->startsends < $now AND $now < $teamwork->startevals)
+    if($teamwork->startsends < $now AND $now < $teamwork->startevals AND !count_records('teamwork_evals', 'teamevaluated', $work->id))
     {
         //boton de eliminar trabajo
         $stractions .= '<a href="assign.php?id='.$cm->id.'&action=deletework&tid='.$work->id.'"><img src="images/delete.png" alt="'.get_string('deletework', 'teamwork').'" title="'.get_string('deletework', 'teamwork').'" /></a>&nbsp;&nbsp;';

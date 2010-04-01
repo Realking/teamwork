@@ -355,6 +355,12 @@ switch($action)
     //si se ha enviado, procesamos
     else
     {
+      // Si hay algun usuario que evalue a este equipo no se puede borrar el trabajo
+      if( count_records('teamwork_evals', 'teamevaluated', $tid))
+      {
+        print_error('cannotdeletethisworkbecausethishaveevaluators', 'teamwork');
+      }
+
       // Borrar el contenido de la base de datos
       $data = new stdClass;
       $data->id = $tid;

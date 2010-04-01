@@ -208,6 +208,7 @@ $string['donothaveanyevaluatorforthisteam'] = 'No hay ningún equipo que evalúe
 $string['removeteamforeval'] = 'Quitar equipo de la evaluación';
 $string['addnewevaluators'] = 'Añadir equipos como evaluadores';
 $string['asignteamforevalleyend'] = 'Leyenda: &nbsp; $a equipos que ya están como evaluadores de este equipo';
+$string['cannotdeletethisworkbecausethishaveevaluators'] = 'No se puede borrar el trabajo ya que este grupo tiene asignados evaluadores. Eliminelos antes de continuar.';
 
 
 //en el archivo index.php
