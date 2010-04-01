@@ -92,14 +92,9 @@ switch($action)
       foreach($works as $work)
       {
         $stractions = teamwork_sent_works_table_options($work);
-
-        //listar todos los trabajos que tiene asignado
-        $evaluators = get_records_sql('select t.id, t.teamname from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_evals e, '.$CFG->prefix.'teamwork_users_teams ut where
-                                 e.teamevaluated = '.$work->id.' AND ut.userid = e.evaluator AND t.id = ut.teamid');
-
-        var_dump($evaluators);
-
-        $table->data[] = array($work->teamname, '', $stractions);
+        $teams = teamwork_get_team_evaluators($work);
+        
+        $table->data[] = array($work->teamname, $teams, $stractions);
       }
 
       //disponibles: imprimir la tabla y el boton de añadir
@@ -135,7 +130,7 @@ switch($action)
 
     // Obtenemos la lista de equipos que evaluan al equipo $tid
     $sql = 'select distinct t.id, t.teamname from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_evals e, '.$CFG->prefix.'teamwork_users_teams u
-            where e.teamevaluated = "'.$tid.'" and u.userid = e.evaluator and t.id = u.teamid';
+            where e.teamevaluated = "'.$tid.'" and u.userid = e.evaluator and t.id = u.teamid and t.teamworkid = "'.$teamwork->id.'"';
 
     print_heading(get_string('teamevaluators', 'teamwork', $team->teamname));
 
@@ -158,9 +153,8 @@ switch($action)
       foreach($evaluators as $evaluator)
       {
         $stractions = '<a href="assign.php?id='.$cm->id.'&action=deleteevaluator&tid='.$tid.'&eid='.$evaluator->id.'"><img src="images/delete.png" alt="'.get_string('removeteamforeval', 'teamwork').'" title="'.get_string('removeteamforeval', 'teamwork').'" /></a>&nbsp;&nbsp;';
-        $name = '<a href="team.php?id='.$cm->id.'&action=userlist&tid='.$evaluator->id.'" target="_blank">'.$evaluator->teamname.'</a>';
 
-        $table->data[] = array($name, $stractions);
+        $table->data[] = array($evaluator->teamname, $stractions);
       }
 
       // Imprimir tabla
@@ -169,7 +163,7 @@ switch($action)
 
     //imprimir opciones inferiores
     echo '<br /><div align="center"><br />';
-    echo '<img src="images/add.png" alt="'.get_string('addevaluators', 'teamwork').'" title="'.get_string('addevaluators', 'teamwork').'"/> <a href="assign.php?id='.$cm->id.'&action=addevaluators">'.get_string('addevaluators', 'teamwork').'</a> | ';
+    echo '<img src="images/add.png" alt="'.get_string('addevaluators', 'teamwork').'" title="'.get_string('addevaluators', 'teamwork').'"/> <a href="assign.php?id='.$cm->id.'&action=addevaluators&tid='.$tid.'">'.get_string('addevaluators', 'teamwork').'</a> | ';
     echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="assign.php?id='.$cm->id.'">'.get_string('goback', 'teamwork').'</a>';
     echo '</div>';
 
@@ -178,7 +172,158 @@ switch($action)
   //añade evaluadores a un equipo
   case 'addevaluators':
 
+    //verificar que se pueda realmente editar este teamwork
+    if(!teamwork_is_editable($teamwork))
+    {
+        print_error('teamworkisnoeditable', 'teamwork');
+    }
 
+    //parametros requeridos
+    $tid = required_param('tid', PARAM_INT);
+
+    //si se envia la lista de los miembros a incorporar...
+    if(isset($_POST['submit']))
+    {
+        //usuarios a añadir
+        $selection = optional_param('selection', array());
+
+        // Descartar por si se enviase, el propio grupo de la lista
+        while(($key = array_search($tid, $selection)) !== FALSE)
+        {
+          unset($selection[$key]);
+        }
+
+        // Obtener la lista de equipos de la instancia
+        $teams = get_records('teamwork_teams', 'teamworkid', $teamwork->id);
+
+        if($teams !== false)
+        {
+            foreach($teams as $item)
+            {
+                $aux[] = $item->id;
+            }
+
+            $teams = $aux;
+            unset($aux);
+        }
+        else
+        {
+            $teams = array();
+        }
+
+        $data = new stdClass;
+        $data->teamevaluated = $tid;
+        $data->timecreated = time();
+
+        // Comprobar que los grupos escogidos pertenezcan a esta instancia del teamwork
+        // Si pertenecen, insertar sus miembros como evaluadores
+        foreach($selection as $s)
+        {
+          if(in_array($s, $teams))
+          {
+            //Obtener los usuarios pertenecientes a ese equipo
+            $users = get_records('teamwork_users_teams', 'teamid', $s);
+
+            // Insertamos cada usuario en la bbdd
+            foreach($users as $user)
+            {
+              $data->evaluator = $user->userid;
+
+              insert_record('teamwork_evals', $data);
+            }
+          }
+        }
+
+        header('Location: assign.php?id='.$cm->id.'&action=editevaluators&tid='.$tid);
+    }
+    // Si no, mostramos la lista de los equipos de la instancia
+    else
+    {
+        // Cargar la lista de equipos asignados actualmente para eliminarlos de los disponibles
+        $sql = 'select distinct t.id from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_evals e, '.$CFG->prefix.'teamwork_users_teams u
+            where e.teamevaluated = "'.$tid.'" and u.userid = e.evaluator and t.id = u.teamid and t.teamworkid = "'.$teamwork->id.'"';
+        $current_teams = get_records_sql($sql);
+
+        if($current_teams !== false)
+        {
+            foreach($current_teams as $item)
+            {
+                $aux[] = $item->id;
+            }
+
+            $current_teams = $aux;
+            unset($aux);
+        }
+        else
+        {
+            $current_teams = array();
+        }
+
+        // Cargar la lista de grupos de la instancia
+        $teams = get_records('teamwork_teams', 'teamworkid', $teamwork->id);
+
+        // Eliminar de la lista nuestro equipo, pues un equipo no puede evaluarse a si mismo
+        if(isset($teams[$tid]))
+        {
+          unset($teams[$tid]);
+        }
+
+        //titulo
+        $team = get_record('teamwork_teams', 'id', $tid);
+        print_heading(get_string('teamevaluators', 'teamwork', $team->teamname));
+
+        // Inicio del formulario
+        echo '<form method="post" action="'.teamwork_create_url('assign.php').'">';
+
+        // Cabecera de la tabla
+        echo '<table width="40%" cellspacing="1" cellpadding="5" id="userstable" class="generaltable boxaligncenter">';
+        echo '<tbody><tr>';
+        echo '<th scope="col" class="header c0" style="vertical-align: top; text-align: center; width: 80%; white-space: nowrap;">'.get_string('teamname', 'teamwork').'</th>';
+        echo '<th scope="col" class="header c1 lastcol" style="vertical-align: top; text-align: center; width: 20%; white-space: nowrap;">'.get_string('actions', 'teamwork').'</th>';
+        echo '</tr>';
+
+        foreach($teams as $team)
+        {
+          $css = '';
+
+          // Si el equipo ya está como evaluador...
+          if(in_array($team->id, $current_teams))
+          {
+              //el equipo ya está como evaluador, marcamos el fondo de verde
+              $css = ' teamwork_highlight_green';
+          }
+
+          echo '<tr class="r0">';
+          echo '<td class="cell c0'.$css.'" style="text-align: center; width: 80%;">';
+              echo $team->teamname;
+          echo '</td>';
+          echo '<td class="cell c1 lastcol'.$css.'" style="text-align: center; width: 20%;">';
+
+          //si css esta vacio (no pertenece a ningun grupo), mostramos el marcador para seleccionar el usuario
+          if(empty($css))
+          {
+              echo '<input type="checkbox" name="selection[]" value="'.$team->id.'" />';
+          }
+          echo '</td>';
+          echo '</tr>';
+        }
+
+        //pie de la tabla
+        echo '</tbody></table>';
+
+        //fin de formulario
+        echo '<p align="center"><input type="submit" name="submit" value="'.get_string('addnewevaluators', 'teamwork').'" /></p>';
+        echo '</form>';
+
+        //leyenda
+        $var = '<span class="teamwork_highlight_green">&nbsp;&nbsp;&nbsp;&nbsp;</span>';
+        echo '<br /><p align="center">'.get_string('asignteamforevalleyend', 'teamwork', $var).'</p>';
+
+        //imprimir opciones inferiores
+        echo '<br /><div align="center">';
+        echo '<img src="images/arrow_undo.png" alt="'.get_string('goback', 'teamwork').'" title="'.get_string('goback', 'teamwork').'"/> <a href="assign.php?id='.$cm->id.'&action=editevaluators&tid='.$tid.'">'.get_string('goback', 'teamwork').'</a>';
+        echo '</div>';
+    }
 
   break;
 

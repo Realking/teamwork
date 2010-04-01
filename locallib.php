@@ -1097,4 +1097,37 @@ function teamwork_sent_works_table_options($work)
 
     return $stractions;
 }
+
+/**
+ * Obtiene la lista de los equipos que evaluan a un equipo
+ *
+ * @param object $team referfencia al equipo
+ * @return string lista de equipos
+ */
+function teamwork_get_team_evaluators($team)
+{
+    global $CFG, $course, $teamwork, $cm;
+
+    $sql = 'select t.id, t.teamname from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_evals e, '.$CFG->prefix.'teamwork_users_teams ut where
+                                 e.teamevaluated = '.$team->id.' AND ut.userid = e.evaluator AND t.id = ut.teamid and t.teamworkid = "'.$teamwork->id.'"';
+
+    //obtenemos los nombres de los usuarios
+    if( !$result = get_records_sql($sql) )
+    {
+        //no hay equipos
+        return '-';
+    }
+    //hay equipos
+    else
+    {
+        $output = '';
+
+        foreach($result as $t)
+        {
+            $output .= ' <a href="team.php?id='.$cm->id.'&action=userlist&tid='.$t->id.'" target="_blank">'.$t->teamname.'</a>,';
+        }
+
+        return substr($output, 0, strlen($output)-1);
+    }
+}
 ?>

@@ -155,7 +155,7 @@ $string['donothaveanyuserinthisteam'] = 'Este equipo no tiene miembros. ¡Añád
 $string['studentname'] = 'Nombre del alumno';
 $string['removeuserfromteam'] = 'Quitar el usuario del grupo';
 $string['select'] = 'Seleccionar';
-$string['asignusertogroupleyend'] = 'Leyenda: &nbsp; $a->red alumnos en otro grupo &nbsp; $a->green alumnos que ya están en este grupo';
+$string['asignusertogroupleyend'] = 'Leyenda: &nbsp; $a->red alumnos en otro equipo &nbsp; $a->green alumnos que ya están en este equipo';
 $string['usersaddedok'] = 'Usuarios añadidos correctamente';
 $string['confirmationfordeleteuserfromteam'] = '¿Desea realmente quitar este alumno del equipo?';
 $string['userdeletedfromteam'] = 'El usuario ya no pertenece al aquipo';
@@ -206,6 +206,8 @@ $string['youcannotcreatesymbolicworks'] = 'No se pueden crear trabajos simbólic
 $string['teamevaluators'] = 'Equipos que evalúan al equipo: $a';
 $string['donothaveanyevaluatorforthisteam'] = 'No hay ningún equipo que evalúe a este';
 $string['removeteamforeval'] = 'Quitar equipo de la evaluación';
+$string['addnewevaluators'] = 'Añadir equipos como evaluadores';
+$string['asignteamforevalleyend'] = 'Leyenda: &nbsp; $a equipos que ya están como evaluadores de este equipo';
 
 
 //en el archivo index.php
