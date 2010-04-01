@@ -330,7 +330,44 @@ switch($action)
   //elimina un evaluador de un equipo
   case 'deleteevaluator':
 
+    //verificar que se pueda realmente editar este teamwork
+    if(!teamwork_is_editable($teamwork))
+    {
+        print_error('teamworkisnoeditable', 'teamwork');
+    }
 
+    //parametros requeridos
+    $tid = required_param('tid', PARAM_INT);
+    $eid = required_param('eid', PARAM_INT);
+
+    // Pedir confirmación
+    if(!isset($_POST['tid']))
+    {
+      notice_yesno(get_string('confirmationforremovefromevaluators', 'teamwork'), 'assign.php', 'assign.php', array('id'=>$cm->id, 'action'=>'deleteevaluator', 'tid'=>$tid, 'eid'=>$eid), array('id'=>$cm->id, 'action'=>'editevaluators', 'tid'=>$tid), 'post', 'get');
+    }
+    // Si se ha enviado, procesamos
+    else
+    {
+      // Obtenemos todos los miembros del equipo que evalua
+      $eval_members = get_records('teamwork_users_teams', 'teamid', $eid);
+
+      foreach($eval_members as $member)
+      {
+        // Eliminamos su evaluacion y cada elemento evaluado si lo hubiere
+
+        // Obtenemos la evaluación
+        $e = get_record('teamwork_evals', 'evaluator', $member->userid, 'teamevaluated', $tid);
+
+        // Eliminamos los items de evaluacion que existieran
+        delete_records('teamwork_eval_items', 'evalid', $e->id);
+
+        // Eliminamos el elemento de evaluación
+        delete_records('teamwork_evals', 'id', $e->id);
+      }
+
+      // Redireccionar a la pagina de asignaciones
+      header('Location: assign.php?id='.$cm->id.'&action=editevaluators&tid='.$tid);
+    }
 
   break;
 
