@@ -366,6 +366,8 @@ switch($action)
 
             $data = new stdClass;
             $d = new stdClass;
+            $d->teamworkid = $teamwork->id;
+            $d->timecreated = time();
 
             foreach($selection as $user)
             {
@@ -381,13 +383,11 @@ switch($action)
                       // Permitir a este miembro evaluar al nuevo miembro
                       $d->userevaluated = $user;
                       $d->evaluator = $member->userid;
-                      $d->timecreated = time();
                       insert_record('teamwork_evals', $d);
                       
                       // Permitir al nuevo miembro evaluar a este miembro del equipo
                       $d->userevaluated = $member->userid;
                       $d->evaluator = $user;
-                      $d->timecreated = time();
                       insert_record('teamwork_evals', $d);
                       
                     }

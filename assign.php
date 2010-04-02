@@ -216,6 +216,7 @@ switch($action)
         $data = new stdClass;
         $data->teamevaluated = $tid;
         $data->timecreated = time();
+        $data->teamworkid = $teamwork->id;
 
         // Comprobar que los grupos escogidos pertenezcan a esta instancia del teamwork
         // Si pertenecen, insertar sus miembros como evaluadores
