@@ -365,12 +365,33 @@ switch($action)
             $count_members = count_records('teamwork_users_teams', 'teamid', $tid);
 
             $data = new stdClass;
+            $d = new stdClass;
 
             foreach($selection as $user)
             {
                 //si el estudiante pertenece a este curso Y no se encuentra en algun grupo
                 if(in_array($user, $students) AND !in_array($user, $students_in_groups))
                 {
+                    // Obtener la lista de miembros del equipo
+                    $tm = get_records('teamwork_users_team', 'teamid', $tid);
+                    
+                    // Para cada miembro del equipo
+                    foreach($tm as $member)
+                    {
+                      // Permitir a este miembro evaluar al nuevo miembro
+                      $d->userevaluated = $user;
+                      $d->evaluator = $member->userid;
+                      $d->timecreated = time();
+                      insert_record('teamwork_evals', $d);
+                      
+                      // Permitir al nuevo miembro evaluar a este miembro del equipo
+                      $d->userevaluated = $member->userid;
+                      $d->evaluator = $user;
+                      $d->timecreated = time();
+                      insert_record('teamwork_evals', $d);
+                      
+                    }
+
                     //insertamos el usuario en el equipo
                     $data->userid = $user;
                     $data->teamid = $tid;
