@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/teamwork/db" VERSION="20090719" COMMENT="XMLDB file for Moodle mod/teamwork"
+<XMLDB PATH="mod/teamwork/db" VERSION="20100402" COMMENT="XMLDB file for Moodle mod/teamwork"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd">
   <TABLES>
     <TABLE NAME="teamwork" COMMENT="tabla principal del modulo teamwork, donde se guardan las instancias del mismo" NEXT="teamwork_teams">
-      <FIELDS>
+      <FIELDS> 
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="course"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Course newmodule activity belongs to" PREVIOUS="id" NEXT="name"/>
         <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="name field for moodle instances" PREVIOUS="course" NEXT="description"/>
@@ -60,8 +60,9 @@
     </TABLE>
     <TABLE NAME="teamwork_evals" COMMENT="Contiene para cada usuario evaluado un registro por cada evaluación que le emiten sus compañeros de equipo, en la evaluación intra grupos." PREVIOUS="teamwork_users_teams" NEXT="teamwork_eval_items">
       <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="userevaluated"/>
-        <FIELD NAME="userevaluated" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="id de usuario que recibe la valoración" PREVIOUS="id" NEXT="teamevaluated"/>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="teamworkid"/>
+        <FIELD NAME="teamworkid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Referencia a la instancia del teamwork para el que se establece la evaluacion" PREVIOUS="id" NEXT="userevaluated"/>
+        <FIELD NAME="userevaluated" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="id de usuario que recibe la valoración" PREVIOUS="teamworkid" NEXT="teamevaluated"/>
         <FIELD NAME="teamevaluated" TYPE="int" LENGTH="10" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="id del equipo que recibe la evaluación" PREVIOUS="userevaluated" NEXT="evaluator"/>
         <FIELD NAME="evaluator" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="id de usuario que emite la evaluación" PREVIOUS="teamevaluated" NEXT="grade"/>
         <FIELD NAME="grade" TYPE="number" LENGTH="5" NOTNULL="false" UNSIGNED="true" SEQUENCE="false" ENUM="false" DECIMALS="2" COMMENT="Nota media que obtiene el evaluado del usuario evaluador tras el proceso de evaluación." PREVIOUS="evaluator" NEXT="timegraded"/>
@@ -72,7 +73,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="evaluator"/>
         <KEY NAME="evaluator" TYPE="foreign" FIELDS="evaluator" REFTABLE="user" REFFIELDS="id" PREVIOUS="primary" NEXT="userevaluated"/>
         <KEY NAME="userevaluated" TYPE="foreign" FIELDS="userevaluated" REFTABLE="user" REFFIELDS="id" PREVIOUS="evaluator" NEXT="teamevaluated"/>
-        <KEY NAME="teamevaluated" TYPE="foreign" FIELDS="teamevaluated" REFTABLE="teamwork_teams" REFFIELDS="id" PREVIOUS="userevaluated"/>
+        <KEY NAME="teamevaluated" TYPE="foreign" FIELDS="teamevaluated" REFTABLE="teamwork_teams" REFFIELDS="id" PREVIOUS="userevaluated" NEXT="teamworkid"/>
+        <KEY NAME="teamworkid" TYPE="foreign" FIELDS="teamworkid" REFTABLE="teamwork" REFFIELDS="id" PREVIOUS="teamevaluated"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="teamwork_eval_items" COMMENT="Valoración de cada item en la evaluación intra grupos" PREVIOUS="teamwork_evals" NEXT="teamwork_items">
