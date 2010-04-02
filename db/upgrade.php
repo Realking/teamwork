@@ -37,6 +37,23 @@ function xmldb_teamwork_upgrade($oldversion=0)
     }
     */
 
+    if($result && $oldversion < 2010040201)
+    {
+      // Actualizacion de la tabla teamwork_evals para añadir el campo teamworkid
+
+      $table = new XMLDBTable('teamwork_evals');
+      $field = new XMLDBField('teamworkid');
+      $field->setAttributes(XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, null, 'id');
+
+      $result = $result && add_field($table, $field);
+
+      // Añadir el nuevo campo creado como clave foranea
+      $key = new XMLDBKey('teamworkid');
+      $key->setAttributes(XMLDB_KEY_FOREIGN, array('teamworkid'), 'teamwork', array('id'));
+
+      $result = $result && add_key($table, $key);
+    }
+
     return $result;
 }
 
