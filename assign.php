@@ -51,6 +51,8 @@ if(!$teamwork = get_record('teamwork', 'id', $cm->instance))
 //es necesario estar logueado en el curso
 require_login($course->id, false, $cm);
 
+//y ademas es necesario que tenga permisos de manager
+require_capability('mod/teamwork:manage', $cm->context);
 
 
 //
