@@ -72,6 +72,12 @@ $string['editsubmission'] = 'Editar el envío';
 $string['submissioncontent'] = 'Contenido del envío';
 $string['attachfile'] = 'Adjuntar archivo';
 $string['submissionnotsent'] = 'Este grupo no ha realizado ningún envío';
+$string['evaluateteam'] = 'Evaluar a este equipo';
+$string['waitingworksforevaluate'] = ' Lista de Trabajos Pendientes de Evaluar';
+$string['waitingworksforevaluateteacher'] = ' Lista de Trabajos Pendientes de Calificar';
+$string['evaluatemember'] = 'Evaluar a este compañero de equipo';
+$string['waitingcoworkersforevaluate'] = ' Lista de Compañeros Pendientes de Evaluar';
+$string['waitingcoworkersforevaluateteacher'] = ' Lista de Alumnos Pendientes de Calificar';
 
 
 //en el editor de templates template.php

@@ -57,11 +57,11 @@ add_to_log($course->id, 'teamwork', 'view', "view.php?id={$cm->id}", $teamwork->
 $ismanager = has_capability('mod/teamwork:manage', $cm->context);
 
 //si es manager y no se tiene asociado alguno de los 2 templates de items necesarios...
-if($ismanager AND count_records('teamwork_tplinstances', 'teamworkid', $teamwork->id) < 2)
+/*if($ismanager AND count_records('teamwork_tplinstances', 'teamworkid', $teamwork->id) < 2)
 {
 	//redirigimos a la página de edición de templates
 	//redirect("template.php?id=$cm->id");
-}
+}*/
 
 //popup con la lista de miembros del equipo para la vision del alumno
 $teamcomponents = optional_param('teamcomponents', null);
@@ -126,13 +126,82 @@ echo '<div class="clearer"></div><br />';
 //mostrar el cuadro de información
 teamwork_show_status_info();
 
+//obtener los datos del equipo al que pertenezco
+$team = get_record_sql('select t.id, t.teamname, t.teamleader, t.workdescription from '.$CFG->prefix.'teamwork_users_teams ut, '.$CFG->prefix.'teamwork_teams t where ut.userid = '.$USER->id.' AND t.id = ut.teamid AND t.teamworkid = '.$teamwork->id);
+
+// Si el alumno/profesor debe evaluar a equipos/compañeros, mostramos la lista de evaluaciones pendientes. Siempre dentro del periodo de eval
+// y siempre que pertenezca a un equipo
+if($teamwork->startevals < time() AND $teamwork->endevals > time() AND ($team !== false OR $ismanager))
+{ 
+  // Obtenemos la lista de trabajos pendientes de evaluar
+  $works = get_records_sql('select t.id, t.teamname, e.id as eid from '.$CFG->prefix.'teamwork_teams as t, '.$CFG->prefix.'teamwork_evals as e
+                            where e.grade IS NULL and e.evaluator = '.$USER->id.' and e.teamevaluated IS NOT NULL and t.id = e.teamevaluated');
+
+  // Si hay resultados...
+  if( !empty($works))
+  {
+    $table = new stdClass;
+    $table->width = '40%';
+    $table->tablealign = 'center';
+    $table->id = 'evalsteamstable';
+    $table->head = array(get_string('teamname', 'teamwork'), get_string('actions', 'teamwork'));
+    $table->align = array('center', 'center');
+    $table->size = array('80%','20%');
+
+    foreach($works as $work)
+    {
+      //boton de visualizar trabajo
+      $stractions = '<a href="viewer.php?id='.$cm->id.'&tid='.$work->id.'"><img src="images/viewer.png" alt="'.get_string('viewwork', 'teamwork').'" title="'.get_string('viewwork', 'teamwork').'" /></a>&nbsp;&nbsp;';
+
+      //boton de realizar evaluación
+      $stractions .= '<a href="eval.php?id='.$cm->id.'&eid='.$work->eid.'"><img src="images/accept.png" alt="'.get_string('evaluateteam', 'teamwork').'" title="'.get_string('evaluateteam', 'teamwork').'" /></a>&nbsp;&nbsp;';
+
+      $table->data[] = array($work->teamname, $stractions);
+    }
+
+    //disponibles: imprimir la tabla y el boton de añadir
+    echo '<br />';
+    print_heading(get_string(isteacher($course->id) ? 'waitingworksforevaluateteacher' : 'waitingworksforevaluate', 'teamwork'));
+    print_table($table);
+  }
+
+  // Obtenemos la lista de compañeros pendientes de evaluar
+  $coworkers = get_records_sql('select u.id, u.firstname, u.lastname, u.picture, u.imagealt, e.id as eid from '.$CFG->prefix.'user as u, '.$CFG->prefix.'teamwork_evals as e
+                            where e.grade IS NULL and e.evaluator = '.$USER->id.' and e.userevaluated IS NOT NULL and u.id = e.userevaluated order by u.lastname asc');
+
+  // Si hay resultados...
+  if( !empty($coworkers))
+  {
+    $table = new stdClass;
+    $table->width = '40%';
+    $table->tablealign = 'center';
+    $table->id = 'evalscoworkerstable';
+    $table->head = array('', get_string('studentname', 'teamwork'), get_string('actions', 'teamwork'));
+    $table->align = array('center', 'center', 'center');
+    $table->size = array('10%','80%','10%');
+
+    foreach($coworkers as $co)
+    {
+      //boton de realizar evaluación
+      $stractions = '<a href="eval.php?id='.$cm->id.'&eid='.$co->eid.'"><img src="images/accept.png" alt="'.get_string('evaluatemember', 'teamwork').'" title="'.get_string('evaluatemember', 'teamwork').'" /></a>&nbsp;&nbsp;';
+
+      // Nombre del compañero
+      $name = '<a href="../../user/view.php?id='.$co->id.'&course='.$course->id.'" target="_blank">'.$co->firstname.' '.$co->lastname.'</a>';
+
+      $table->data[] = array(print_user_picture($co, $course->id, null, 0, true) ,$name, $stractions);
+    }
+
+    //disponibles: imprimir la tabla y el boton de añadir
+    echo '<br />';
+    print_heading(get_string(isteacher($course->id) ? 'waitingcoworkersforevaluateteacher' : 'waitingcoworkersforevaluate', 'teamwork'));
+    print_table($table);
+  }
+}
+
 //enunciado de la actividad
 echo '<br />';
 print_heading(get_string('activity'));
 print_simple_box($teamwork->description, 'center', '', '', 0, 'generalbox', 'intro');
-
-//obtener los datos del equipo al que pertenezco
-$team = get_record_sql('select t.id, t.teamname, t.teamleader, t.workdescription from '.$CFG->prefix.'teamwork_users_teams ut, '.$CFG->prefix.'teamwork_teams t where ut.userid = '.$USER->id.' AND t.id = ut.teamid AND t.teamworkid = '.$teamwork->id);
 
 //si pertenezco a un grupo
 if($team !== false)
