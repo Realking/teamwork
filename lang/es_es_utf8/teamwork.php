@@ -224,6 +224,12 @@ $string['areyouleader?'] = '¿Eres el líder?';
 $string['duedate'] = 'Fecha límite';
 
 
+//en el archivo viewer.php
+$string['worksviewer'] = 'Visor de Trabajos';
+$string['youarentallowedtoseethiswork'] = 'No tiene permiso para ver este trabajo';
+$string['thisteamnotexistornotisfromthisinstance'] = 'El equipo no existe o no pertenece a esta instancia';
+
+
 //generales
 $string['teamworkisnoeditable'] = 'No se puede editar la actividad';
 $string['submit'] = 'Enviar';
