@@ -216,6 +216,7 @@ $string['addnewevaluators'] = 'Añadir equipos como evaluadores';
 $string['asignteamforevalleyend'] = 'Leyenda: &nbsp; $a equipos que ya están como evaluadores de este equipo';
 $string['cannotdeletethisworkbecausethishaveevaluators'] = 'No se puede borrar el trabajo ya que este grupo tiene asignados evaluadores. Eliminelos antes de continuar.';
 $string['confirmationforremovefromevaluators'] = '¿Desea realmente quitar este grupo como evaluador?';
+$string['confirmationforcreatesymbolicsworks'] = '¿Desea realmente crear trabajos simbólicos para todos los equipos?';
 
 
 //en el archivo index.php
