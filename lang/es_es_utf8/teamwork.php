@@ -53,11 +53,12 @@ $string['nolimit'] = 'Sin límite';
 
 //en la vista principal view.php
 $string['phase1'] = 'Esperando el inicio del envío de trabajos';
-$string['phase2'] = 'Envío de trabajos';
-$string['phase3'] = 'Esperando el inicio de la calificación de trabajos';
-$string['phase4'] = 'Calificación de trabajos';
-$string['phase5'] = 'Esperando las calificaciones finales';
-$string['phase6'] = 'Alumno calificado, fin de la actividad';
+$string['phase2'] = 'Esperando ser asignado a un equipo';
+$string['phase3'] = 'Envío de trabajos';
+$string['phase4'] = 'Esperando el inicio de la calificación de trabajos';
+$string['phase5'] = 'Calificación de trabajos';
+$string['phase6'] = 'Esperando las calificaciones finales';
+$string['phase7'] = 'Alumno calificado, fin de la actividad';
 $string['currentphase'] = 'Fase actual';
 $string['timebefore'] = 'faltan $a';
 $string['timeafter'] = '$a después';

@@ -93,6 +93,8 @@ function teamwork_show_status_info()
  */
 function teamwork_phase($teamwork, $numeric = false)
 {
+    global $CFG, $USER;
+
     $time = time();
 
     if($time < $teamwork->startsends)
@@ -100,30 +102,35 @@ function teamwork_phase($teamwork, $numeric = false)
         $status = 1;
         $message = get_string('phase1', 'teamwork');
     }
-    else if($time < $teamwork->endsends)
+    else if( !count_records_sql('select count(*) from '.$CFG->prefix.'teamwork_users_teams as ut, '.$CFG->prefix.'teamwork_teams as t where t.teamworkid = '.$teamwork->id.' and ut.teamid = t.id and ut.userid = '.$USER->id))
     {
-        $status = 2;
-        $message = get_string('phase2', 'teamwork');
+      $status = 2;
+      $message = get_string('phase2', 'teamwork');
     }
-    else if($time < $teamwork->startevals)
+    else if($time < $teamwork->endsends)
     {
         $status = 3;
         $message = get_string('phase3', 'teamwork');
     }
-    else if($time < $teamwork->endevals)
+    else if($time < $teamwork->startevals)
     {
         $status = 4;
         $message = get_string('phase4', 'teamwork');
     }
-    else if(!teamwork_check_student_evaluated())
+    else if($time < $teamwork->endevals)
     {
         $status = 5;
         $message = get_string('phase5', 'teamwork');
     }
-    else
+    else if(!teamwork_check_student_evaluated())
     {
         $status = 6;
         $message = get_string('phase6', 'teamwork');
+    }
+    else
+    {
+        $status = 7;
+        $message = get_string('phase7', 'teamwork');
     }
 
     //si $numeric es true devolver $status
