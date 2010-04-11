@@ -231,6 +231,12 @@ switch($action)
         //parametros requeridos
         $tid = required_param('tid', PARAM_INT);
 
+        // Un equipo puede ser borrado si y solo si no tiene miembros asignados
+        if(count_records('teamwork_users_teams', 'teamid', $tid))
+        {
+          print_error('youcannotdeletethisteambecauseithavememebers', 'teamwork');
+        }
+
         //si el grupo puede ser borrado, pedir confirmación
         //si no ha sido enviada, mostrar la confirmacion
         if(!isset($_POST['tid']))
@@ -245,6 +251,9 @@ switch($action)
 
             //borrar lista de asociaciones usuario-equipo
             delete_records('teamwork_users_teams', 'teamid', $tid);
+
+            // Borrar el archivo subido si existiere
+            remove_dir( $CFG->dataroot.'/'.$course->id.'/'.$CFG->moddata.'/teamwork/'.$teamwork->id.'/'.$tid );
 
             //mostrar mensaje
             header('Location: team.php?id='.$cm->id);

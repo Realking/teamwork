@@ -737,8 +737,12 @@ function teamwork_group_table_options($team)
         //boton de editar los miembros del grupo
         $stractions .= '<a href="team.php?id='.$cm->id.'&action=userlist&tid='.$team->id.'"><img src="images/page_edit.png" alt="'.get_string('editmembers', 'teamwork').'" title="'.get_string('editmembers', 'teamwork').'" /></a>&nbsp;&nbsp;';
 
-        //boton de eliminar grupo
-        $stractions .= '<a href="team.php?id='.$cm->id.'&action=deleteteam&tid='.$team->id.'"><img src="images/delete.png" alt="'.get_string('deleteteam', 'teamwork').'" title="'.get_string('deleteteam', 'teamwork').'" /></a>&nbsp;&nbsp;';
+        // Un equipo puede ser borrado si y solo si no tiene miembros asignados
+        if( !count_records('teamwork_users_teams', 'teamid', $team->id))
+        {
+          //boton de eliminar grupo
+          $stractions .= '<a href="team.php?id='.$cm->id.'&action=deleteteam&tid='.$team->id.'"><img src="images/delete.png" alt="'.get_string('deleteteam', 'teamwork').'" title="'.get_string('deleteteam', 'teamwork').'" /></a>&nbsp;&nbsp;';
+        }
     }
 
     return $stractions;

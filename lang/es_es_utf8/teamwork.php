@@ -189,6 +189,7 @@ $string['randomteampreviewcount'] = 'Nº Miembros ($a)';
 $string['youdontusetherandombecauseteamsexist'] = 'No puedes usar el generador ya que existen equipos creados';
 $string['numberteammemberscannotbezero'] = 'Este valor debe ser 1 o más';
 $string['badnamingscheme'] = "Debe contener exactamente un caracter '@' o '#'";
+$string['youcannotdeletethisteambecauseithavememebers'] = 'No se puede borrar un equipo que tiene miembros. Borre estos primero.';
 
 
 //en el archivo locallib.php
