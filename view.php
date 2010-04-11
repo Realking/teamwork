@@ -73,10 +73,10 @@ if($teamcomponents !== null)
     echo '<div class="clearer"></div>';
 
     //obtenemos el equipo al que pertenece el usuario
-    $team = get_record_sql('select t.id, t.teamname, t.teamleader from '.$CFG->prefix.'teamwork_users_teams ut, '.$CFG->prefix.'teamwork_teams t where ut.userid = '.$USER->id.' AND t.id = ut.teamid AND t.teamworkid = '.$teamwork->id);
+    $team = get_record_sql('select t.id, t.teamname, t.teamleader from '.$CFG->prefix.'teamwork_users_teams as ut, '.$CFG->prefix.'teamwork_teams as t where ut.userid = '.$USER->id.' AND t.id = ut.teamid AND t.teamworkid = '.$teamwork->id);
 
     //obtenemos los miembros del grupo
-    if($members = get_records_sql('select u.id, u.firstname, u.lastname, u.picture, u.imagealt from '.$CFG->prefix.'user u, '.$CFG->prefix.'teamwork_users_teams ut where ut.teamid = '.$team->id.' AND u.id = ut.userid order by u.lastname ASC'))
+    if($members = get_records_sql('select u.id, u.firstname, u.lastname, u.picture, u.imagealt from '.$CFG->prefix.'user as u, '.$CFG->prefix.'teamwork_users_teams as ut where ut.teamid = '.$team->id.' AND u.id = ut.userid order by u.lastname ASC'))
     {
         echo print_heading(get_string('teammembers', 'teamwork', $team->teamname));
         echo '<br />';
@@ -127,7 +127,7 @@ echo '<div class="clearer"></div><br />';
 teamwork_show_status_info();
 
 //obtener los datos del equipo al que pertenezco
-$team = get_record_sql('select t.id, t.teamname, t.teamleader, t.workdescription from '.$CFG->prefix.'teamwork_users_teams ut, '.$CFG->prefix.'teamwork_teams t where ut.userid = '.$USER->id.' AND t.id = ut.teamid AND t.teamworkid = '.$teamwork->id);
+$team = get_record_sql('select t.id, t.teamname, t.teamleader, t.workdescription from '.$CFG->prefix.'teamwork_users_teams as ut, '.$CFG->prefix.'teamwork_teams as t where ut.userid = '.$USER->id.' AND t.id = ut.teamid AND t.teamworkid = '.$teamwork->id);
 
 // Si el alumno/profesor debe evaluar a equipos/compañeros, mostramos la lista de evaluaciones pendientes. Siempre dentro del periodo de eval
 // y siempre que pertenezca a un equipo

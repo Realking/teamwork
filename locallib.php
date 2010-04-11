@@ -58,7 +58,7 @@ function teamwork_show_status_info()
     }
 
     //grupo al que pertenece
-    $result = get_record_sql('select t.teamname, t.teamleader from '.$CFG->prefix.'teamwork_users_teams ut, '.$CFG->prefix.'teamwork_teams t where ut.userid = '.$USER->id.' AND t.id = ut.teamid AND t.teamworkid = '.$teamwork->id);
+    $result = get_record_sql('select t.teamname, t.teamleader from '.$CFG->prefix.'teamwork_users_teams as ut, '.$CFG->prefix.'teamwork_teams as t where ut.userid = '.$USER->id.' AND t.id = ut.teamid AND t.teamworkid = '.$teamwork->id);
 
     if($result)
     {
@@ -239,7 +239,7 @@ function teamwork_get_instances_of_tpl($tplid)
 {
     global $CFG;
     
-    $result = get_records_sql('select i.id, t.name, i.evaltype, t.id as teamworkid from '.$CFG->prefix.'teamwork_tplinstances i, '.$CFG->prefix.'teamwork t where t.id = i.teamworkid AND i.templateid = '.$tplid);
+    $result = get_records_sql('select i.id, t.name, i.evaltype, t.id as teamworkid from '.$CFG->prefix.'teamwork_tplinstances as i, '.$CFG->prefix.'teamwork as t where t.id = i.teamworkid AND i.templateid = '.$tplid);
 
     if($result === false)
     {
@@ -647,7 +647,7 @@ function teamwork_check_scale($scale)
     //si no hemos realizado la consulta
     if(!isset($result[$scale]))
     {
-        $result[$scale] = count_records_sql('select count(s.id) from '.$CFG->prefix.'scale s where s.id = '.$scale.' and (s.courseid = '.$course->id.' or s.courseid = 0)');
+        $result[$scale] = count_records_sql('select count(s.id) from '.$CFG->prefix.'scale as s where s.id = '.$scale.' and (s.courseid = '.$course->id.' or s.courseid = 0)');
     }
 
     return ($result[$scale]) ? true : false;
@@ -747,7 +747,7 @@ function teamwork_get_team_members($team)
     global $CFG, $course;
     
     //obtenemos los nombres de los usuarios
-    if(!$result = get_records_sql('select u.id, u.firstname, u.lastname from '.$CFG->prefix.'teamwork_users_teams ut, '.$CFG->prefix.'user u where u.id = ut.userid and ut.teamid = '.$team->id))
+    if(!$result = get_records_sql('select u.id, u.firstname, u.lastname from '.$CFG->prefix.'teamwork_users_teams as ut, '.$CFG->prefix.'user as u where u.id = ut.userid and ut.teamid = '.$team->id))
     {
         //no hay usuarios
         return '-';
@@ -1108,7 +1108,7 @@ function teamwork_get_team_evaluators($team)
 {
     global $CFG, $course, $teamwork, $cm;
 
-    $sql = 'select t.id, t.teamname from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_evals e, '.$CFG->prefix.'teamwork_users_teams ut where
+    $sql = 'select t.id, t.teamname from '.$CFG->prefix.'teamwork_teams as t, '.$CFG->prefix.'teamwork_evals as e, '.$CFG->prefix.'teamwork_users_teams as ut where
                                  e.teamevaluated = '.$team->id.' AND ut.userid = e.evaluator AND t.id = ut.teamid and t.teamworkid = "'.$teamwork->id.'"';
 
     //obtenemos los nombres de los usuarios

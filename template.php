@@ -180,7 +180,7 @@ switch($section)
                     echo '<br />';
                     print_heading(get_string('coursetemplatesasignedlisting', 'teamwork'));
 
-                    if(!$asignedtpls = get_records_sql('select t.id, t.name, i.evaltype, i.id from '.$CFG->prefix.'teamwork_tplinstances i, '.$CFG->prefix.'teamwork_templates t where t.id = i.templateid and i.teamworkid = '.$teamwork->id))
+                    if(!$asignedtpls = get_records_sql('select t.id, t.name, i.evaltype, i.id from '.$CFG->prefix.'teamwork_tplinstances as i, '.$CFG->prefix.'teamwork_templates as t where t.id = i.templateid and i.teamworkid = '.$teamwork->id))
                     {
                         //no hay ninguna plantilla asignada
                         echo '<p align="center">'.get_string('notemplateasigned', 'teamwork').'</p>';
