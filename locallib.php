@@ -700,9 +700,17 @@ class teamwork_groups_form extends moodleform
  * @param object $teamwork referencia al teamwork actual
  * @return bool true si se puede editar, en otro caso false
  */
-//TODO implementar la funcion is_editable
 function teamwork_is_editable($teamwork)
 {
+    global $CFG;
+
+    // Consideramos que se puede editar mientras que ningún alumno/profesor haya enviado alguna evaluación
+    if(count_records_sql('select count(*) from '.$CFG->prefix.'teamwork_evals as e where e.teamworkid = '.$teamwork->id.' and grade IS NOT NULL'))
+    {
+      // Si hay al menos una evaluación...
+      return false;
+    }
+
     return true;
 }
 
