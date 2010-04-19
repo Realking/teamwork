@@ -93,7 +93,7 @@ function teamwork_show_status_info()
  */
 function teamwork_phase($teamwork, $numeric = false)
 {
-    global $CFG, $USER;
+    global $CFG, $USER, $course;
 
     $time = time();
 
@@ -106,6 +106,13 @@ function teamwork_phase($teamwork, $numeric = false)
     {
       $status = 2;
       $message = get_string('phase2', 'teamwork');
+
+      // Si es profesor devolvemos la fase 3
+      if(isteacher($course->id, $USER->id))
+      {
+        $status = 3;
+        $message = get_string('phase3', 'teamwork');
+      }
     }
     else if($time < $teamwork->endsends)
     {
