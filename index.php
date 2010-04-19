@@ -29,6 +29,8 @@ require_course_login($course);
 //añade al log que se ha visto esta pagina
 add_to_log($course->id, 'teamwork', 'view all', "index.php?id=$course->id", "");
 
+//conocer si el usuario posee permisos de gestión (admin, profesor, y profesor-editor)
+$isteacher = isteacher($course->id, $USER->id);
 
 //construir la barra de navegacion superior
 $navlinks = array();
@@ -52,18 +54,45 @@ $table = new stdClass;
 
 if ($course->format == 'weeks')
 {
-    $table->head  = array (get_string('week'), get_string('name'), get_string('areyouleader?', 'teamwork'), get_string('status'), get_string('duedate', 'teamwork'), get_string('grade'));
-    $table->align = array ('center', 'left', 'center', 'left', 'left', 'left');
+    // Si es profesor mostrar una información más breve
+    if($isteacher)
+    {
+      $table->head  = array (get_string('week'), get_string('name'), get_string('status'));
+      $table->align = array ('center', 'left', 'left');
+    }
+    else
+    {
+      $table->head  = array (get_string('week'), get_string('name'), get_string('areyouleader?', 'teamwork'), get_string('status'), get_string('duedate', 'teamwork'), get_string('grade'));
+      $table->align = array ('center', 'left', 'center', 'left', 'left', 'left');
+    }
 }
 else if ($course->format == 'topics')
 {
-    $table->head  = array (get_string('topic'), get_string('name'), get_string('areyouleader?', 'teamwork'), get_string('status'), get_string('duedate', 'teamwork'), get_string('grade'));
-    $table->align = array ('center', 'left', 'center', 'left', 'left', 'left');
+    // Si es profesor mostrar una información más breve
+    if($isteacher)
+    {
+      $table->head  = array (get_string('topic'), get_string('name'), get_string('status'));
+      $table->align = array ('center', 'left', 'left');
+    }
+    else
+    {
+      $table->head  = array (get_string('topic'), get_string('name'), get_string('areyouleader?', 'teamwork'), get_string('status'), get_string('duedate', 'teamwork'), get_string('grade'));
+      $table->align = array ('center', 'left', 'center', 'left', 'left', 'left');
+    }
 }
 else
 {
-    $table->head  = array (get_string('name'), get_string('areyouleader?', 'teamwork'), get_string('status'), get_string('duedate', 'teamwork'), get_string('grade'));
-    $table->align = array ('left', 'center', 'left', 'left', 'left');
+    // Si es profesor mostrar una información más breve
+    if($isteacher)
+    {
+      $table->head  = array (get_string('name'), get_string('status'));
+      $table->align = array ('left', 'left');
+    }
+    else
+    {
+      $table->head  = array (get_string('name'), get_string('areyouleader?', 'teamwork'), get_string('status'), get_string('duedate', 'teamwork'), get_string('grade'));
+      $table->align = array ('left', 'center', 'left', 'left', 'left');
+    }
 }
 
 $currentsection = '';
@@ -106,15 +135,15 @@ foreach($modinfo->instances['teamwork'] as $cm)
 
     //fechas limite
     switch(teamwork_phase($teamworks[$cm->instance], true))
-    {
-        case 2:
+    {        
+        case 3:
             $due = userdate($teamworks[$cm->instance]->endsends);
         break;
 
-        case 4:
+        case 5:
             $due = userdate($teamworks[$cm->instance]->endevals);
         break;
-    
+        
         default:
         $due = '-';
     }
@@ -123,11 +152,27 @@ foreach($modinfo->instances['teamwork'] as $cm)
 
     if ($course->format == "weeks" or $course->format == "topics")
     {
-        $table->data[] = array ($printsection, $link, $leader, $status, $due, $grade);
+        // Si es profesor mostrar una información más breve
+        if($isteacher)
+        {
+          $table->data[] = array ($printsection, $link, $status);
+        }
+        else
+        {
+          $table->data[] = array ($printsection, $link, $leader, $status, $due, $grade);
+        }
     }
     else
     {
-        $table->data[] = array ($link, $leader, $status, $due, $grade);
+        // Si es profesor mostrar una información más breve
+        if($isteacher)
+        {
+          $table->data[] = array ($link, $status);
+        }
+        else
+        {
+          $table->data[] = array ($link, $leader, $status, $due, $grade);
+        }
     }
 }
 
