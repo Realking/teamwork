@@ -233,6 +233,20 @@ $string['youarentallowedtoseethiswork'] = 'No tiene permiso para ver este trabaj
 $string['thisteamnotexistornotisfromthisinstance'] = 'El equipo no existe o no pertenece a esta instancia';
 
 
+// En el archivo eval.php
+$string['assessmentscollection'] = 'Recogida de Evaluaciones';
+$string['thisevaluationnotisforyou'] = 'Esta evaluación no te pertenece';
+$string['thisevaluationalreadyhasbeenundertaken'] = 'Esta evaluación ya ha sido realizada. No puede cambiarla.';
+$string['evaluationform'] = 'Formulario de Evaluación';
+$string['thisevaluationidnotexist'] = 'No existe esta evaluación en el sistema';
+$string['youareevaluatingtheteam'] = 'Estás evaluando al equipo $a';
+$string['youareevaluatingtheuser'] = 'Estás evaluando a tu compañero de equipo $a';
+$string['evaluationsavedok'] = 'Su evaluación ha sido guardada';
+$string['teamevalform'] = 'Formulario de Evaluación de Equipo';
+$string['userevalform'] = 'Formulario de Evaluación de Compañero';
+$string['thisevaluseanonexistscale'] = 'Esta evaluación usa una escala que no existe. Contacte con el profesor.';
+
+
 //generales
 $string['teamworkisnoeditable'] = 'No se puede editar la actividad';
 $string['submit'] = 'Enviar';

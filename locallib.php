@@ -1156,4 +1156,82 @@ function teamwork_get_team_evaluators($team)
         return substr($output, 0, strlen($output)-1);
     }
 }
+
+/**
+ * Clase que muestra el formulario de editar (o añadir) un grupo de usuarios
+ */
+class teamwork_evaluation_form extends moodleform
+{
+    /**
+     * Define el formulario
+     */
+    function definition()
+    {
+        global $CFG, $teamwork;
+        $mform =& $this->_form;
+
+        //
+        /// Obtener items de la evaluación
+        //
+
+        // Obtener la ID de la plantilla que debemos usar
+        if( !$tplid = get_record('teamwork_tplinstances', 'teamworkid', $teamwork->id, 'evaltype', $this->_customdata['type']) )
+        {
+          print_error('notemplateasigned', 'teamwork');
+        }
+
+        // Obtenemos los items de evaluación
+        if( !$items = get_records('teamwork_items', 'templateid', $tplid->templateid) )
+        {
+          print_error('thisevaluationidnotexist', 'teamwork');
+        }
+        
+        //
+        /// Dibujo del formulario
+        //
+
+        // Marco del formulario
+        $t = ($this->_customdata['type'] == 'user') ? 'userevalform' : 'teamevalform';
+        $mform->addElement('header', 'general', get_string($t, 'teamwork'));
+        $mform->setHelpButton('general', array($t, get_string($t, 'teamwork'), 'teamwork'));
+
+
+        // Para cada elemento de la plantilla...
+        foreach($items as $item)
+        {
+          // Si es 0 directamente no mostramos el item de evaluación
+          if($item->scale != 0)
+          {
+            // Si se trata de un numero positivo es que es el máximo de puntuación disponible
+            if($item->scale > 0)
+            {
+              // Generamos las opciones para el select
+              for($i=0; $i <= $item->scale; $i++)
+              {
+                $options[$i] = $i;
+              }
+            }
+            // Si se trata de un número negativo, hay que mirar la escala
+            else
+            {
+              if( !$scale = get_record('scale', 'id', abs($item->scale)) )
+              {
+                print_error('thisevaluseanonexistscale', 'teamwork');
+              }
+
+              $options = array_reverse(make_menu_from_list($scale->scale));
+            }
+
+            // Mostramos el elemento
+            $mform->addElement('select', 'item['.$item->id.']', $item->description, $options);
+            //$mform->setDefault('item'.$item->id, 'random');
+            //regla de validacion (no puede estar vacio el campo)
+            $mform->addRule('item['.$item->id.']', null, 'required', null, 'server');
+          }
+        }
+        
+        // Botones de envío y cancelación
+        $this->add_action_buttons();
+    }
+}
 ?>
