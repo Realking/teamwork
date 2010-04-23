@@ -133,13 +133,83 @@ elseif(!$form->is_validated())
 else
 {
   // Obtenemos los datos del formulario
-  $data = $form->get_data();
-
-  var_dump($data);
+  $data = $form->get_data()->item;
   
+  // Obtener la ID de la plantilla que debemos usar
+  if( !$tplid = get_record('teamwork_tplinstances', 'teamworkid', $teamwork->id, 'evaltype', (! is_null($eval->userevaluated)) ? 'user' : 'team' ) )
+  {
+    print_error('notemplateasigned', 'teamwork');
+  }
 
-  //actualizar los datos en la base de datos
-  //update_record('teamwork_templates', $data);
+  // Obtenemos los items de evaluación
+  if( !$items = get_records('teamwork_items', 'templateid', $tplid->templateid) )
+  {
+    print_error('thisevaluationidnotexist', 'teamwork');
+  }
+  $items_keys = array_keys($items);
+
+  // Comprobar que el numero de elementos sea el mismo
+  if( count($items) != count($data))
+  {
+    print_error('thenumberofsubmititemnotisequaltonumberofthisevaluationitems', 'teamwork');
+  }
+  
+  // Para cada uno de los item enviados...
+  foreach($data as $key => $value)
+  {
+    // Comprobar que realmente pertenece a los items de esta evaluación
+    if( ! in_array($key, $items_keys) )
+    {
+      print_error('itemnotinthisevaluation', 'teamwork');
+    }
+  }
+
+  // Ahora que el envio es seguro, se puede proceder a insertarlo en la bbdd
+  foreach($data as $key => $value)
+  {
+    $insert = new stdClass;
+    $insert->evalid = $eid;
+    $insert->itemid = $key;
+
+    // Si se trata de una evaluación 0..100
+    if($items[$key]->scale > 0)
+    {
+      $value = (int) $value;
+      
+      // Comprobar que el valor que se envia esta dentro del rango permitido
+      if($value < 0)
+      {
+        $value = 0;
+      }
+      else if($value > 100)
+      {
+        $value = 100;
+      }
+
+      $insert->grade = $value / $items[$key]->scale; // se almacena en forma de porcentaje, es decir, de 0 a 1
+    }
+    // Si se trata de una escala
+    else if($items[$key]->scale < 0)
+    {
+      // Obtenemos la escala
+      if( !$scale = get_record('scale', 'id', abs($items[$key]->scale)) )
+      {
+        print_error('thisevaluseanonexistscale', 'teamwork');
+      }
+
+      // El primer elemento de la escala vale 0, el resto se reparte 100% entre los elementos de la escala menos el primero
+      $insert->grade = ($value == 0) ? 0 : $value / (count(make_menu_from_list($scale->scale)) - 1);
+    }
+
+    // Insertar la evaluacion del elemento
+    insert_record('teamwork_eval_items', $insert);
+  }
+
+  // Actualizar la evaluación
+  $update = new stdClass;
+  $update->id = $eid;
+  $update->timegraded = time();
+  update_record('teamwork_evals', $update);
 
   // Mostramos mensaje
   echo '<br /><p align="center">';

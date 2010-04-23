@@ -245,6 +245,8 @@ $string['evaluationsavedok'] = 'Su evaluación ha sido guardada';
 $string['teamevalform'] = 'Formulario de Evaluación de Equipo';
 $string['userevalform'] = 'Formulario de Evaluación de Compañero';
 $string['thisevaluseanonexistscale'] = 'Esta evaluación usa una escala que no existe. Contacte con el profesor.';
+$string['itemnotinthisevaluation'] = 'El elemento no pertenece a esta evaluación';
+$string['thenumberofsubmititemnotisequaltonumberofthisevaluationitems'] = 'El numero de elementos de la evaluación no coincide';
 
 
 //generales
