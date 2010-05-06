@@ -22,7 +22,8 @@
         <FIELD NAME="allowselecteval" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Activa/desactiva la elección de evaluaciones por el alumno." PREVIOUS="bgintra" NEXT="selectevalmin"/>
         <FIELD NAME="selectevalmin" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Número mínimo de evaluaciones que un alumno debe elegir." PREVIOUS="allowselecteval" NEXT="selectevalmax"/>
         <FIELD NAME="selectevalmax" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Número máximo de evaluaciones que puede realizar un alumno" PREVIOUS="selectevalmin" NEXT="selectteammax"/>
-        <FIELD NAME="selectteammax" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Numero máximo de alumnos que pueden evaluar este trabajo en la libre elección." PREVIOUS="selectevalmax"/>
+        <FIELD NAME="selectteammax" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="Numero máximo de alumnos que pueden evaluar este trabajo en la libre elección." PREVIOUS="selectevalmax" NEXT="doassessment"/>
+        <FIELD NAME="doassessment" TYPE="int" LENGTH="1" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false" ENUM="false" COMMENT="0 no hacer nada, 1 calcular notas" PREVIOUS="selectteammax"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
