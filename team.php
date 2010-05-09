@@ -408,6 +408,19 @@ switch($action)
                     $data->userid = $user;
                     $data->teamid = $tid;
                     insert_record('teamwork_users_teams', $data);
+
+                    // Permitir a los profesores del curso evaluar a este alumno si esta activa esa opcion
+                    if($teamwork->wgteacher)
+                    {
+                      $teachers = get_course_teachers($course->id);
+
+                      foreach($teachers as $teacher)
+                      {
+                        $d->evaluator = $teacher->id;
+                        $d->userevaluated = $user;
+                        insert_record('teamwork_evals', $d);
+                      }
+                    }
                 }
             }
 
@@ -619,17 +632,11 @@ switch($action)
                 update_record('teamwork_teams', $data);
             }
 
-            // Para cada miembro de los que quedan en el equipo
-            $tm = get_records('teamwork_users_teams', 'teamid', $tid);
+            // Borrar cualquier calificación hacia ese alumno
+            delete_records('teamwork_evals', 'teamworkid', $teamwork->id, 'userevaluated', $uid);
 
-            foreach($tm as $member)
-            {
-              // Impedir que este miembro pueda/deba evaluar al ex-miembro
-              delete_records('teamwork_evals', 'teamworkid', $teamwork->id, 'evaluator', $member->userid, 'userevaluated', $uid);
-
-              // Impedir que el ex-miembro pueda/deba evaluar a este miembro
-              delete_records('teamwork_evals', 'teamworkid', $teamwork->id, 'evaluator', $uid, 'userevaluated', $member->userid);
-            }
+            // Borrar cualquier calificación del que este alumno sea evaluador
+            delete_records('teamwork_evals', 'teamworkid', $teamwork->id, 'evaluator', $uid);
 
             //redireccionar
             header('Location: team.php?id='.$cm->id.'&action=userlist&tid='.$tid);
@@ -862,6 +869,19 @@ switch($action)
                           $d->evaluator = $member->id;
                           insert_record('teamwork_evals', $d);
                         }
+                      }
+                    }
+
+                    // Permitir a los profesores del curso evaluar a este alumno si esta activa esa opcion
+                    if($teamwork->wgteacher)
+                    {
+                      $teachers = get_course_teachers($course->id);
+
+                      foreach($teachers as $teacher)
+                      {
+                        $d->evaluator = $teacher->id;
+                        $d->userevaluated = $user;
+                        insert_record('teamwork_evals', $d);
                       }
                     }
                   }
