@@ -867,38 +867,6 @@ switch($action)
                   }
                 }
 
-                // Una vez creados los equipos, obtenemos la lista para la evaluación entre equipos
-                $teams = get_records('teamwork_teams', 'teamworkid', $teamwork->id);
-
-                $insert = new stdClass;
-                $insert->teamworkid = $teamwork->id;
-                $insert->timecreated = time();
-
-                // Para cada equipo...
-                foreach($teams as $team)
-                {
-                  // Obtenemos la lista de miembros de ese equipo
-                  $members = get_records('teamwork_users_teams', 'teamid', $team->id);
-
-                  // Creamos la lista de equipos a los que deben valorar
-                  $tlist = $teams;
-                  unset($tlist[$team->id]);
-
-                  // Para cada miembro del equipo actual
-                  foreach($members as $member)
-                  {
-                    $insert->evaluator = $member->userid;
-
-                    // Para cada equipo a valorar
-                    foreach($tlist as $l)
-                    {
-                      $insert->teamevaluated = $l->id;
-                      
-                      insert_record('teamwork_evals', $insert);
-                    }
-                  }
-                }
-
                 //redireccionar a la página con la lista de miembros del equipo
                 header('Location: team.php?id='.$cm->id);
             }
