@@ -290,6 +290,22 @@ if($team !== false)
                 $um = new upload_manager('attachedfile', true, false, null, false, 0, false, true, true);
                 $um->process_file_uploads($filepath);
 
+                // Permitir a los profesores del curso evaluar a este equipo si esta activa esa opcion
+                if($teamwork->wgteacher)
+                {
+                  $teachers = get_course_teachers($course->id);
+                  $insert = new stdClass;
+                  $insert->teamworkid = $teamwork->id;
+                  $insert->timecreated = time();
+                  $insert->teamevaluated = $team->id;
+
+                  foreach($teachers as $teacher)
+                  {
+                    $insert->evaluator = $teacher->id;
+                    insert_record('teamwork_evals', $insert);
+                  }
+                }
+
                 //redireccionar
                 header('Location: view.php?id='.$cm->id);
             }

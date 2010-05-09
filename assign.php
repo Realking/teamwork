@@ -396,7 +396,10 @@ switch($action)
     else
     {
       // Si hay algun usuario que evalue a este equipo no se puede borrar el trabajo
-      if( count_records('teamwork_evals', 'teamevaluated', $tid))
+      $teachers = array_keys(get_course_teachers($course->id));
+      $sql = "select count(*) from ".$CFG->prefix."teamwork_evals where teamevaluated = ".$tid." and evaluator NOT IN(".implode(',', $teachers).")";
+      
+      if( count_records_sql($sql))
       {
         print_error('cannotdeletethisworkbecausethishaveevaluators', 'teamwork');
       }
@@ -410,6 +413,9 @@ switch($action)
 
       // Borrar el archivo subido si existiere
       remove_dir( $CFG->dataroot.'/'.$course->id.'/'.$CFG->moddata.'/teamwork/'.$teamwork->id.'/'.$tid );
+
+      // Borrar a los profesores como evaluadores, ya que en este punto tenemos la certeza que los unicos que quedan son los profesores
+      delete_record('teamwork_evals', 'teamworkid', $teamwork->id, 'teamevaluated', $tid);
 
       // Redireccionar a la pagina de asignaciones
       header('Location: assign.php?id='.$cm->id);
@@ -441,6 +447,29 @@ switch($action)
       {
         // Actualizar los equipos de esta instancia con los datos por defecto
         execute_sql('update '.$CFG->prefix."teamwork_teams set workdescription = '" . get_string('symbolycworktext', 'teamwork') . "', worktime = ".time()." where teamworkid = ".$teamwork->id);
+
+        // Permitir a los profesores del curso evaluar a todos los equipos si esta activa esa opcion
+        if($teamwork->wgteacher)
+        {
+          // Obtener la lista de equipos de la instancia
+          $teams = get_records('teamwork_teams', 'teamworkid', $teamwork->id);
+
+          $teachers = get_course_teachers($course->id);
+          $insert = new stdClass;
+          $insert->teamworkid = $teamwork->id;
+          $insert->timecreated = time();
+
+          foreach($teams as $team)
+          { 
+            $insert->teamevaluated = $team->id;
+
+            foreach($teachers as $teacher)
+            {
+              $insert->evaluator = $teacher->id;
+              insert_record('teamwork_evals', $insert);
+            }
+          }
+        }
 
         // Redireccionar a la lista de trabajos enviados
         header('Location: assign.php?id='.$cm->id);
