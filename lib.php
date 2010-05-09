@@ -149,4 +149,55 @@ function teamwork_cron()
 {
 	return true;
 }
+
+/**
+ * Indica si una escala está siendo usada por una determinada instancia de teamwork
+ *
+ * @param int $teamworkid
+ * @param int $scaleid numero negativo
+ * @return bool
+ */
+function teamwork_scale_used($teamworkid, $scaleid)
+{
+    global $CFG;
+    $return = false;
+
+    // Obtenemos los templates instanciados en este teamwork
+    $sql = 'select count(*) from '.$CFG->prefix.'teamwork_tplinstances as tpl, '.$CFG->prefix.'teamwork_items as i
+            where tpl.teamworkid = '.$teamworkid.' and i.templateid = tpl.templateid and i.scale = -'.$scaleid;
+
+    $rec = count_records_sql($sql);
+
+    if ($rec && !empty($scaleid))
+    {
+      $return = true;
+    }
+
+    return $return;
+}
+
+/**
+ * Comprueba si una escala está siendo usada en cualquier instancia de teamwork
+ *
+ * @param $scaleid int
+ * @return boolean true si la escala está siendo usada por cualquier teamwork
+ */
+function teamwork_scale_used_anywhere($scaleid)
+{
+    global $CFG;
+    $return = false;
+
+    // Obtenemos los templates instanciados en este teamwork
+    $sql = 'select count(*) from '.$CFG->prefix.'teamwork_tplinstances as tpl, '.$CFG->prefix.'teamwork_items as i
+            where i.templateid = tpl.templateid and i.scale = -'.$scaleid;
+
+    $rec = count_records_sql($sql);
+
+    if ($rec && !empty($scaleid))
+    {
+      $return = true;
+    }
+
+    return $return;
+}
 ?>
