@@ -817,27 +817,86 @@ switch($action)
             {
                 $teamdata = new stdClass;
                 $userdata = new stdClass;
+                $d = new stdClass;
+                $d->teamworkid = $teamwork->id;
+                $d->timecreated = time();
 
                 //para cada equipo a crear
                 foreach($teams as $team)
                 {
-                    //crear los datos del equipo
-                    $teamdata->teamworkid = $teamwork->id;
-                    $teamdata->teamname = $team['name'];
-                    $teamdata->teamleader = $team['members'][0]->id;
+                  //crear los datos del equipo
+                  $teamdata->teamworkid = $teamwork->id;
+                  $teamdata->teamname = $team['name'];
+                  $teamdata->teamleader = $team['members'][0]->id;
 
-                    //insertar los datos
-                    $teamid = insert_record('teamwork_teams', $teamdata);
+                  //insertar los datos
+                  $teamid = insert_record('teamwork_teams', $teamdata);
 
-                    foreach($team['members'] as $member)
+                  foreach($team['members'] as $member)
+                  {
+                    //datos de la asignación
+                    $userdata->userid = $member->id;
+                    $userdata->teamid = $teamid;
+
+                    //insertar datos de la asignación
+                    insert_record('teamwork_users_teams', $userdata);
+
+                    // Obtener la lista de miembros del equipo
+                    $tm = get_records('teamwork_users_teams', 'teamid', $teamid);
+
+                    if( $tm )
                     {
-                        //datos de la asignación
-                        $userdata->userid = $member->id;
-                        $userdata->teamid = $teamid;
+                      // Para cada miembro del equipo
+                      foreach($tm as $m)
+                      {
+                        // Impedir la evaluación a uno mismo
+                        if($member->id != $m->userid)
+                        {
+                          // Permitir a este miembro evaluar al nuevo miembro
+                          $d->userevaluated = $member->id;
+                          $d->evaluator = $m->userid;
+                          insert_record('teamwork_evals', $d);
 
-                        //insertar datos de la asignación
-                        insert_record('teamwork_users_teams', $userdata);
+                          // Permitir al nuevo miembro evaluar a este miembro del equipo
+                          $d->userevaluated = $m->userid;
+                          $d->evaluator = $member->id;
+                          insert_record('teamwork_evals', $d);
+                        }
+                      }
                     }
+                  }
+                }
+
+                // Una vez creados los equipos, obtenemos la lista para la evaluación entre equipos
+                $teams = get_records('teamwork_teams', 'teamworkid', $teamwork->id);
+
+                $insert = new stdClass;
+                $insert->teamworkid = $teamwork->id;
+                $insert->timecreated = time();
+
+                // Para cada equipo...
+                foreach($teams as $team)
+                {
+                  // Obtenemos la lista de miembros de ese equipo
+                  $members = get_records('teamwork_users_teams', 'teamid', $team->id);
+
+                  // Creamos la lista de equipos a los que deben valorar
+                  $tlist = $teams;
+                  unset($tlist[$team->id]);
+
+                  // Para cada miembro del equipo actual
+                  foreach($members as $member)
+                  {
+                    $insert->evaluator = $member->userid;
+
+                    // Para cada equipo a valorar
+                    foreach($tlist as $l)
+                    {
+                      $insert->teamevaluated = $l->id;
+                      
+                      insert_record('teamwork_evals', $insert);
+                    }
+                  }
                 }
 
                 //redireccionar a la página con la lista de miembros del equipo
