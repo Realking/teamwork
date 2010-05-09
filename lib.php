@@ -19,7 +19,9 @@
  */
 function teamwork_add_instance($teamwork)
 {	
-	//añadir los valores por defecto
+	$return = false;
+
+  //añadir los valores por defecto
 	if($teamwork->allowselecteval == '0')
 	{
 		$teamwork->selectevalmin = 0;
@@ -27,7 +29,40 @@ function teamwork_add_instance($teamwork)
 		$teamwork->selectteammax = 0;
 	}
 	
-	return insert_record('teamwork', $teamwork);
+	$return = insert_record('teamwork', $teamwork);
+  
+  if($return)
+  {
+    // Añadimos las fechas como eventos del calendario
+    $event = new stdClass;
+    $event->name        = $teamwork->name;
+    $event->description = $teamwork->description;
+    $event->courseid    = $teamwork->course;
+    $event->groupid     = 0;
+    $event->userid      = 0;
+    $event->modulename  = 'teamwork';
+    $event->instance    = $return;
+    $event->eventtype   = 'due';
+    $event->timeduration = 0;
+    
+    // Fecha de inicio de envíos
+    $event->timestart   = $teamwork->startsends;
+    add_event($event);
+    
+    // Fecha de finalización de envíos
+    $event->timestart   = $teamwork->endsends;
+    add_event($event);
+    
+    // Fecha de inicio de evaluaciones
+    $event->timestart   = $teamwork->startevals;
+    add_event($event);
+    
+    // Fecha de finalización de evaluaciones
+    $event->timestart   = $teamwork->endevals;
+    add_event($event);
+  }
+
+  return (bool) $return;
 }
 
 /**
@@ -38,7 +73,9 @@ function teamwork_add_instance($teamwork)
  */
 function teamwork_update_instance($teamwork)
 {	
-	//añadir los valores por defecto
+	$return = false;
+
+  //añadir los valores por defecto
 	if($teamwork->allowselecteval == '0')
 	{
 		$teamwork->selectevalmin = 0;
@@ -48,7 +85,43 @@ function teamwork_update_instance($teamwork)
 	
 	$teamwork->id = $teamwork->instance;
 	
-	return update_record('teamwork', $teamwork);
+	$return = update_record('teamwork', $teamwork);
+
+  if($return)
+  {
+    // Eliminamos los datos del calendario antiguo
+    delete_records('event', 'modulename', 'teamwork', 'instance', $teamwork->id);
+
+    // Añadimos las fechas como eventos del calendario
+    $event = new stdClass;
+    $event->name        = $teamwork->name;
+    $event->description = $teamwork->description;
+    $event->courseid    = $teamwork->course;
+    $event->groupid     = 0;
+    $event->userid      = 0;
+    $event->modulename  = 'teamwork';
+    $event->instance    = $teamwork->id;
+    $event->eventtype   = 'due';
+    $event->timeduration = 0;
+
+    // Fecha de inicio de envíos
+    $event->timestart   = $teamwork->startsends;
+    add_event($event);
+
+    // Fecha de finalización de envíos
+    $event->timestart   = $teamwork->endsends;
+    add_event($event);
+
+    // Fecha de inicio de evaluaciones
+    $event->timestart   = $teamwork->startevals;
+    add_event($event);
+
+    // Fecha de finalización de evaluaciones
+    $event->timestart   = $teamwork->endevals;
+    add_event($event);
+  }
+
+  return (bool) $return;
 }
 
 /**
@@ -126,6 +199,13 @@ function teamwork_delete_instance($id)
 
   // Borramos las evaluaciones
   $result = $result && delete_records('teamwork_evals', 'teamworkid', $teamwork->id);
+
+  //
+  /// Calendario
+  //
+
+  // Borramos los eventos asociados a esta instancia
+  $result = $result && delete_records('event', 'modulename', 'teamwork', 'instance', $teamwork->id);
 
   //
   /// Instancia
