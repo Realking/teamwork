@@ -102,17 +102,10 @@ function teamwork_phase($teamwork, $numeric = false)
         $status = 1;
         $message = get_string('phase1', 'teamwork');
     }
-    else if( !count_records_sql('select count(*) from '.$CFG->prefix.'teamwork_users_teams as ut, '.$CFG->prefix.'teamwork_teams as t where t.teamworkid = '.$teamwork->id.' and ut.teamid = t.id and ut.userid = '.$USER->id))
+    else if( !count_records_sql('select count(*) from '.$CFG->prefix.'teamwork_users_teams as ut, '.$CFG->prefix.'teamwork_teams as t where t.teamworkid = '.$teamwork->id.' and ut.teamid = t.id and ut.userid = '.$USER->id) AND !isteacher($course->id, $USER->id))
     {
       $status = 2;
       $message = get_string('phase2', 'teamwork');
-
-      // Si es profesor devolvemos la fase 3
-      if(isteacher($course->id, $USER->id))
-      {
-        $status = 3;
-        $message = get_string('phase3', 'teamwork');
-      }
     }
     else if($time < $teamwork->endsends)
     {
@@ -719,7 +712,7 @@ function teamwork_is_editable($teamwork)
     global $CFG;
 
     // Consideramos que se puede editar mientras que ningún alumno/profesor haya enviado alguna evaluación
-    if(count_records_sql('select count(*) from '.$CFG->prefix.'teamwork_evals as e where e.teamworkid = '.$teamwork->id.' and grade IS NOT NULL'))
+    if(count_records_sql('select count(*) from '.$CFG->prefix.'teamwork_evals as e where e.teamworkid = '.$teamwork->id.' and timegraded IS NOT NULL'))
     {
       // Si hay al menos una evaluación...
       return false;
