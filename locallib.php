@@ -1090,7 +1090,7 @@ class teamwork_edit_submission_form extends moodleform
  */
 function teamwork_sent_works_table_options($work)
 {
-    global $cm, $teamwork;
+    global $cm, $teamwork, $CFG, $course;
 
     $stractions = '';
     $now = time();
@@ -1108,7 +1108,7 @@ function teamwork_sent_works_table_options($work)
       $stractions .= '<a href="viewer.php?id='.$cm->id.'&tid='.$work->id.'"><img src="images/viewer.png" alt="'.get_string('viewwork', 'teamwork').'" title="'.get_string('viewwork', 'teamwork').'" /></a>&nbsp;&nbsp;';
     }
 
-    if($teamwork->startsends < $now AND $now < $teamwork->startevals AND !count_records_sql("select count(*) from ".$CFG->prefix."teamwork_evals where teamevaluated = ".$tid." and evaluator NOT IN(".implode(',', array_keys(get_course_teachers($course->id))).")"))
+    if($teamwork->startsends < $now AND $now < $teamwork->startevals AND !count_records_sql("select count(*) from ".$CFG->prefix."teamwork_evals where teamevaluated = ".$work->id." and evaluator NOT IN(".implode(',', array_keys(get_course_teachers($course->id))).")"))
     {
         //boton de eliminar trabajo
         $stractions .= '<a href="assign.php?id='.$cm->id.'&action=deletework&tid='.$work->id.'"><img src="images/delete.png" alt="'.get_string('deletework', 'teamwork').'" title="'.get_string('deletework', 'teamwork').'" /></a>&nbsp;&nbsp;';

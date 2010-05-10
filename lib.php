@@ -121,7 +121,7 @@ function teamwork_update_instance($teamwork)
     add_event($event);
   }
 
-  return (bool) $return;
+  return $return;
 }
 
 /**
