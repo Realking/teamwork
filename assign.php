@@ -415,7 +415,7 @@ switch($action)
       remove_dir( $CFG->dataroot.'/'.$course->id.'/'.$CFG->moddata.'/teamwork/'.$teamwork->id.'/'.$tid );
 
       // Borrar a los profesores como evaluadores, ya que en este punto tenemos la certeza que los unicos que quedan son los profesores
-      delete_record('teamwork_evals', 'teamworkid', $teamwork->id, 'teamevaluated', $tid);
+      delete_records('teamwork_evals', 'teamworkid', $teamwork->id, 'teamevaluated', $tid);
 
       // Redireccionar a la pagina de asignaciones
       header('Location: assign.php?id='.$cm->id);
