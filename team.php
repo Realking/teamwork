@@ -408,19 +408,6 @@ switch($action)
                     $data->userid = $user;
                     $data->teamid = $tid;
                     insert_record('teamwork_users_teams', $data);
-
-                    // Permitir a los profesores del curso evaluar a este alumno si esta activa esa opcion
-                    if($teamwork->wgteacher)
-                    {
-                      $teachers = get_course_teachers($course->id);
-
-                      foreach($teachers as $teacher)
-                      {
-                        $d->evaluator = $teacher->id;
-                        $d->userevaluated = $user;
-                        insert_record('teamwork_evals', $d);
-                      }
-                    }
                 }
             }
 
@@ -869,19 +856,6 @@ switch($action)
                           $d->evaluator = $member->id;
                           insert_record('teamwork_evals', $d);
                         }
-                      }
-                    }
-
-                    // Permitir a los profesores del curso evaluar a este alumno si esta activa esa opcion
-                    if($teamwork->wgteacher)
-                    {
-                      $teachers = get_course_teachers($course->id);
-
-                      foreach($teachers as $teacher)
-                      {
-                        $d->evaluator = $teacher->id;
-                        $d->userevaluated = $user;
-                        insert_record('teamwork_evals', $d);
                       }
                     }
                   }
