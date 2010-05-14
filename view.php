@@ -319,8 +319,18 @@ if($team !== false)
     }
 }
 
+// Iniciar el proceso del cálculo de notas
+if($ismanager AND time() > $teamwork->endevals AND !$teamwork->doassessment AND isset($_GET['dograde']))
+{
+  // Actualizar la bbdd
+  $update = new stdClass;
+  $update->id = $teamwork->id;
+  $update->doassessment = 1;
+  update_record('teamwork', $update);
 
-
+  // Redireccionar
+  header('Location: view.php?id='.$cm->id);
+}
 
 
 //

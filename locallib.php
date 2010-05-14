@@ -78,6 +78,23 @@ function teamwork_show_status_info()
         {
             echo ' | <a href="assign.php?id='.$cm->id.'">'.get_string('assignseditor', 'teamwork').'</a>';
         }
+
+        // Mostrar botón de calificar alumnos cuando proceda
+        if(time() > $teamwork->endevals AND !$teamwork->doassessment)
+        {
+          echo '<br /><br />';
+          echo '<div style="text-align: center">';
+          print_single_button('view.php', array('id'=>$cm->id, 'dograde'=>true), get_string('dograde', 'teamwork'), 'get', '_self', false, '', false, get_string('dogradeask', 'teamwork'));
+          echo '</div>';
+        }
+
+        // Mostrar mensaje de calificaciones en proceso cuando proceda
+        if($teamwork->doassessment)
+        {
+          echo '<br /><br />';
+          echo '<div style="text-align: center">'.get_string('gradeinprogress', 'teamwork');
+          echo '</div>';
+        }
     }
 
     //cerrar caja

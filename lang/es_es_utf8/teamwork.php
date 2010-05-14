@@ -79,6 +79,9 @@ $string['waitingworksforevaluateteacher'] = ' Lista de Trabajos Pendientes de Ca
 $string['evaluatemember'] = 'Evaluar a este compañero de equipo';
 $string['waitingcoworkersforevaluate'] = ' Lista de Compañeros Pendientes de Evaluar';
 $string['waitingcoworkersforevaluateteacher'] = ' Lista de Alumnos Pendientes de Calificar';
+$string['dograde'] = 'Calcular las calificaciones';
+$string['dogradeask'] = '¿Desea realmente calcular las calificaciones?';
+$string['gradeinprogress'] = 'El cálculo de calificaciones se encuentra en proceso. Puede durar unos minutos.';
 
 
 //en el editor de templates template.php
