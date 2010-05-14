@@ -69,8 +69,8 @@ echo '<div class="clearer"></div><br />';
 /// Body
 //
 
-// Obtener los datos de la evaluación
-if( !$eval = get_record('teamwork_evals', 'id', $eid) )
+// Obtener los datos de la evaluación asegurandonos que pertenece a esta instancia
+if( !$eval = get_record('teamwork_evals', 'id', $eid, 'teamworkid', $teamwork->id) )
 {
   print_error('thisevaluationidnotexist', 'teamwork');
 }
@@ -85,6 +85,12 @@ if( $eval->evaluator != $USER->id )
 if( ! is_null($eval->timegraded) )
 {
   print_error('thisevaluationalreadyhasbeenundertaken', 'teamwork');
+}
+
+// Comprobar que el plazo de evaluación siga abierto
+if(time() > $teamwork->endevals)
+{
+  print_error('evaluationshavebeenclosed', 'teamwork');
 }
 
 // Titulo de la página

@@ -247,6 +247,7 @@ $string['userevalform'] = 'Formulario de Evaluación de Compañero';
 $string['thisevaluseanonexistscale'] = 'Esta evaluación usa una escala que no existe. Contacte con el profesor.';
 $string['itemnotinthisevaluation'] = 'El elemento no pertenece a esta evaluación';
 $string['thenumberofsubmititemnotisequaltonumberofthisevaluationitems'] = 'El numero de elementos de la evaluación no coincide';
+$string['evaluationshavebeenclosed'] = 'Ya no se puede evaluar este trabajo';
 
 
 //generales
