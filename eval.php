@@ -159,7 +159,9 @@ else
   {
     print_error('thenumberofsubmititemnotisequaltonumberofthisevaluationitems', 'teamwork');
   }
-  
+
+  $weightsum = 0;
+
   // Para cada uno de los item enviados...
   foreach($data as $key => $value)
   {
@@ -168,8 +170,13 @@ else
     {
       print_error('itemnotinthisevaluation', 'teamwork');
     }
+
+    // De paso, almacenamos la suma total de los pesos
+    $weightsum += $items[$key]->weight;
   }
 
+  $globalgrade = 0;
+  
   // Ahora que el envio es seguro, se puede proceder a insertarlo en la bbdd
   foreach($data as $key => $value)
   {
@@ -209,12 +216,16 @@ else
 
     // Insertar la evaluacion del elemento
     insert_record('teamwork_eval_items', $insert);
+
+    //Almacenamos la nota de este item en la nota global
+    $globalgrade += $insert->grade * ($items[$key]->weight / $weightsum);
   }
 
   // Actualizar la evaluación
   $update = new stdClass;
   $update->id = $eid;
   $update->timegraded = time();
+  $update->grade = $globalgrade;
   update_record('teamwork_evals', $update);
 
   // Mostramos mensaje
