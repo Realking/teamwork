@@ -62,7 +62,7 @@ function teamwork_add_instance($teamwork)
     add_event($event);
   }
 
-  return (bool) $return;
+  return $return;
 }
 
 /**
@@ -220,14 +220,119 @@ function teamwork_delete_instance($id)
 
 /**
  * Realiza comprobaciones periodicas acorde al cron de moodle
- * 
+ *
+ * - Realizar el cálculo de las notas cuando el profesor lo decide
  * - Enviar recordatorios por email a los alumnos
  * 
  * @return void
  */
 function teamwork_cron()
 {
-	return true;
+	global $CFG;
+  
+  mtrace('... Starting...');
+
+  //
+  /// Cálculo de las calificaciones
+  //
+
+  // Obtener las instancias de teamwork en las que se pida calcular las notas
+  $instances = get_records('teamwork', 'doassessment', '1');
+
+  // Si existen instancias...
+  if($instances)
+  {
+    mtrace('... iniciando el calculo de calificaciones');
+
+    foreach($instances as $instance)
+    {
+      mtrace('## Calificaciones de la instancia ID: '.$instancia->id.' | '.$instancia->name.' ##');
+      
+      // Equipos que participan en la calificación
+      $teams = get_records('teamwork_teams', 'teamworkid', $instancia->id);
+
+      // Si no hay equipos pasamos a la siguiente instancia
+      if(empty($teams))
+      {
+        mtrace('... Esta instancia no tiene equipos definidos.');
+        continue;
+      }
+
+      // Profesores del curso
+      $teachers = get_course_teachers($instance->course);
+      $teachers_keys = array_keys($teachers);
+
+      // Alumnos participantes
+      foreach($teams as $team)
+      {
+        $students[$team->id] = get_records('teamwork_users_teams', 'teamid', $team->id);
+      }
+
+
+      //
+      /// Cálculo de las notas de un equipo
+      //
+
+      // Si está activa la evaluación del profesor
+      if($instance->wgteacher)
+      {
+        // Para cada equipo...
+        foreach($teams as $team)
+        {
+          // Obtener la calificación de los profesores hacia ese equipo
+          $sql = 'select id, grade from '.$CFG->prefix.'teamwork_evals where teamevaluated = '.$team->id.'
+                  and evaluator in('.implode(',', $teachers_keys).') and grade is not null and teamworkid = '.$instance->id;
+          $result = get_records_sql($sql);
+
+          if(!empty($result))
+          {
+            $sum = 0;
+
+            // Para cada evaluación de un profesor...
+            foreach($result as $g)
+            {
+              $sum += $g->grade;
+            }
+
+            // Calif. Profesores hacia este equipo. Realizar la media aritmética con las notas
+            $teamsgrades[$team->id]['teachers'] = ($sum / count($result)) * ($instance->wgteacher / ($instance->wgteacher + $instance->wgteam));
+          }
+        }
+      }
+
+      // Si está activa la evaluación del equipo (por el resto de los alumnos)
+      if($instance->wgteam)
+      {
+        // Para cada equipo...
+        foreach($teams as $team)
+        {
+          // Obtener la calificación de los alumnos hacia ese equipo
+          $sql = 'select id, grade from '.$CFG->prefix.'teamwork_evals where teamevaluated = '.$team->id.'
+                  and evaluator not in('.implode(',', $teachers_keys).') and grade is not null and teamworkid = '.$instance->id;
+          $result = get_records_sql($sql);
+
+          if(!empty($result))
+          {
+            $sum = 0;
+
+            // Para cada evaluación de un alumno...
+            foreach($result as $g)
+            {
+              $sum += $g->grade;
+            }
+
+            // Calif. Alumnos hacia este equipo. Realizar la media aritmética con las notas
+            $teamsgrades[$team->id]['students'] = ($sum / count($result)) * ($instance->wgteacher / ($instance->wgteacher + $instance->wgteam));
+          }
+        }
+      }
+
+      mtrace(print_r($teamsgrades, true));
+
+    } // Final bucle instancias
+  } // Final si existen instancias
+
+  return true;
 }
 
 /**
