@@ -19,23 +19,14 @@
  */
 function teamwork_add_instance($teamwork)
 {	
-	$return = false;
+  $return = false;
 
-  //añadir los valores por defecto
-	if($teamwork->allowselecteval == '0')
-	{
-		$teamwork->selectevalmin = 0;
-		$teamwork->selectevalmax = 0;
-		$teamwork->selectteammax = 0;
-	}
-	
-	$return = insert_record('teamwork', $teamwork);
+  $return = insert_record('teamwork', $teamwork);
   
   if($return)
   {
     // Añadimos las fechas como eventos del calendario
     $event = new stdClass;
-    $event->name        = $teamwork->name;
     $event->description = $teamwork->description;
     $event->courseid    = $teamwork->course;
     $event->groupid     = 0;
@@ -46,18 +37,22 @@ function teamwork_add_instance($teamwork)
     $event->timeduration = 0;
     
     // Fecha de inicio de envíos
+    $event->name        = $teamwork->name.' - '.get_string('startsends', 'teamwork');
     $event->timestart   = $teamwork->startsends;
     add_event($event);
     
     // Fecha de finalización de envíos
+    $event->name        = $teamwork->name.' - '.get_string('endsends', 'teamwork');
     $event->timestart   = $teamwork->endsends;
     add_event($event);
     
     // Fecha de inicio de evaluaciones
+    $event->name        = $teamwork->name.' - '.get_string('startevals', 'teamwork');
     $event->timestart   = $teamwork->startevals;
     add_event($event);
     
     // Fecha de finalización de evaluaciones
+    $event->name        = $teamwork->name.' - '.get_string('endevals', 'teamwork');
     $event->timestart   = $teamwork->endevals;
     add_event($event);
   }
@@ -73,19 +68,13 @@ function teamwork_add_instance($teamwork)
  */
 function teamwork_update_instance($teamwork)
 {	
-	$return = false;
+  $return = false;
 
-  //añadir los valores por defecto
-	if($teamwork->allowselecteval == '0')
-	{
-		$teamwork->selectevalmin = 0;
-		$teamwork->selectevalmax = 0;
-		$teamwork->selectteammax = 0;
-	}
+  // Añadir los valores por defecto
 	
-	$teamwork->id = $teamwork->instance;
-	
-	$return = update_record('teamwork', $teamwork);
+  $teamwork->id = $teamwork->instance;
+
+  $return = update_record('teamwork', $teamwork);
 
   if($return)
   {
@@ -94,7 +83,6 @@ function teamwork_update_instance($teamwork)
 
     // Añadimos las fechas como eventos del calendario
     $event = new stdClass;
-    $event->name        = $teamwork->name;
     $event->description = $teamwork->description;
     $event->courseid    = $teamwork->course;
     $event->groupid     = 0;
@@ -105,18 +93,22 @@ function teamwork_update_instance($teamwork)
     $event->timeduration = 0;
 
     // Fecha de inicio de envíos
+    $event->name        = $teamwork->name.' - '.get_string('startsends', 'teamwork');
     $event->timestart   = $teamwork->startsends;
     add_event($event);
 
     // Fecha de finalización de envíos
+    $event->name        = $teamwork->name.' - '.get_string('endsends', 'teamwork');
     $event->timestart   = $teamwork->endsends;
     add_event($event);
 
     // Fecha de inicio de evaluaciones
+    $event->name        = $teamwork->name.' - '.get_string('startevals', 'teamwork');
     $event->timestart   = $teamwork->startevals;
     add_event($event);
 
     // Fecha de finalización de evaluaciones
+    $event->name        = $teamwork->name.' - '.get_string('endevals', 'teamwork');
     $event->timestart   = $teamwork->endevals;
     add_event($event);
   }
@@ -132,13 +124,13 @@ function teamwork_update_instance($teamwork)
  */
 function teamwork_delete_instance($id)
 {
-	// Obtenemos los datos de la instancia de teamwork
-	if(! $teamwork = get_record('teamwork', 'id', $id))
-	{
+  // Obtenemos los datos de la instancia de teamwork
+  if(! $teamwork = get_record('teamwork', 'id', $id))
+  {
     return false;
   }
 	
-	// Por defecto el resultado de la eliminación es positivo
+  // Por defecto el resultado de la eliminación es positivo
   $result = true;
 
   //
@@ -214,8 +206,8 @@ function teamwork_delete_instance($id)
   // Borramos la instancia del teamwork
   $result = $result && delete_records('teamwork', 'id', $teamwork->id);
 	
-	// Devolver el resultado de la operación
-	return $result;
+  // Devolver el resultado de la operación
+  return $result;
 }
 
 /**
@@ -228,7 +220,7 @@ function teamwork_delete_instance($id)
  */
 function teamwork_cron()
 {
-	global $CFG;
+  global $CFG;
   
   mtrace('... Starting...');
 
