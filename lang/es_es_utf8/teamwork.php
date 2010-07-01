@@ -12,7 +12,7 @@
  */
 
 //
-///usadas por moodle y de obligada inclusión
+/// Usadas por moodle y de obligada inclusión
 //
 
 $string['modulename'] = 'Trabajo en Equipo';
@@ -21,10 +21,10 @@ $string['modulenameplural'] = 'Trabajos en Equipo';
 
 
 //
-/// usadas por el módulo teamwork
+/// Usadas por el módulo teamwork
 //
 
-//en el formulario de creación/modificación de la actividad
+// En el formulario de creación/modificación de la actividad
 $string['description'] = 'Descripción';
 $string['timing'] = 'Fechas';
 $string['evaluationweights'] = 'Pesos de las Calificaciones';
@@ -38,7 +38,6 @@ $string['wggranding'] = 'Calificación de las Calificaciones';
 $string['wgteam'] = 'Calificación de los Alumnos';
 $string['wgteacher'] = 'Calificación del Profesor';
 $string['wgintra'] = 'Calificación de Participación';
-//$string['evaluationinfo'] = 'La suma de las 4 opciones debe ser 100';
 $string['bgteam'] = 'Eliminar extremos en calificación del equipo';
 $string['bgintra'] = 'Eliminar extremos en calificación de participación';
 $string['allowselecteval'] = 'Permitir que los alumnos elijan los trabajos';
@@ -47,11 +46,9 @@ $string['selectevalmax'] = 'Número máximo de trabajos que un alumno puede cali
 $string['selectteammax'] = 'Número máximo de veces que puede ser calificado un trabajo';
 
 $string['deactivateeval'] = 'Desactivada';
-$string['deactivateextremecut'] = 'No eliminar';
-$string['nolimit'] = 'Sin límite';
 
 
-//en la vista principal view.php
+// En la vista principal view.php
 $string['phase1'] = 'Esperando el inicio del envío de trabajos';
 $string['phase2'] = 'Esperando ser asignado a un equipo';
 $string['phase3'] = 'Envío de trabajos';
@@ -84,7 +81,7 @@ $string['dogradeask'] = '¿Desea realmente calcular las calificaciones?';
 $string['gradeinprogress'] = 'El cálculo de calificaciones se encuentra en proceso. Puede durar unos minutos.';
 
 
-//en el editor de templates template.php
+// En el editor de templates template.php
 $string['templatesanditemseditor'] = 'Editor de plantillas y criterios de evaluación';
 $string['coursetemplateslisting'] = 'Listado de plantillas disponibles';
 $string['coursetemplatesasignedlisting'] = 'Listado de plantillas asignadas';
@@ -145,7 +142,7 @@ $string['importscaleerror'] = '¡Atención! La escala de uno o varios elementos 
 $string['youdonthavepermissiontochangeorder'] = 'No tiene permiso para cambiar el orden de estos elementos';
 
 
-//en el editor de equipos team.php
+// En el editor de equipos team.php
 $string['teamseditor'] = 'Editor de equipos de usuarios';
 $string['addnewteam'] = 'Añadir nuevo equipo';
 $string['editteam'] = 'Editar equipo';
@@ -196,12 +193,12 @@ $string['badnamingscheme'] = "Debe contener exactamente un caracter '@' o '#'";
 $string['youcannotdeletethisteambecauseithavememebers'] = 'No se puede borrar un equipo que tiene miembros. Borre estos primero.';
 
 
-//en el archivo locallib.php
+// En el archivo locallib.php
 $string['upitem'] = 'Subir elemento';
 $string['downitem'] = 'Bajar elemento';
 
 
-//en el archivo assign.php
+// En el archivo assign.php
 $string['assignseditor'] = 'Editor de Asignaciones';
 $string['sentworkslist'] = 'Lista de Trabajos Enviados';
 $string['teamsthatevalthiswork'] = 'Equipos que evalúan a este trabajo';
@@ -224,13 +221,13 @@ $string['confirmationforremovefromevaluators'] = '¿Desea realmente quitar este 
 $string['confirmationforcreatesymbolicsworks'] = '¿Desea realmente crear trabajos simbólicos para todos los equipos?';
 
 
-//en el archivo index.php
+// En el archivo index.php
 $string['noinstances'] = 'No hay ninguna instancia de este módulo';
 $string['areyouleader?'] = '¿Eres el líder?';
 $string['duedate'] = 'Fecha límite';
 
 
-//en el archivo viewer.php
+// En el archivo viewer.php
 $string['worksviewer'] = 'Visor de Trabajos';
 $string['youarentallowedtoseethiswork'] = 'No tiene permiso para ver este trabajo';
 $string['thisteamnotexistornotisfromthisinstance'] = 'El equipo no existe o no pertenece a esta instancia';
@@ -253,7 +250,7 @@ $string['thenumberofsubmititemnotisequaltonumberofthisevaluationitems'] = 'El nu
 $string['evaluationshavebeenclosed'] = 'Ya no se puede evaluar este trabajo';
 
 
-//generales
+// Generales
 $string['teamworkisnoeditable'] = 'No se puede editar la actividad';
 $string['submit'] = 'Enviar';
 
