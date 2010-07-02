@@ -230,7 +230,7 @@ else
 
   // Mostramos mensaje
   echo '<br /><p align="center">';
-  print_string('evaluationsavedok', 'teamwork', $teameval->teamname);
+  print_string('evaluationsavedok', 'teamwork');
   echo '</p>';
   print_continue('view.php?id='.$cm->id);
 }
