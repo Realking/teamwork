@@ -222,7 +222,7 @@ function teamwork_cron()
 {
   global $CFG;
   
-  mtrace('... Starting...');
+  mtrace(' ');
 
   //
   /// Cálculo de las calificaciones
@@ -238,7 +238,7 @@ function teamwork_cron()
 
     foreach($instances as $instance)
     {
-      mtrace('## Calificaciones de la instancia ID: '.$instance->id.' | '.$instance->name.' ##');
+      mtrace('... Calificaciones de la instancia ID: '.$instance->id.' | '.$instance->name);
       
       // Equipos que participan en la calificación
       $teams = get_records('teamwork_teams', 'teamworkid', $instance->id);
@@ -437,10 +437,30 @@ function teamwork_cron()
           }
         }
       }
+      
+      //
+      /// Insertar calificaciones en el gradebook
+      //
 
-      mtrace(print_r($teamsgrades, true));
-      mtrace(print_r($studentsgrades, true));
+      // Parámetros de configuración de la evaluación
+      $params = array('itemname'  => $instance->name,
+                      'idnumber'  => NULL,
+                      'gradetype' => GRADE_TYPE_VALUE,
+                      'grademax'  => $instance->maxgrade,
+                      'grademin'  => 0
+      );
 
+      $grades = array();
+      
+      foreach($studentsgrades as $student => $grade)
+      {
+        $grades[$student]['userid'] = $student;
+        $grades[$student]['rawgrade'] = $grade * $instance->maxgrade;
+      }
+      
+      // Enviamos los datos al gradebook
+      $graderesult = grade_update('mod/teamwork', $instance->course, 'mod', 'teamwork', $instance->id, 0, $grades, $params);
+      
     } // Final bucle instancias
   } // Final si existen instancias
 

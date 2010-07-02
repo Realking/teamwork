@@ -105,6 +105,11 @@ class mod_teamwork_mod_form extends moodleform_mod
 
         $mform->addElement('select', 'wggrading', get_string('wggrading', 'teamwork'), $selectrange);
         $mform->setHelpButton('wggrading', array('wggrading', get_string('helpwggrading', 'teamwork'), 'teamwork'));
+
+        $selectrange = array_combine(range(1, 100), range(1, 100));
+
+        $mform->addElement('select', 'maxgrade', get_string('maxgrade', 'teamwork'), $selectrange);
+        $mform->setHelpButton('maxgrade', array('maxgrade', get_string('helpmaxgrade', 'teamwork'), 'teamwork'));
         //--------------------------------------------------------------
 
         //------------------------- otrasopciones -------------------------

@@ -40,6 +40,7 @@ $string['wgteacher'] = 'Calificación del Profesor';
 $string['wgintra'] = 'Calificación de Participación';
 $string['bgteam'] = 'Eliminar extremos en Calificación Alumnos';
 $string['bgintra'] = 'Eliminar extremos en Calificación Participación';
+$string['maxgrade'] = 'Calificación Máxima';
 $string['allowselecteval'] = 'Permitir que los alumnos elijan los trabajos';
 $string['selectevalmin'] = 'Número mínimo de trabajos que un alumno debe calificar';
 $string['selectevalmax'] = 'Número máximo de trabajos que un alumno puede calificar';
