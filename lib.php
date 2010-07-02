@@ -311,14 +311,49 @@ function teamwork_cron()
           {
             $sum = 0;
 
-            // Para cada evaluación de un alumno...
+            // Para cada evaluación de un alumno... media artimética
             foreach($result as $g)
             {
               $sum += $g->grade;
             }
+            
+            $mean = ($sum / count($result));
+
+            // Si hay que eliminar los extremos...
+            if($instance->bgteam)
+            {
+              $sum = 0;
+
+              // Hay que calcular la desviación típica de la muestra
+              foreach($result as $r)
+              {
+                $sum += pow($r->grade - $mean, 2);
+              }
+
+              $desviation = sqrt($sum / (count($result)-1));
+
+              // Establecemos los margenes de confianza superior e inferior
+              $margin_top     = $mean + 2 * $desviation;
+              $margin_bottom  = $mean - 2 * $desviation;
+
+              // Volvemos a calcular la media pero eliminando aquellos elementos fuera de los margenes
+
+              $sum = 0;
+
+              foreach($result as $r)
+              {
+                // Comprobamos que se encuentra dentro del margen permitido
+                if($r->grade >= $margin_bottom AND $r->grade <= $margin_top)
+                {
+                  $sum += $g->grade;
+                }
+              }
+
+              $mean = ($sum / count($result));
+            }
 
             // Calif. Alumnos hacia este equipo. Realizar la media aritmética con las notas
-            $teamsgrades[$team->id]['students'] = ($sum / count($result)) * ($instance->wgteam / ($instance->wgteacher + $instance->wgteam));
+            $teamsgrades[$team->id]['students'] = $mean * ($instance->wgteam / ($instance->wgteacher + $instance->wgteam));
           }
         }
       }
@@ -362,8 +397,41 @@ function teamwork_cron()
                   $sum += $g->grade;
                 }
 
+                // Si hay que eliminar los extremos...
+                if($instance->bgintra)
+                {
+                  $sum = 0;
+
+                  // Hay que calcular la desviación típica de la muestra
+                  foreach($result as $r)
+                  {
+                    $sum += pow($r->grade - $mean, 2);
+                  }
+
+                  $desviation = sqrt($sum / (count($result)-1));
+
+                  // Establecemos los margenes de confianza superior e inferior
+                  $margin_top     = $mean + 2 * $desviation;
+                  $margin_bottom  = $mean - 2 * $desviation;
+
+                  // Volvemos a calcular la media pero eliminando aquellos elementos fuera de los margenes
+
+                  $sum = 0;
+
+                  foreach($result as $r)
+                  {
+                    // Comprobamos que se encuentra dentro del margen permitido
+                    if($r->grade >= $margin_bottom AND $r->grade <= $margin_top)
+                    {
+                      $sum += $g->grade;
+                    }
+                  }
+
+                  $mean = ($sum / count($result));
+                }
+
                 // Calif. Compañeros hacia este alumno. Realizar la media aritmética con las notas
-                $studentsgrades[$student] = ($studentsgrades[$student] * $instance->wgintra * ($sum / count($result))) + ($studentsgrades[$student] * (1 - $instance->wgintra));
+                $studentsgrades[$student] = ($studentsgrades[$student] * $instance->wgintra * $mean) + ($studentsgrades[$student] * (1 - $instance->wgintra));
               }
             }
           }
