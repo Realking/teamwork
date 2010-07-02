@@ -91,11 +91,20 @@ class mod_teamwork_mod_form extends moodleform_mod
         $mform->addElement('select', 'wgteam', get_string('wgteam', 'teamwork'), $selectrange);
         $mform->setHelpButton('wgteam', array('wgteam', get_string('helpwgteam', 'teamwork'), 'teamwork'));
 
+        $values = array();
+        $keys = range(0.01, 1, 0.01);
+        foreach($keys as $k)
+        {
+          $values[] = ($k*100).' %';
+        }
+
+        $selectrange = array(0=>get_string('deactivateeval', 'teamwork')) + (array_combine($keys, $values));
+
         $mform->addElement('select', 'wgintra', get_string('wgintra', 'teamwork'), $selectrange);
         $mform->setHelpButton('wgintra', array('wgintra', get_string('helpwgintra', 'teamwork'), 'teamwork'));
 
-        $mform->addElement('select', 'wggranding', get_string('wggranding', 'teamwork'), $selectrange);
-        $mform->setHelpButton('wggranding', array('wggranding', get_string('helpwggranding', 'teamwork'), 'teamwork'));
+        $mform->addElement('select', 'wggrading', get_string('wggrading', 'teamwork'), $selectrange);
+        $mform->setHelpButton('wggrading', array('wggrading', get_string('helpwggrading', 'teamwork'), 'teamwork'));
         //--------------------------------------------------------------
 
         //------------------------- otrasopciones -------------------------

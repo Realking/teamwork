@@ -238,10 +238,10 @@ function teamwork_cron()
 
     foreach($instances as $instance)
     {
-      mtrace('## Calificaciones de la instancia ID: '.$instancia->id.' | '.$instancia->name.' ##');
+      mtrace('## Calificaciones de la instancia ID: '.$instance->id.' | '.$instance->name.' ##');
       
       // Equipos que participan en la calificación
-      $teams = get_records('teamwork_teams', 'teamworkid', $instancia->id);
+      $teams = get_records('teamwork_teams', 'teamworkid', $instance->id);
 
       // Si no hay equipos pasamos a la siguiente instancia
       if(empty($teams))
@@ -257,7 +257,11 @@ function teamwork_cron()
       // Alumnos participantes
       foreach($teams as $team)
       {
-        $students[$team->id] = get_records('teamwork_users_teams', 'teamid', $team->id);
+        $result = get_records('teamwork_users_teams', 'teamid', $team->id);
+        foreach($result as $r)
+        {
+          $students[$team->id][] = $r->userid;
+        }
       }
 
 
@@ -314,12 +318,60 @@ function teamwork_cron()
             }
 
             // Calif. Alumnos hacia este equipo. Realizar la media aritmética con las notas
-            $teamsgrades[$team->id]['students'] = ($sum / count($result)) * ($instance->wgteacher / ($instance->wgteacher + $instance->wgteam));
+            $teamsgrades[$team->id]['students'] = ($sum / count($result)) * ($instance->wgteam / ($instance->wgteacher + $instance->wgteam));
+          }
+        }
+      }
+
+      //
+      /// Calificación del Alumno
+      //
+
+      // Al menos una de las dos calificaciones anteriores debe estar activa (profesor o alumnos)
+      // si no no tiene sentido corregir una nota que no existe, por tanto no se califica esta instancia
+      if($instance->wgteacher OR  $instance->wgteam)
+      {
+        $studentsgrades = array();
+        
+        // Recorremos los estudiantes que estan agrupados por equipos
+        foreach($students as $team => $stds)
+        {
+          $teamgrade = (isset($teamsgrades[$team]['teachers'])) ? $teamsgrades[$team]['teachers'] : 0;
+          $teamgrade = (isset($teamsgrades[$team]['students'])) ? $teamgrade + $teamsgrades[$team]['students'] : $teamgrade;
+
+          foreach($stds as $student)
+          {
+            // La calificación del alumno en este punto es la obtenida por su equipo
+            $studentsgrades[$student] = $teamgrade;
+            
+            // Si está activa la Calificación de Participación (Intra)
+            if($instance->wgintra)
+            {
+              // Obtener la calificación de los compañeros de equipo hacia este alumno
+              $sql = 'select id, grade from '.$CFG->prefix.'teamwork_evals where userevaluated = '.$student.'
+                      and grade is not null and teamworkid = '.$instance->id;
+              $result = get_records_sql($sql);
+
+              if(!empty($result))
+              {
+                $sum = 0;
+
+                // Para cada evaluación de un alumno...
+                foreach($result as $g)
+                {
+                  $sum += $g->grade;
+                }
+
+                // Calif. Compañeros hacia este alumno. Realizar la media aritmética con las notas
+                $studentsgrades[$student] = ($studentsgrades[$student] * $instance->wgintra * ($sum / count($result))) + ($studentsgrades[$student] * (1 - $instance->wgintra));
+              }
+            }
           }
         }
       }
 
       mtrace(print_r($teamsgrades, true));
+      mtrace(print_r($studentsgrades, true));
 
     } // Final bucle instancias
   } // Final si existen instancias
