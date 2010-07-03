@@ -186,18 +186,22 @@ function teamwork_check_student_evaluated()
 
   // Obtenemos los datos del gradebook para este usuario
   $grade = grade_get_grades($cm->course, 'mod', 'teamwork', $cm->instance, $USER->id);
-  
-  // Los procesamos
-  $grademax = $grade->items[0]->grademax;
-  $grade = $grade->items[0]->grades[$USER->id]->grade;
 
-  // Si no hay evaluación devolver false
-  if($grade === null)
+  if( isset($grade->items[0]) )
   {
-    return false;
-  }
+    // Los procesamos
+    $grademax = $grade->items[0]->grademax;
+    $grade = $grade->items[0]->grades[$USER->id]->grade;
 
-  return array('grade' => $grade, 'grademax' => $grademax);
+    // Si hay evaluación
+    if($grade !== null)
+    {
+      return array('grade' => $grade, 'grademax' => $grademax);
+    }
+  }
+  
+  // Si no hay evaluación devolver false
+  return false;
 }
 
 /**
