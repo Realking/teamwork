@@ -67,6 +67,16 @@ function teamwork_show_status_info()
         $link = link_to_popup_window($CFG->wwwroot.'/mod/teamwork/view.php?id='.$cm->id.'&teamcomponents=true', null, $result->teamname, 400, 500, get_string('teammembers', 'teamwork', $result->teamname), null, true);
         echo '<b>'.get_string('groupbelong', 'teamwork').'</b>: '.$link." $leader<br />\n";
     }
+
+    // Si el alumno ha sido evaluado
+    $grade = teamwork_check_student_evaluated();
+
+    if($grade !== false)
+    {
+      // Mostrar evaluación al alumno
+      echo '<br />';
+      echo '<b>'.get_string('studentgrade', 'teamwork').'</b>: '.round($grade['grade'], 2).' / '.round($grade['grademax'], 2)."<br />\n";
+    }
 	
     //si es manager imprimir aqui enlaces a la administración
     if($ismanager)
@@ -139,7 +149,7 @@ function teamwork_phase($teamwork, $numeric = false)
         $status = 5;
         $message = get_string('phase5', 'teamwork');
     }
-    else if(!teamwork_check_student_evaluated())
+    else if(teamwork_check_student_evaluated() === false)
     {
         $status = 6;
         $message = get_string('phase6', 'teamwork');
@@ -162,12 +172,32 @@ function teamwork_phase($teamwork, $numeric = false)
 /**
  * Comprueba si el estudiante ha sido calificado por el profesor en esta actividad o no
  * 
- * @return bool true si ha sido calificado, false en cualquier otro caso 
+ * @return mixed false si no ha sido calificado, array con los datos de la calificación
  */
 //TODO implementar esta funcion
 function teamwork_check_student_evaluated()
 {
+  global $cm, $USER, $CFG;
+
+  if( !function_exists('grade_get_grades') )
+  {
+    require_once($CFG->libdir.'/gradelib.php');
+  }
+
+  // Obtenemos los datos del gradebook para este usuario
+  $grade = grade_get_grades($cm->course, 'mod', 'teamwork', $cm->instance, $USER->id);
+  
+  // Los procesamos
+  $grademax = $grade->items[0]->grademax;
+  $grade = $grade->items[0]->grades[$USER->id]->grade;
+
+  // Si no hay evaluación devolver false
+  if($grade === null)
+  {
     return false;
+  }
+
+  return array('grade' => $grade, 'grademax' => $grademax);
 }
 
 /**

@@ -80,6 +80,7 @@ $string['waitingcoworkersforevaluateteacher'] = ' Lista de Alumnos Pendientes de
 $string['dograde'] = 'Calcular las calificaciones';
 $string['dogradeask'] = '¿Desea realmente calcular las calificaciones?';
 $string['gradeinprogress'] = 'El cálculo de calificaciones se encuentra en proceso. Puede durar unos minutos.';
+$string['studentgrade'] = 'Calificación obtenida';
 
 
 // En el editor de templates template.php
