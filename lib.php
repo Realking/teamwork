@@ -140,6 +140,9 @@ function teamwork_delete_instance($id)
   // Si las plantillas que usa no son usadas en otra instancia de este curso, las borramos
   if($tpls = get_records('teamwork_tplinstances', 'teamworkid', $teamwork->id))
   {
+    // Borramos las intancias de plantillas a este teamwork
+    $result = $result && delete_records('teamwork_tplinstances', 'teamworkid', $teamwork->id);
+    
     foreach($tpls as $tpl)
     {
       // Comprobamos si esta plantilla se está usando en otra instancia
@@ -154,9 +157,7 @@ function teamwork_delete_instance($id)
       }
     }
   }
-
-  // Borramos las intancias de plantillas a este teamwork
-  $result = $result && delete_records('teamwork_tplinstances', 'teamworkid', $teamwork->id);
+  
 
   //
   /// Equipos
