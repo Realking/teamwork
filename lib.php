@@ -319,28 +319,29 @@ function teamwork_cron()
             }
             
             $mean = ($sum / count($result));
+            $teamsmean[$team->id] = $mean;
+
+            $sum = 0;
+
+            // Desviación típica de la muestra
+            foreach($result as $r)
+            {
+              $sum += pow($r->grade - $mean, 2);
+            }
+
+            $desviation = sqrt($sum / (count($result)-1));
+            $teamsdesviation[$team->id] = $desviation;
 
             // Si hay que eliminar los extremos...
             if($instance->bgteam)
             {
-              $sum = 0;
-
-              // Hay que calcular la desviación típica de la muestra
-              foreach($result as $r)
-              {
-                $sum += pow($r->grade - $mean, 2);
-              }
-
-              $desviation = sqrt($sum / (count($result)-1));
-
               // Establecemos los margenes de confianza superior e inferior
               $margin_top     = $mean + 2 * $desviation;
               $margin_bottom  = $mean - 2 * $desviation;
 
-              // Volvemos a calcular la media pero eliminando aquellos elementos fuera de los margenes
-
               $sum = 0;
 
+              // Volvemos a calcular la media pero eliminando aquellos elementos fuera de los margenes
               foreach($result as $r)
               {
                 // Comprobamos que se encuentra dentro del margen permitido
@@ -358,6 +359,7 @@ function teamwork_cron()
           }
         }
       }
+      mtrace(print_r($teamsgrades, true));
 
       //
       /// Calificación del Alumno
@@ -368,8 +370,8 @@ function teamwork_cron()
       if($instance->wgteacher OR  $instance->wgteam)
       {
         $studentsgrades = array();
-        
-        // Recorremos los estudiantes que estan agrupados por equipos
+
+        // Guardamos las notas de los alumnos
         foreach($students as $team => $stds)
         {
           $teamgrade = (isset($teamsgrades[$team]['teachers'])) ? $teamsgrades[$team]['teachers'] : 0;
@@ -379,66 +381,183 @@ function teamwork_cron()
           {
             // La calificación del alumno en este punto es la obtenida por su equipo
             $studentsgrades[$student] = $teamgrade;
-            
-            // Si está activa la Calificación de Participación (Intra)
-            if($instance->wgintra)
-            {
-              // Obtener la calificación de los compañeros de equipo hacia este alumno
-              $sql = 'select id, grade from '.$CFG->prefix.'teamwork_evals where userevaluated = '.$student.'
-                      and grade is not null and teamworkid = '.$instance->id;
-              $result = get_records_sql($sql);
+          }
+        }
+        mtrace(print_r($studentsgrades, true));
+        //
+        /// CALIFICACIÓN DE PARTICIPACIÓN (INTRA)
+        //
 
-              if(!empty($result))
+        // Si está activa la Calificación de Participación (Intra)
+        if($instance->wgintra)
+        {
+          // Recorremos los estudiantes que estan agrupados por equipos
+          foreach($studentsgrades as $student => $studentgrade)
+          {
+            // Obtener la calificación de los compañeros de equipo hacia este alumno
+            $sql = 'select id, grade from '.$CFG->prefix.'teamwork_evals where userevaluated = '.$student.'
+                    and grade is not null and teamworkid = '.$instance->id;
+            $result = get_records_sql($sql);
+
+            if(!empty($result))
+            {
+              $sum = 0;
+
+              // Para cada evaluación de un alumno...
+              foreach($result as $g)
               {
+                $sum += $g->grade;
+              }
+
+              $mean = ($sum / count($result));
+              $intramean[$student] = $mean;
+
+              $sum = 0;
+
+              // Hay que calcular la desviación típica de la muestra
+              foreach($result as $r)
+              {
+                $sum += pow($r->grade - $mean, 2);
+              }
+
+              $desviation = sqrt($sum / (count($result)-1));
+              $intradesviation[$student] = $desviation;
+
+              // Si hay que eliminar los extremos...
+              if($instance->bgintra)
+              {
+                // Establecemos los margenes de confianza superior e inferior
+                $margin_top     = $mean + 2 * $desviation;
+                $margin_bottom  = $mean - 2 * $desviation;
+
+                // Volvemos a calcular la media pero eliminando aquellos elementos fuera de los margenes
+
                 $sum = 0;
 
-                // Para cada evaluación de un alumno...
-                foreach($result as $g)
+                foreach($result as $r)
                 {
-                  $sum += $g->grade;
+                  // Comprobamos que se encuentra dentro del margen permitido
+                  if($r->grade >= $margin_bottom AND $r->grade <= $margin_top)
+                  {
+                    $sum += $g->grade;
+                  }
                 }
 
-                // Si hay que eliminar los extremos...
-                if($instance->bgintra)
+                $mean = ($sum / count($result));
+              }
+
+              // Calif. Compañeros hacia este alumno. Realizar la media aritmética con las notas
+              $studentsgrades[$student] = ($studentsgrades[$student] * $instance->wgintra * $mean) + ($studentsgrades[$student] * (1 - $instance->wgintra));
+            }
+          }
+          mtrace(print_r($studentsgrades, true));
+        }
+
+        //
+        /// CALIFICACIÓN DE CALIFICACIONES (METAEVALUACIÓN)
+        //
+
+        // Si está activa la metaevaluación
+        if($instance->wggrading)
+        {
+          // Iteramos sobre cada estudiante
+          $studentsgrades_keys = array_keys($studentsgrades);
+          
+          foreach($studentsgrades_keys as $student)
+          {
+            /**
+             * Para cada estudiante...
+             *
+             * 1. Obtener la lista de evaluaciones que ese estudiante ha hecho a
+             *    los demás equipos (si esta evaluación está activa) o a los demas
+             *    compañeros de equipo (si está activa)
+             *
+             * 2. Comparar cada una de esas evaluaciones con la media + desviacion
+             *    tipica para ver que rango de penalización se le aplica por cada
+             *    una de esas calificaciones que ha hecho.
+             *
+             * 3. Hacer la media aritmética de esas penalizaciones
+             * 
+             * 4. Corregir la nota del estudiante aplicando esa penalización
+             */
+
+            // Obtener las evaluaciones no nulas realizadas por este estudiante
+            $sql = 'select id, userevaluated, teamevaluated, grade from '.$CFG->prefix.'teamwork_evals
+                    where grade is not null and evaluator = '.$student.' and teamworkid = '.$instance->id;
+
+            // Si hay evaluaciones (si no hay no se penalizará al usuario, pasamos al siguiente)
+            if($evals = get_records_sql($sql))
+            {
+              $sum = $count = 0;
+              
+              // Iteramos por cada evaluación
+              foreach($evals as $eval)
+              {
+                // Vemos el tipo de evaluación y si está activa
+                if($eval->userevaluated !== null AND !$instance->wgintra)
                 {
-                  $sum = 0;
-
-                  // Hay que calcular la desviación típica de la muestra
-                  foreach($result as $r)
-                  {
-                    $sum += pow($r->grade - $mean, 2);
-                  }
-
-                  $desviation = sqrt($sum / (count($result)-1));
-
-                  // Establecemos los margenes de confianza superior e inferior
-                  $margin_top     = $mean + 2 * $desviation;
-                  $margin_bottom  = $mean - 2 * $desviation;
-
-                  // Volvemos a calcular la media pero eliminando aquellos elementos fuera de los margenes
-
-                  $sum = 0;
-
-                  foreach($result as $r)
-                  {
-                    // Comprobamos que se encuentra dentro del margen permitido
-                    if($r->grade >= $margin_bottom AND $r->grade <= $margin_top)
-                    {
-                      $sum += $g->grade;
-                    }
-                  }
-
-                  $mean = ($sum / count($result));
+                  //Estamos en una evaluación entre miembros pero se encuentra inactiva, saltar a la siguiente evaluación
+                  continue;
                 }
 
-                // Calif. Compañeros hacia este alumno. Realizar la media aritmética con las notas
-                $studentsgrades[$student] = ($studentsgrades[$student] * $instance->wgintra * $mean) + ($studentsgrades[$student] * (1 - $instance->wgintra));
+                if($eval->teamevaluated !== null AND !$instance->wgteam)
+                {
+                  //Estamos en una evaluación a equipos pero se encuentra inactiva, saltar a la siguiente evaluación
+                  continue;
+                }
+
+                // Si estamos en este punto es porque nuestra evaluación es valida
+
+                // Calcular el rango de penalización
+                if($eval->userevaluated !== null)
+                {
+                  $margin_top_2 = $intramean[$eval->userevaluated] + 2 * $intradesviation[$eval->userevaluated];
+                  $margin_bottom_2 = $intramean[$eval->userevaluated] - 2 * $intradesviation[$eval->userevaluated];
+                  $margin_top_3 = $intramean[$eval->userevaluated] + 3 * $intradesviation[$eval->userevaluated];
+                  $margin_bottom_3 = $intramean[$eval->userevaluated] - 3 * $intradesviation[$eval->userevaluated];
+                }
+
+                if($eval->teamevaluated !== null)
+                {
+                  $margin_top_2 = $teamsmean[$eval->teamevaluated] + 2 * $teamsdesviation[$eval->teamevaluated];
+                  $margin_bottom_2 = $teamsmean[$eval->teamevaluated] - 2 * $teamsdesviation[$eval->teamevaluated];
+                  $margin_top_3 = $teamsmean[$eval->teamevaluated] + 3 * $teamsdesviation[$eval->teamevaluated];
+                  $margin_bottom_3 = $teamsmean[$eval->teamevaluated] - 3 * $teamsdesviation[$eval->teamevaluated];
+                }
+
+                // Comprobar en que rango se encuentra la evaluación de este estudiante
+                if($eval->grade < $margin_bottom_3 OR $eval->grade > $margin_top_3)
+                {
+                  $penalization = 0.5;
+                }
+                elseif($eval->grade < $margin_bottom_2 OR $eval->grade > $margin_top_2)
+                {
+                  $penalization = 0.75;
+                }
+                else
+                {
+                  $penalization = 1;
+                }
+      mtrace('student: '.$student.' | evalid: '.$eval->id.' | grade: '.$eval->grade.' | penalization: '.$penalization.' | teamid: '.$eval->teamevaluated.' | teammean: '.$teamsmean[$eval->teamevaluated].' | teamdesviation: '.$teamsdesviation[$eval->teamevaluated]);
+      mtrace('mt2: '.$margin_top_2.' | mb2: '.$margin_bottom_2.' | mt3: '.$margin_top_3.' | mb3: '.$margin_bottom_3);
+      mtrace(' ');
+                // Guardamos la penalización para la media
+                $sum += $penalization;
+                $count++;
+              }
+
+              // Corregir la nota del estudiante
+              if($count != 0)
+              {
+                $studentsgrades[$student] = $studentsgrades[$student] * $instance->wggrading * ($sum / $count) + $studentsgrades[$student] * (1 - $instance->wggrading);
               }
             }
           }
+
+          mtrace(print_r($studentsgrades, true));
         }
       }
-      
+      mtrace(print_r($studentsgrades, true));
       //
       /// Insertar calificaciones en el gradebook
       //
