@@ -1,3 +1,43 @@
-#############################################################
-## TEAMWORK - evaluación de trabajos en equipo para Moodle ##
-#############################################################
+Descripción:
+============
+Módulo de Evaluación de Trabajos en Equipo - TeamWork
+
+Este módulo permite al profesorado disponer de un tipo de actividad en la plataforma
+con la que evaluar aquellos trabajos formados por grupos en los que se quiere que
+sean los propios compañeros de clase quienes los evalúen, facilitando la labor de
+toma de las calificaciones y su posterior análisis para obtener las notas finales.
+
+El desarrollo de este módulo ha sido financiado por el Departamento de Estadística,
+Econometría e Investigación Operativa de la Universidad de Córdoba.
+
+
+Instalación:
+============
+En el directorio raíz de Moodle, dentro de la carpeta 'mod' cree una nueva carpeta
+llamada 'teamwork' y dentro de esta copie el contenido de este repositorio. Entre
+como administrador en Moodle y pulse sobre el enlace 'Notificaciones' ('Notifications' en
+inglés) que se encuentra en el menú de administración. El proceso de instalación comenzará
+y si no ocurre ningún error, el módulo ya se encontrará disponible para su uso. Para
+conocer la forma de insertar un módulo de actividad en un curso consulte la ayuda oficial
+de Moodle.
+
+
+Autor:
+======
+Javier Aranda es estudiante de Ingeniería Técnica en Informática de Gestión en
+la Universidad de Córdoba. Se encuentra actualmente becado en el citado departamento
+para la realización de este proyecto. Dispone además de un blog: http://javierav.com
+
+
+Licencia:
+=========
+Este proyecto se distribuye bajo la licencia GNU Affero GPL v3
+http://www.fsf.org/licensing/licenses/agpl-3.0.html
+
+
+Agradecimientos:
+================
+* Prof. Dr. Roberto Espejo Mohedano por idear el proyecto y buscar financiación.
+* Adolfo Muñoz Aguilar, gestor del moodle de la universidad, por abrirme el camino
+en este difícil mundo del desarrollo para moodle.
+* Escuela Politécnica Superior, por la financiación.
