@@ -359,7 +359,7 @@ function teamwork_cron()
           }
         }
       }
-      mtrace(print_r($teamsgrades, true));
+
 
       //
       /// Calificación del Alumno
@@ -383,7 +383,7 @@ function teamwork_cron()
             $studentsgrades[$student] = $teamgrade;
           }
         }
-        mtrace(print_r($studentsgrades, true));
+
         //
         /// CALIFICACIÓN DE PARTICIPACIÓN (INTRA)
         //
@@ -450,7 +450,6 @@ function teamwork_cron()
               $studentsgrades[$student] = ($studentsgrades[$student] * $instance->wgintra * $mean) + ($studentsgrades[$student] * (1 - $instance->wgintra));
             }
           }
-          mtrace(print_r($studentsgrades, true));
         }
 
         //
@@ -538,9 +537,7 @@ function teamwork_cron()
                 {
                   $penalization = 1;
                 }
-      mtrace('student: '.$student.' | evalid: '.$eval->id.' | grade: '.$eval->grade.' | penalization: '.$penalization.' | teamid: '.$eval->teamevaluated.' | teammean: '.$teamsmean[$eval->teamevaluated].' | teamdesviation: '.$teamsdesviation[$eval->teamevaluated]);
-      mtrace('mt2: '.$margin_top_2.' | mb2: '.$margin_bottom_2.' | mt3: '.$margin_top_3.' | mb3: '.$margin_bottom_3);
-      mtrace(' ');
+
                 // Guardamos la penalización para la media
                 $sum += $penalization;
                 $count++;
@@ -553,11 +550,9 @@ function teamwork_cron()
               }
             }
           }
-
-          mtrace(print_r($studentsgrades, true));
         }
       }
-      mtrace(print_r($studentsgrades, true));
+
       //
       /// Insertar calificaciones en el gradebook
       //
@@ -580,6 +575,12 @@ function teamwork_cron()
       
       // Enviamos los datos al gradebook
       $graderesult = grade_update('mod/teamwork', $instance->course, 'mod', 'teamwork', $instance->id, 0, $grades, $params);
+
+      // Actualizamos la bandera que indica que se debe calcular las notas de esta instancia
+      $update = new stdClass;
+      $update->id = $instance->id;
+      $update->doassessment = 0;
+      update_record('teamwork', $update);
       
     } // Final bucle instancias
   } // Final si existen instancias
