@@ -590,7 +590,6 @@ class teamwork_items_form extends moodleform
 
         //marco del formulario
         $mform->addElement('header', 'general', get_string('edititem', 'teamwork'));
-        $mform->setHelpButton('general', array('edititem', get_string('edititem', 'teamwork'), 'teamwork'));
 
         //---> Criterio a evaluar
 
@@ -726,7 +725,6 @@ class teamwork_groups_form extends moodleform
 
         //marco del formulario
         $mform->addElement('header', 'general', get_string('editteam', 'teamwork'));
-        $mform->setHelpButton('general', array('editteam', get_string('editteam', 'teamwork'), 'teamwork'));
 
         //---> Nombre
 
