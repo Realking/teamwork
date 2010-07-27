@@ -81,7 +81,6 @@ class mod_teamwork_mod_form extends moodleform_mod
 		
         //------------------------- evaluación -------------------------
         $mform->addElement('header', 'evaluationweights', get_string('evaluationweights', 'teamwork'));
-        $mform->setHelpButton('evaluationweights', array('evaluationweights', get_string('evaluationweights', 'teamwork'), 'teamwork'));
 
         $selectrange = array(0=>get_string('deactivateeval', 'teamwork')) + (array_combine(range(1, 100), range(1, 100)));
 
