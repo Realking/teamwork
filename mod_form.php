@@ -64,32 +64,32 @@ class mod_teamwork_mod_form extends moodleform_mod
         // Fechas
         $mform->addElement('date_time_selector', 'startsends', get_string('startsends', 'teamwork'), array('optional'=>false));
         $mform->setDefault('startsends', time());
-        $mform->setHelpButton('startsends', array('startsends', get_string('helpstartends', 'teamwork'), 'teamwork'));
+        $mform->setHelpButton('startsends', array('startsends', get_string('startsends', 'teamwork'), 'teamwork'));
 		
         $mform->addElement('date_time_selector', 'endsends', get_string('endsends', 'teamwork'), array('optional'=>false));
         $mform->setDefault('endsends', time()+7*24*3600);
-        $mform->setHelpButton('endsends', array('endsends', get_string('helpendsends', 'teamwork'), 'teamwork'));
+        $mform->setHelpButton('endsends', array('endsends', get_string('endsends', 'teamwork'), 'teamwork'));
 		
         $mform->addElement('date_time_selector', 'startevals', get_string('startevals', 'teamwork'), array('optional'=>false));
         $mform->setDefault('startevals', time()+8*24*3600);
-        $mform->setHelpButton('startevals', array('startevals', get_string('helpstartevals', 'teamwork'), 'teamwork'));
+        $mform->setHelpButton('startevals', array('startevals', get_string('startevals', 'teamwork'), 'teamwork'));
 		
         $mform->addElement('date_time_selector', 'endevals', get_string('endevals', 'teamwork'), array('optional'=>false));
         $mform->setDefault('endevals', time()+14*24*3600);
-        $mform->setHelpButton('endevals', array('endevals', get_string('helpendevals', 'teamwork'), 'teamwork'));
+        $mform->setHelpButton('endevals', array('endevals', get_string('endevals', 'teamwork'), 'teamwork'));
         //-----------------------------------------------------------------
 		
         //------------------------- evaluación -------------------------
         $mform->addElement('header', 'evaluationweights', get_string('evaluationweights', 'teamwork'));
-        $mform->setHelpButton('evaluationweights', array('evaluationweights', get_string('helpevaluationweights', 'teamwork'), 'teamwork'));
+        $mform->setHelpButton('evaluationweights', array('evaluationweights', get_string('evaluationweights', 'teamwork'), 'teamwork'));
 
         $selectrange = array(0=>get_string('deactivateeval', 'teamwork')) + (array_combine(range(1, 100), range(1, 100)));
 
         $mform->addElement('select', 'wgteacher', get_string('wgteacher', 'teamwork'), $selectrange);
-        $mform->setHelpButton('wgteacher', array('wgteacher', get_string('helpwgteacher', 'teamwork'), 'teamwork'));
+        $mform->setHelpButton('wgteacher', array('wgteacher', get_string('wgteacher', 'teamwork'), 'teamwork'));
 
         $mform->addElement('select', 'wgteam', get_string('wgteam', 'teamwork'), $selectrange);
-        $mform->setHelpButton('wgteam', array('wgteam', get_string('helpwgteam', 'teamwork'), 'teamwork'));
+        $mform->setHelpButton('wgteam', array('wgteam', get_string('wgteam', 'teamwork'), 'teamwork'));
 
         $values = array();
         $keys = range(0.01, 1, 0.01);
@@ -101,15 +101,15 @@ class mod_teamwork_mod_form extends moodleform_mod
         $selectrange = array(0=>get_string('deactivateeval', 'teamwork')) + (array_combine($keys, $values));
 
         $mform->addElement('select', 'wgintra', get_string('wgintra', 'teamwork'), $selectrange);
-        $mform->setHelpButton('wgintra', array('wgintra', get_string('helpwgintra', 'teamwork'), 'teamwork'));
+        $mform->setHelpButton('wgintra', array('wgintra', get_string('wgintra', 'teamwork'), 'teamwork'));
 
         $mform->addElement('select', 'wggrading', get_string('wggrading', 'teamwork'), $selectrange);
-        $mform->setHelpButton('wggrading', array('wggrading', get_string('helpwggrading', 'teamwork'), 'teamwork'));
+        $mform->setHelpButton('wggrading', array('wggrading', get_string('wggrading', 'teamwork'), 'teamwork'));
 
         $selectrange = array_combine(range(1, 100), range(1, 100));
 
         $mform->addElement('select', 'maxgrade', get_string('maxgrade', 'teamwork'), $selectrange);
-        $mform->setHelpButton('maxgrade', array('maxgrade', get_string('helpmaxgrade', 'teamwork'), 'teamwork'));
+        $mform->setHelpButton('maxgrade', array('maxgrade', get_string('maxgrade', 'teamwork'), 'teamwork'));
         //--------------------------------------------------------------
 
         //------------------------- otrasopciones -------------------------
@@ -118,10 +118,10 @@ class mod_teamwork_mod_form extends moodleform_mod
         $selectrange = array(0=>get_string('no'), 1=>get_string('yes'));
 
         $mform->addElement('select', 'bgteam', get_string('bgteam', 'teamwork'), $selectrange);
-        $mform->setHelpButton('bgteam', array('bgteam', get_string('helpbgteam', 'teamwork'), 'teamwork'));
+        $mform->setHelpButton('bgteam', array('bgteam', get_string('bgteam', 'teamwork'), 'teamwork'));
 
         $mform->addElement('select', 'bgintra', get_string('bgintra', 'teamwork'), $selectrange);
-        $mform->setHelpButton('bgintra', array('bgintra', get_string('helpbgintra', 'teamwork'), 'teamwork'));
+        $mform->setHelpButton('bgintra', array('bgintra', get_string('bgintra', 'teamwork'), 'teamwork'));
         //-----------------------------------------------------------------
 
         //------------------------- commonmodulesettings -------------------------
