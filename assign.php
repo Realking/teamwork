@@ -48,11 +48,14 @@ if(!$teamwork = get_record('teamwork', 'id', $cm->instance))
 	error('Course module is incorrect');
 }
 
+// Si existe $cm->context lo usamos, si no, lo obtenemos
+$mod_context = (isset($cm->context)) ? $cm->context : get_context_instance(CONTEXT_MODULE, $cm->id);
+
 //es necesario estar logueado en el curso
 require_login($course->id, false, $cm);
 
 //y ademas es necesario que tenga permisos de manager
-require_capability('mod/teamwork:manage', $cm->context);
+require_capability('mod/teamwork:manage', $mod_context);
 
 
 //

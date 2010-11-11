@@ -47,6 +47,9 @@ if(!$teamwork = get_record('teamwork', 'id', $cm->instance))
 //es necesario estar logueado en el curso
 require_login($course->id, false, $cm);
 
+// Si existe $cm->context lo usamos, si no, lo obtenemos
+$mod_context = (isset($cm->context)) ? $cm->context : get_context_instance(CONTEXT_MODULE, $cm->id);
+
 
 //
 /// header
@@ -68,7 +71,7 @@ echo '<div class="clearer"></div><br />';
 //
 
 // Ver si se trata de un profesor o no
-$cap = has_capability('mod/teamwork:manage', $cm->context);
+$cap = has_capability('mod/teamwork:manage', $mod_context);
 
 // Si no es un profesor, nos aseguramos que el alumno puede ver este trabajo (porque lo corrige)
 if( !$cap )

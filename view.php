@@ -46,22 +46,14 @@ if(!$teamwork = get_record('teamwork', 'id', $cm->instance))
 //es necesario estar logueado en el curso
 require_login($course->id, false, $cm);
 
-//$context = get_context_instance(CONTEXT_MODULE, $cm->id);
-//es lo mismo que $context = $cm->context;
-//require_capability('mod/assignment:view', $context);
-
 //añadir al log que se ha visto esta página
 add_to_log($course->id, 'teamwork', 'view', "view.php?id={$cm->id}", $teamwork->id, $cm->id);
 
-//conocer si el usuario posee permisos de gestión (admin, profesor, y profesor-editor)
-$ismanager = has_capability('mod/teamwork:manage', $cm->context);
+// Si existe $cm->context lo usamos, si no, lo obtenemos
+$mod_context = (isset($cm->context)) ? $cm->context : get_context_instance(CONTEXT_MODULE, $cm->id);
 
-//si es manager y no se tiene asociado alguno de los 2 templates de items necesarios...
-/*if($ismanager AND count_records('teamwork_tplinstances', 'teamworkid', $teamwork->id) < 2)
-{
-	//redirigimos a la página de edición de templates
-	//redirect("template.php?id=$cm->id");
-}*/
+//conocer si el usuario posee permisos de gestión (admin, profesor, y profesor-editor)
+$ismanager = has_capability('mod/teamwork:manage', $mod_context);
 
 //popup con la lista de miembros del equipo para la vision del alumno
 $teamcomponents = optional_param('teamcomponents', null);
