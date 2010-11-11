@@ -15,7 +15,7 @@
 $module->version  = 2010051401;
 
 //versión de moodle mínima para instalarse
-$module->requires = 2007101509;
+$module->requires = 2007021599;
 
 //tiempo cada cual debe ser llamada la función de cron del módulo
 $module->cron     = 60;
