@@ -92,7 +92,7 @@ switch($action)
     print_heading(get_string('sentworkslist', 'teamwork'));
 
     // Si hay trabajos enviados
-    if($works = get_records_sql('select * from '.$CFG->prefix.'teamwork_teams as t where t.teamworkid = '.$teamwork->id.' and t.worktime != 0 order by t.teamname'))
+    if($works = get_records_sql('select * from '.$CFG->prefix.'teamwork_teams t where t.teamworkid = '.$teamwork->id.' and t.worktime != 0 order by t.teamname'))
     {
       foreach($works as $work)
       {
@@ -115,7 +115,7 @@ switch($action)
 
     //imprimir opciones inferiores
     echo '<br /><div align="center"><br />';
-    if(count_records_sql('select count(*) from '.$CFG->prefix.'teamwork_teams as t where t.teamworkid = '.$teamwork->id.' and t.worktime != 0 order by t.teamname') == 0)
+    if(count_records_sql('select count(*) from '.$CFG->prefix.'teamwork_teams t where t.teamworkid = '.$teamwork->id.' and t.worktime != 0 order by t.teamname') == 0)
     {
       echo '<img src="images/asterisk.png" alt="'.get_string('symbolicwork', 'teamwork').'" title="'.get_string('symbolicwork', 'teamwork').'"/> <a href="assign.php?id='.$cm->id.'&action=symbolicworks">'.get_string('symbolicwork', 'teamwork').'</a> | ';
     }
@@ -134,7 +134,7 @@ switch($action)
     $team = get_record('teamwork_teams', 'id', $tid);
 
     // Obtenemos la lista de equipos que evaluan al equipo $tid
-    $sql = 'select distinct t.id, t.teamname from '.$CFG->prefix.'teamwork_teams as t, '.$CFG->prefix.'teamwork_evals as e, '.$CFG->prefix.'teamwork_users_teams as u
+    $sql = 'select distinct t.id, t.teamname from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_evals e, '.$CFG->prefix.'teamwork_users_teams u
             where e.teamevaluated = "'.$tid.'" and u.userid = e.evaluator and t.id = u.teamid and t.teamworkid = "'.$teamwork->id.'"';
 
     print_heading(get_string('teamevaluators', 'teamwork', $team->teamname));
@@ -246,7 +246,7 @@ switch($action)
     else
     {
         // Cargar la lista de equipos asignados actualmente para eliminarlos de los disponibles
-        $sql = 'select distinct t.id from '.$CFG->prefix.'teamwork_teams as t, '.$CFG->prefix.'teamwork_evals as e, '.$CFG->prefix.'teamwork_users_teams as u
+        $sql = 'select distinct t.id from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_evals e, '.$CFG->prefix.'teamwork_users_teams u
             where e.teamevaluated = "'.$tid.'" and u.userid = e.evaluator and t.id = u.teamid and t.teamworkid = "'.$teamwork->id.'"';
         $current_teams = get_records_sql($sql);
 
@@ -443,7 +443,7 @@ switch($action)
     else
     {
       // Obtener la lista de trabajos enviados
-      $works = count_records_sql('select count(*) from '.$CFG->prefix.'teamwork_teams as t where t.teamworkid = '.$teamwork->id.' and t.worktime != 0 order by t.teamname');
+      $works = count_records_sql('select count(*) from '.$CFG->prefix.'teamwork_teams t where t.teamworkid = '.$teamwork->id.' and t.worktime != 0 order by t.teamname');
 
       // Para que se puedan crear trabajos simbolicos es necesario que ningún grupo haya subido nada y que esté cerrado el plazo de envio
       if($works == 0 AND $teamwork->endsends < time())

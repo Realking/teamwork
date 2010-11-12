@@ -272,7 +272,7 @@ switch($action)
         $team = get_record('teamwork_teams', 'id', $tid);
 
         //obtener la lista de componentes del grupo
-        if(!$members = get_records_sql('select u.id, u.firstname, u.lastname, u.picture, u.imagealt from '.$CFG->prefix.'user as u, '.$CFG->prefix.'teamwork_users_teams as t where t.teamid = '.$tid.' and u.id = t.userid order by u.lastname asc'))
+        if(!$members = get_records_sql('select u.id, u.firstname, u.lastname, u.picture, u.imagealt from '.$CFG->prefix.'user u, '.$CFG->prefix.'teamwork_users_teams t where t.teamid = '.$tid.' and u.id = t.userid order by u.lastname asc'))
         {
             //no hay grupos definidos
             print_heading(get_string('teammembers', 'teamwork', $team->teamname));
@@ -356,7 +356,7 @@ switch($action)
 
             //obtener una lista de los alumnos del curso que se encuentran asignados a algun grupo, que es lo mismo que
             //obtener la lista de grupos de la actividad y sus alumnos asociados
-            $students_in_groups = get_records_sql('select ut.userid from '.$CFG->prefix.'teamwork_teams as t, '.$CFG->prefix.'teamwork_users_teams as ut
+            $students_in_groups = get_records_sql('select ut.userid from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_users_teams ut
                                                    where t.teamworkid = '.$teamwork->id.' and ut.teamid = t.id');
 
             if( $students_in_groups !== false)
@@ -483,7 +483,7 @@ switch($action)
 
             //obtener una lista de los alumnos del curso que se encuentran asignados a algun grupo, que es lo mismo que
             //obtener la lista de grupos de la actividad y sus alumnos asociados
-            $students_in_groups = get_records_sql('select ut.userid from '.$CFG->prefix.'teamwork_teams as t, '.$CFG->prefix.'teamwork_users_teams as ut
+            $students_in_groups = get_records_sql('select ut.userid from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_users_teams ut
                                                    where t.teamworkid = '.$teamwork->id.' and ut.teamid = t.id');
             
             if( $students_in_groups !== false)

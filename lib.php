@@ -601,7 +601,7 @@ function teamwork_scale_used($teamworkid, $scaleid)
     $return = false;
 
     // Obtenemos los templates instanciados en este teamwork
-    $sql = 'select count(*) from '.$CFG->prefix.'teamwork_tplinstances as tpl, '.$CFG->prefix.'teamwork_items as i
+    $sql = 'select count(*) from '.$CFG->prefix.'teamwork_tplinstances tpl, '.$CFG->prefix.'teamwork_items i
             where tpl.teamworkid = '.$teamworkid.' and i.templateid = tpl.templateid and i.scale = -'.$scaleid;
 
     $rec = count_records_sql($sql);
@@ -626,7 +626,7 @@ function teamwork_scale_used_anywhere($scaleid)
     $return = false;
 
     // Obtenemos los templates instanciados en este teamwork
-    $sql = 'select count(*) from '.$CFG->prefix.'teamwork_tplinstances as tpl, '.$CFG->prefix.'teamwork_items as i
+    $sql = 'select count(*) from '.$CFG->prefix.'teamwork_tplinstances tpl, '.$CFG->prefix.'teamwork_items i
             where i.templateid = tpl.templateid and i.scale = -'.$scaleid;
 
     $rec = count_records_sql($sql);
