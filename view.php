@@ -102,7 +102,7 @@ if($teamcomponents !== null)
 //iniciamos el bufer de salida (es posible que tengamos que modificar las cabeceras http y si imprimimos aqui algo no podremos hacerlo)
 ob_start();
 
-$navigation = build_navigation('', $cm);
+$navigation = (function_exists('build_navigation')) ? build_navigation('', $cm) : teamwork_build_navigation('', $cm); // Compatibilidad con Moodle 1.8.x
 $pagetitle = strip_tags($course->shortname.': '.get_string('modulename', 'teamwork').': '.format_string($teamwork->name,true));
 
 print_header($pagetitle, $course->fullname, $navigation, '', '', true, update_module_button($cm->id, $course->id, get_string('modulename', 'teamwork')), navmenu($course, $cm));
