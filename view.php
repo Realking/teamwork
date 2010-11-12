@@ -49,11 +49,8 @@ require_login($course->id, false, $cm);
 //añadir al log que se ha visto esta página
 add_to_log($course->id, 'teamwork', 'view', "view.php?id={$cm->id}", $teamwork->id, $cm->id);
 
-// Si existe $cm->context lo usamos, si no, lo obtenemos
-$mod_context = (isset($cm->context)) ? $cm->context : get_context_instance(CONTEXT_MODULE, $cm->id);
-
 //conocer si el usuario posee permisos de gestión (admin, profesor, y profesor-editor)
-$ismanager = has_capability('mod/teamwork:manage', $mod_context);
+$ismanager = has_capability('mod/teamwork:manage', $cm->context);
 
 //popup con la lista de miembros del equipo para la vision del alumno
 $teamcomponents = optional_param('teamcomponents', null);
@@ -102,7 +99,7 @@ if($teamcomponents !== null)
 //iniciamos el bufer de salida (es posible que tengamos que modificar las cabeceras http y si imprimimos aqui algo no podremos hacerlo)
 ob_start();
 
-$navigation = (function_exists('build_navigation')) ? build_navigation('', $cm) : teamwork_build_navigation('', $cm); // Compatibilidad con Moodle 1.8.x
+$navigation = build_navigation('', $cm);
 $pagetitle = strip_tags($course->shortname.': '.get_string('modulename', 'teamwork').': '.format_string($teamwork->name,true));
 
 print_header($pagetitle, $course->fullname, $navigation, '', '', true, update_module_button($cm->id, $course->id, get_string('modulename', 'teamwork')), navmenu($course, $cm));

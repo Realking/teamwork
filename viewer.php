@@ -47,9 +47,6 @@ if(!$teamwork = get_record('teamwork', 'id', $cm->instance))
 //es necesario estar logueado en el curso
 require_login($course->id, false, $cm);
 
-// Si existe $cm->context lo usamos, si no, lo obtenemos
-$mod_context = (isset($cm->context)) ? $cm->context : get_context_instance(CONTEXT_MODULE, $cm->id);
-
 
 //
 /// header
