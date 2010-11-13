@@ -68,7 +68,7 @@ echo '<div class="clearer"></div><br />';
 //
 
 // Ver si se trata de un profesor o no
-$cap = has_capability('mod/teamwork:manage', $mod_context);
+$cap = has_capability('mod/teamwork:manage', $cm->context);
 
 // Si no es un profesor, nos aseguramos que el alumno puede ver este trabajo (porque lo corrige)
 if( !$cap )
@@ -132,4 +132,5 @@ else
 //
 
 print_footer($course);
+
 ?>
