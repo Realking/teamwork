@@ -88,7 +88,7 @@
         <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="teamwork_items" REFFIELDS="id" PREVIOUS="evalid"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="teamwork_items" COMMENT="Items de evaluación" PREVIOUS="teamwork_eval_items" NEXT="teamwork_rubrics">
+    <TABLE NAME="teamwork_items" COMMENT="Items de evaluación" PREVIOUS="teamwork_eval_items" NEXT="teamwork_templates">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="templateid"/>
         <FIELD NAME="templateid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id del template al que pertenece este item de evaluación" PREVIOUS="id" NEXT="itemorder"/>
@@ -102,19 +102,7 @@
         <KEY NAME="templateid" TYPE="foreign" FIELDS="templateid" REFTABLE="teamwork_templates" REFFIELDS="id" PREVIOUS="primary"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="teamwork_rubrics" COMMENT="Rubricas" PREVIOUS="teamwork_items" NEXT="teamwork_templates">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="itemid"/>
-        <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id del item al que hace referencia" PREVIOUS="id" NEXT="rubricorder"/>
-        <FIELD NAME="rubricorder" TYPE="int" LENGTH="3" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Orden del elemento de la rubrica" PREVIOUS="itemid" NEXT="description"/>
-        <FIELD NAME="description" TYPE="text" LENGTH="medium" NOTNULL="true" SEQUENCE="false" ENUM="false" COMMENT="Texto de la rubrica en si" PREVIOUS="rubricorder"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" NEXT="itemid"/>
-        <KEY NAME="itemid" TYPE="foreign" FIELDS="itemid" REFTABLE="teamwork_items" REFFIELDS="id" PREVIOUS="primary"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="teamwork_templates" COMMENT="Contiene un modelo de evaluación instanciable a un teamwork en el ámbito de un curso." PREVIOUS="teamwork_rubrics" NEXT="teamwork_tplinstances">
+    <TABLE NAME="teamwork_templates" COMMENT="Contiene un modelo de evaluación instanciable a un teamwork en el ámbito de un curso." PREVIOUS="teamwork_items" NEXT="teamwork_tplinstances">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true" ENUM="false" NEXT="courseid"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false" ENUM="false" COMMENT="Id del curso donde este template ha sido definido y puede ser usado" PREVIOUS="id" NEXT="teamworkid"/>
