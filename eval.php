@@ -103,7 +103,7 @@ if( ! is_null($eval->userevaluated) )
   $usereval = get_record('user', 'id', $eval->userevaluated);
 
   echo '<p align="center">';
-  print_string('youareevaluatingtheuser', 'teamwork', $usereval->firstname.$usereval->lastname);
+  print_string('youareevaluatingtheuser', 'teamwork', $usereval->firstname.' '.$usereval->lastname);
   echo '</p>';
 }
 else
