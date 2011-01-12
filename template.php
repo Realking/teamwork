@@ -364,12 +364,9 @@ switch($section)
                     $struploadafile = get_string("uploadafile");
                     $strmaxsize = get_string('maxsize', '', display_size($course->maxbytes));
                     echo '<div style="text-align:center">';
-                    echo '<form enctype="multipart/form-data" method="post" action="template.php">';
+                    echo '<form enctype="multipart/form-data" method="post" action="template.php?id='.$cm->id.'&section=templates&action=import">';
                     echo '<fieldset class="invisiblefieldset">';
                     echo "<p>$struploadafile ($strmaxsize)</p>";
-                    echo '<input type="hidden" name="id" value="'.$cm->id.'" />';
-                    echo '<input type="hidden" name="section" value="templates" />';
-                    echo '<input type="hidden" name="action" value="import" />';
                     upload_print_form_fragment(1,array('importfile'),false,null,0,0,false);
                     echo '<input type="submit" name="save" value="'.get_string('uploadthisfile').'" />';
                     echo '</fieldset>';
@@ -386,8 +383,8 @@ switch($section)
 
                     //obtener los datos de la plantilla
                     $tpldata = new stdClass;
-                    $tpldata->name = $content['template']['@']['name'] . '(imp)';
-                    $tpldata->description = $content['template']['@']['description'];
+                    $tpldata->name = $content['template']['#']['name'][0]['#'] . '(imp)';
+                    $tpldata->description = $content['template']['#']['description'][0]['#'];
                     $tpldata->courseid = $course->id;
                     $tpldata->teamworkid = $teamwork->id;
 
@@ -402,21 +399,32 @@ switch($section)
 
                     foreach($content['template']['#']['items'][0]['#']['item'] as $item)
                     {
-                        $itemdata->itemorder = $item['@']['order'];
-                        $itemdata->description = $item['@']['description'];
+                        $itemdata->itemorder = $item['#']['order'][0]['#'];
+                        $itemdata->description = $item['#']['description'][0]['#'];
 
                         //comprobar que la escala existe y la tenemos disponible en esta actividad
-                        $status = teamwork_check_scale(abs($item['@']['scale']));
-                        $itemdata->scale = ($item['@']['scale'] >= 0 or $status) ? $item['@']['scale'] : 0;
-                        $scale_error = (!$status) ? true : $scale_error;
+                        if($item['#']['scale'][0]['#'] < 0)
+                        {
+													if( teamwork_check_scale(abs($item['#']['scale'][0]['#'])) )
+													{
+														$itemdata->scale = $item['#']['scale'][0]['#'];
+													}
+													else
+													{
+														$itemdata->scale = 0;
+														$scale_error = true;
+													}
+												}
+												else
+												{
+													$itemdata->scale = $item['#']['scale'][0]['#'];
+												}
                         
-                        $itemdata->weight = $item['@']['weight'];
+                        $itemdata->weight = $item['#']['weight'][0]['#'];
 
                         //insertar el elemento en la base de datos
                         insert_record('teamwork_items', $itemdata);
                     }
-                    
-                    //TODO implementar la importación de las rubricas
 
                     //mostrar mensaje
                     if($scale_error)
