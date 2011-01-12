@@ -478,13 +478,22 @@ switch($section)
                     //para cada item asociado...
                     foreach($itemsdata as $item)
                     {
-                        $xmlitems[] =  array('item', array('order'=>$item->itemorder, 'description'=>$item->description, 'scale'=>$item->scale, 'weight'=>$item->weight), '');
+                        $it = array();
+                        $it[] = array('order', null, $item->itemorder);
+                        $it[] = array('description', null, $item->description);
+                        $it[] = array('scale', null, $item->scale);
+                        $it[] = array('weight', null, $item->weight);
+                        
+                        $xmlitems[] = array('item', null, $it);
                     }
                 }
-
-                $xml = array('template', array('name'=>$tpldata->name, 'description'=>$tpldata->description), array('items', null, $xmlitems));
-
-                //TODO implementar la exportación de rubricas
+                
+                $template_c   = array();
+                $template_c[] = array('name', null, $tpldata->name);
+                $template_c[] = array('description', null, $tpldata->description);
+                $template_c[] = array('items', null, $xmlitems);
+                
+                $xml = array('template', null, $template_c);
 
                 echo teamwork_array2xml($xml);
                 exit();
