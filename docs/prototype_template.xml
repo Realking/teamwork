@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Prototipo de documento xml de importación/exportación de plantillas para el módulo TeamWork de Moodle -->
 
-<template name="" description="">
-    <items>
-        <item order="" description="" scale="" weight="" />
-    </items>
+<template>
+	<name></name>
+	<description></description>
+  <items>
+		<item>
+			<order></order>
+			<description></description>
+			<scale></scale>
+			<weight></weight>
+		</item>
+  </items>
 </template>
