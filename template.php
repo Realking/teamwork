@@ -461,8 +461,8 @@ switch($section)
                 //obtener los datos del template
                 $tpldata = get_record('teamwork_templates', 'id', $tplid);
 
-                //verificar que la plantilla que intentamos exportar sea de esta actividad
-                if($tpldata->teamworkid != $teamwork->id)
+                //verificar que la plantilla que intentamos exportar sea de este curso
+                if($tpldata->courseid != $course->id)
                 {
                     print_error('youdonthavepermissiontoexportthistemplate','teamwork');
                 }
