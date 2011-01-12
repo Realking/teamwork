@@ -329,7 +329,7 @@ function teamwork_cron()
               $sum += pow($r->grade - $mean, 2);
             }
 
-            $desviation = sqrt($sum / (count($result)-1));
+            $desviation = (count($result) < 2) ? 0 : (sqrt($sum / (count($result)-1)));
             $teamsdesviation[$team->id] = $desviation;
 
             // Si hay que eliminar los extremos...
@@ -420,7 +420,7 @@ function teamwork_cron()
                 $sum += pow($r->grade - $mean, 2);
               }
 
-              $desviation = sqrt($sum / (count($result)-1));
+              $desviation = (count($result) < 2) ? 0 : (sqrt($sum / (count($result)-1)));
               $intradesviation[$student] = $desviation;
 
               // Si hay que eliminar los extremos...
