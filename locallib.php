@@ -485,14 +485,14 @@ function teamwork_array2xml_extract($array, $depth)
     //si el contenido es otro array es que hay sublementos, obtener contenido
     if(is_array($content))
     {
-        $xml .= "\n" . teamwork_array2xml($content, $depth + 1);
+        $xml .= "\n" . teamwork_array2xml($content, $depth + 1) . str_repeat("\t", $depth);
     }
     else
     {
-        $xml .= htmlentities($content);
+        $xml .= $content;
     }
 
-    $xml .= str_repeat("\t", $depth) . '</'.$name.">\n";
+    $xml .= '</'.$name.">\n";
 
     return $xml;
 }
