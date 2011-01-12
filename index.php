@@ -148,7 +148,8 @@ foreach($modinfo->instances['teamwork'] as $cm)
         $due = '-';
     }
 
-    $grade = '-';
+    $grade = teamwork_check_student_evaluated();
+    $grade = ($grade) ? round($grade['grade'], 2).' / '.round($grade['grademax'], 2) : '-';
 
     if ($course->format == "weeks" or $course->format == "topics")
     {
