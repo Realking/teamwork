@@ -480,7 +480,7 @@ switch($section)
                     {
                         $it = array();
                         $it[] = array('order', null, $item->itemorder);
-                        $it[] = array('description', null, $item->description);
+                        $it[] = array('description', null, '<![CDATA['.$item->description.']]>');
                         $it[] = array('scale', null, $item->scale);
                         $it[] = array('weight', null, $item->weight);
                         
@@ -489,8 +489,8 @@ switch($section)
                 }
                 
                 $template_c   = array();
-                $template_c[] = array('name', null, $tpldata->name);
-                $template_c[] = array('description', null, $tpldata->description);
+                $template_c[] = array('name', null, '<![CDATA['.$tpldata->name.']]>');
+                $template_c[] = array('description', null, '<![CDATA['.$tpldata->description.']]>');
                 $template_c[] = array('items', null, $xmlitems);
                 
                 $xml = array('template', null, $template_c);
