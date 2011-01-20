@@ -1,0 +1,12 @@
+Mejoras al teamwork para futuras versiones
+==========================================
+
+* Implementar el filtro de grupos que define moodle a la hora de realizar las asignaciones. 
+De esta forma se evita que aparezcan alumnos que no pertenecen al grupo seleccionado.
+
+* Permitir a los alumnos crear sus propios equipos y el autoasignarse a ellos.
+
+* Permitir al profesor ver en todo momento si los alumnos están subiendo trabajos, aunque no 
+se haya llegado a la fecha de finalización de envíos.
+
+* Permitir a los alumnos seleccionar qué trabajos quiere corregir de los disponibles.
