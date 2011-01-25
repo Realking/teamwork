@@ -278,7 +278,7 @@ if($team !== false)
                 require_once($CFG->dirroot.'/lib/uploadlib.php');
                 $um = new upload_manager('attachedfile', true, false, null, false, 0, false, true, true);
                 $um->process_file_uploads($filepath);
-
+                
                 // Permitir a los profesores del curso evaluar a este equipo si esta activa esa opcion
                 if($teamwork->wgteacher)
                 {
@@ -290,8 +290,13 @@ if($team !== false)
 
                   foreach($teachers as $teacher)
                   {
-                    $insert->evaluator = $teacher->id;
-                    insert_record('teamwork_evals', $insert);
+			// Solamente se añaden los profesores si estos no han sido añadido antes
+			// Comprobamos que este profesor no tenga ya una evaluación asignada
+			if ( ! count_records('teamwork_evals', 'teamworkid', $teamwork->id, 'teamevaluated', $team->id, 'evaluator', $teacher->id) )
+			{
+				$insert->evaluator = $teacher->id;
+				insert_record('teamwork_evals', $insert);
+			}
                   }
                 }
 
