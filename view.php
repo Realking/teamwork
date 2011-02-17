@@ -124,7 +124,7 @@ if($teamwork->startevals < time() AND $teamwork->endevals > time() AND ($team !=
 { 
   // Obtenemos la lista de trabajos pendientes de evaluar
   $works = get_records_sql('select t.id, t.teamname, e.id eid from '.$CFG->prefix.'teamwork_teams t, '.$CFG->prefix.'teamwork_evals e
-                            where e.timegraded IS NULL and e.evaluator = '.$USER->id.' and e.teamevaluated IS NOT NULL and t.id = e.teamevaluated and e.teamworkid = '.$teamwork->id);
+                            where e.timegraded IS NULL and e.evaluator = '.$USER->id.' and e.teamevaluated IS NOT NULL and t.id = e.teamevaluated and e.teamworkid = '.$teamwork->id.' ORDER BY t.teamname ASC');
 
   // Si hay resultados...
   if( !empty($works))
