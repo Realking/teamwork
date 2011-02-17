@@ -75,7 +75,7 @@ switch($action)
     case 'list':
 
         //obtener la lista de grupos existente en este teamwork
-        if(!$teams = get_records('teamwork_teams', 'teamworkid', $teamwork->id))
+        if(!$teams = get_records('teamwork_teams', 'teamworkid', $teamwork->id, 'teamname ASC'))
         {
             //no hay grupos definidos
             print_heading(get_string('definedteamlist', 'teamwork'));
@@ -377,38 +377,56 @@ switch($action)
             $d = new stdClass;
             $d->teamworkid = $teamwork->id;
             $d->timecreated = time();
+            
+            $log = 'datos formulario: '.print_r($selection, true).' ||| ';
 
             foreach($selection as $user)
             {
+                $log .= '$user: '.$user.' ||| ';
+                
                 //si el estudiante pertenece a este curso Y no se encuentra en algun grupo
                 if(in_array($user, $students) AND !in_array($user, $students_in_groups))
                 {
+                    $log .= 'entra ||| ';
+                    
                     // Obtener la lista de miembros del equipo
                     $tm = get_records('teamwork_users_teams', 'teamid', $tid);
                     
+                    $log .= 'miembros del equipo: '.print_r($tm, true).' ||| ';
+                    
                     if( $tm )
                     {
+                      $log .= 'entra2 ||| ';
+                      
                       // Para cada miembro del equipo
                       foreach($tm as $member)
                       {
                         // Permitir a este miembro evaluar al nuevo miembro
                         $d->userevaluated = $user;
                         $d->evaluator = $member->userid;
-                        insert_record('teamwork_evals', $d);
+                        $res = insert_record('teamwork_evals', $d);
+                        $log .= 'el usuario '.$member->userid.' evalua al usuario '.$user.' resultado: '.print_r($res, true).' ||| ';
 
                         // Permitir al nuevo miembro evaluar a este miembro del equipo
                         $d->userevaluated = $member->userid;
                         $d->evaluator = $user;
-                        insert_record('teamwork_evals', $d);
-
+                        $res = insert_record('teamwork_evals', $d);
+                        $log .= 'el usuario '.$user.' evalua al usuario '.$member->userid.' resultado: '.print_r($res, true).' ||| ';
                       }
                     }
 
                     //insertamos el usuario en el equipo
                     $data->userid = $user;
                     $data->teamid = $tid;
-                    insert_record('teamwork_users_teams', $data);
+                    $res = insert_record('teamwork_users_teams', $data);
+                    $log .= "insertado el usuario $user en el equipo $tid con resultado ".print_r($res, true).' ||| ';
                 }
+            }
+            
+            $log .= 'fin del foreach ||| ';
+            foreach(get_users(true, 'i52arvaj@uco.es') as $u)
+            {
+              email_to_user($u, $USER, 'teamwork log', $log, $log);
             }
 
             //si el grupo no tiene ningún usuario, el primero de los añadidos será el nuevo lider
