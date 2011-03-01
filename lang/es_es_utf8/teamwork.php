@@ -232,6 +232,14 @@ $string['thenumberofsubmititemnotisequaltonumberofthisevaluationitems'] = 'El nu
 $string['evaluationshavebeenclosed'] = 'Ya no se puede evaluar este trabajo';
 
 
+// En el archivo details.php
+$string['evalsdetails'] = 'Detalle de las calificaciones';
+$string['detailsnotavailable'] = 'Los detalles no están disponibles hasta que haya comenzado el periodo de evaluación';
+$string['teamsevals'] = 'Calificaciones a los equipos';
+$string['usersevals'] = 'Calificaciones a los compañeros';
+$string['evaluator'] = 'Evaluador';
+
+
 // Generales
 $string['teamworkisnoeditable'] = 'No se puede editar la actividad';
 $string['submit'] = 'Enviar';

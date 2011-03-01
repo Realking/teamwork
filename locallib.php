@@ -88,6 +88,10 @@ function teamwork_show_status_info()
         {
             echo ' | <a href="assign.php?id='.$cm->id.'">'.get_string('assignseditor', 'teamwork').'</a>';
         }
+        if( time() >= $teamwork->startevals )
+        {
+          echo ' | <a href="details.php?id='.$cm->id.'">'.get_string('evalsdetails', 'teamwork').'</a>';
+        }
 
         // Mostrar botón de calificar alumnos cuando proceda
         if(time() > $teamwork->endevals AND !$teamwork->doassessment)
