@@ -88,6 +88,8 @@ if(! $evals = get_records_sql($sql) )
 }
 else
 {
+	$max_cols = 10;
+	
 	$table = new stdClass;
 	$table->width = '95%';
 	$table->tablealign = 'center';
@@ -99,13 +101,22 @@ else
 		print_error('notexistanyteam', 'teamwork');
 	}
 	
-	$table->head = array(get_string('evaluator', 'teamwork'));
-	$table->align = array('center');
+	for( $i=0; $i <= floor(count($teams)/$max_cols); $i++ )
+	{
+		$tables[$i]->head  = array(get_string('evaluator', 'teamwork'));
+		$tables[$i]->align = array('center');
+	}
+	
+	$j = 0;
 	
 	foreach($teams as $team)
 	{
-		$table->head[] = $team->teamname;
-		$table->align[] = 'center';
+		$t = floor($j/$max_cols);
+		
+		$tables[$t]->head[] = $team->teamname;
+		$tables[$t]->align[] = 'center';
+		
+		$j++;
 	}
 
 	$evaluations_s = array();
@@ -129,47 +140,78 @@ else
 	// Evaluaciones de los profesores
 	foreach($evaluations_t as $k => $v)
 	{
-		$data = array('<span class="redfont">'.$k.'</span>');
+		for( $i=0; $i <= floor(count($teams)/$max_cols); $i++ )
+		{
+			$data[$i] = array('<span class="redfont">'.$k.'</span>');
+		}
+		
+		$j = 0;
 		
 		foreach($teams as $team)
 		{
+			$t = floor($j/$max_cols);
+			
 			if(isset($v[$team->id]))
 			{
-				$data[] = '<span class="redfont">'.$v[$team->id].'</span>';
+				$data[$t][] = '<span class="redfont">'.$v[$team->id].'</span>';
 			}
 			else
 			{
-				$data[] = '<span class="redfont">-</span>';
+				$data[$t][] = '<span class="redfont">-</span>';
 			}
+			
+			$j++;
 		}
 		
-		$table->data[] = $data;
+		for($i = 0; $i < count($data); $i++)
+		{
+			$tables[$i]->data[] = $data[$i];
+		}
 	}
 	
-	$table->data[] = 'hr';
+	for( $i=0; $i <= floor(count($teams)/$max_cols); $i++ )
+	{
+		$tables[$i]->data[] = 'hr';
+	}
 	
 	// Evaluaciones de los alumnos
 	foreach($evaluations_s as $k => $v)
 	{
-		$data = array($k);
+		for( $i=0; $i <= floor(count($teams)/$max_cols); $i++ )
+		{
+			$data[$i] = array($k);
+		}
+		
+		$j = 0;
 		
 		foreach($teams as $team)
 		{
+			$t = floor($j/$max_cols);
+			
 			if(isset($v[$team->id]))
 			{
-				$data[] = $v[$team->id];
+				$data[$t][] = $v[$team->id];
 			}
 			else
 			{
-				$data[] = '-';
+				$data[$t][] = '-';
 			}
+			
+			$j++;
 		}
 		
-		$table->data[] = $data;
+		for($i = 0; $i < count($data); $i++)
+		{
+			$tables[$i]->data[] = $data[$i];
+		}
 	}
 
-	// Imprimir la tabla
-	print_table($table);
+	// Imprimir las tablas
+	foreach( $tables as $table )
+	{
+		print_table($table);
+		echo '<br />';
+	}
 }
 
 
