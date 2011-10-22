@@ -10,3 +10,21 @@ De esta forma se evita que aparezcan alumnos que no pertenecen al grupo seleccio
 se haya llegado a la fecha de finalización de envíos.
 
 * Permitir a los alumnos seleccionar qué trabajos quiere corregir de los disponibles.
+
+* Añadir las acciones que realiza el usuario al Log.
+
+* Implementar las funciones para crear un backup de las instancias del módulo y su posterior carga.
+
+* Permitir la edición de las calificaciones mientras se esté en el plazo de evaluación.
+
+* Importación/exportación de plantillas en formato JSON
+
+* Resumen de calificaciones en las que el profesor puede ver cómo se ha obtenido la nota para un
+determinado alumno calificado. Exportación a CVS.
+
+* Exportar todos los datos de las calificaciones con fines estadísticos.
+
+* Al importar/exportar hacer también lo propio con las escalas definidas por el profesor a nivel
+local.
+
+* El profesor no tiene fecha límite para evaluar.
